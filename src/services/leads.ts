@@ -1,8 +1,7 @@
 import { callApi } from "@/utils/apiUtils";
 import leadsEndpoints from "@/utils/apiUtils/endpoints/leads";
 import { ApiEndpoint } from "@/types/api";
-import type { Lead, LeadSource } from "@/types/models-leads";
-import type { LeadStatus } from "@/types/models-leads";
+import type { Lead, LeadSource, LeadStatus } from "@/types/models";
 
 export async function fetchLeadsService(status?: string): Promise<{ leads: Lead[] }> {
   return callApi({

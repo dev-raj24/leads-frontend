@@ -1,5 +1,6 @@
 "use client";
 
+import { use } from "react";
 import Link from "next/link";
 import { IconGlobe, IconRobot, IconWhatsapp, IconArrowRight } from "@/components/icons";
 import { ApiError } from "@/utils/apiUtils";
@@ -7,8 +8,9 @@ import { useLead } from "@/hooks/leads/query";
 import { useUpdateLeadStatus } from "@/hooks/leads/mutation";
 import { timeAgo, statusLabel, sourceLabel, maskContact } from "@/lib/format";
 
-export default function LeadDetailPage({ params }: { params: { id: string } }) {
-  const { data, isLoading: loading, error: queryError } = useLead(params.id);
+export default function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const { data, isLoading: loading, error: queryError } = useLead(id);
   const lead = data?.lead ?? null;
   const updateStatusMutation = useUpdateLeadStatus();
 

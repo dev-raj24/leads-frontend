@@ -1,6 +1,9 @@
 // types/models.ts — domain types shared across services, hooks, and pages.
 // Mirrors the shapes returned by leadworks-api.
 
+export type LeadSource = "form" | "chat_widget" | "whatsapp" | "missed_call";
+export type LeadStatus = "new" | "replied" | "closed" | "won" | "lost";
+
 export interface Lead {
   id: string;
   tenantId: string;
@@ -8,8 +11,8 @@ export interface Lead {
   name: string | null;
   contact: string;
   message: string | null;
-  source: "form" | "chat_widget" | "whatsapp" | "missed_call";
-  status: "new" | "replied" | "closed" | "won" | "lost";
+  source: LeadSource;
+  status: LeadStatus;
   score: number;
   customFields?: Record<string, unknown>;
   createdAt: string;

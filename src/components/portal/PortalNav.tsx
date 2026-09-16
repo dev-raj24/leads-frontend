@@ -1,10 +1,12 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { IconHome, IconUsers, IconChat, IconTag, IconRefresh, IconSettings, IconBlog } from "@/components/icons";
 import { clearToken, isLoggedIn } from "@/lib/session";
+import { fetchLeadsService } from "@/services/leads";
 import { useLeads } from "@/hooks/leads/query";
 
 const items = [
@@ -25,7 +27,7 @@ export function PortalNav() {
   useEffect(() => {
     // Only run if we have a token to avoid unnecessary 401s
     if (typeof window !== "undefined" && window.localStorage.getItem("lw_token")) {
-      fetchLeads()
+      fetchLeadsService()
         .then(res => setLeadsCount(res.leads.length))
         .catch(() => {});
     }

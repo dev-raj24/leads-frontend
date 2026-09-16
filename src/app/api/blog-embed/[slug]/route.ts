@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4001";
 
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ slug: string }> }) {
+  const { slug } = await props.params;
   const { searchParams } = new URL(req.url);
   const siteKey = searchParams.get("siteKey");
 
@@ -16,7 +17,7 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
   let upstream: Response;
   try {
     upstream = await fetch(
-      `${API_URL}/api/public/blog/${encodeURIComponent(params.slug)}?siteKey=${encodeURIComponent(siteKey)}`
+      `${API_URL}/api/public/blog/${encodeURIComponent(slug)}?siteKey=${encodeURIComponent(siteKey)}`
     );
   } catch {
     const res = NextResponse.json({ error: "backend_unreachable" }, { status: 502 });
