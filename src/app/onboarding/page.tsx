@@ -2,77 +2,70 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Logo } from "@/components/Logo";
+import Link from "next/link";
+import { AuthShell } from "@/components/AuthShell";
+import { useSignup } from "@/hooks/auth/mutation";
+import { authErrorMessage } from "@/lib/errors";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const signup = useSignup();
   const [businessName, setBusinessName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [servicesInfo, setServicesInfo] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      router.push("/dashboard");
-    }, 600);
-  };
+    signup.mutate(
+      { businessName, email, password, servicesInfo: servicesInfo.trim() || undefined },
+      { onSuccess: () => router.push("/dashboard") }
+    );
+  }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, background: "#f8fafc" }}>
-      <div style={{ background: "white", padding: 32, borderRadius: 16, border: "1px solid #e2e8f0", width: "100%", maxWidth: 440, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}>
-        <div style={{ marginBottom: 24, textAlign: "center" }}>
-          <Logo size={28} />
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginTop: 16 }}>Set up your workspace</h2>
-          <p style={{ fontSize: 14, color: "#64748b", marginTop: 4 }}>Tell us a bit about your business to get started.</p>
-        </div>
+    <AuthShell>
+        <h2>
+          Set up your <em>workspace.</em>
+        </h2>
+        <div className="auth-sub">Two minutes, no card. Your AI learns your business from this.</div>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Business Name</label>
-            <input
-              type="text"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-              placeholder="e.g. Acme Clinic"
-              required
-              style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #cbd5e1" }}
+        <form onSubmit={handleSubmit}>
+          <div className="field">
+            <label className="flabel" htmlFor="business">Business name</label>
+            <input id="business" className="finput" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. Sharma Dental Clinic" required />
+          </div>
+          <div className="field">
+            <label className="flabel" htmlFor="email">Work email</label>
+            <input id="email" className="finput" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbusiness.in" required />
+          </div>
+          <div className="field">
+            <label className="flabel" htmlFor="password">Password</label>
+            <input id="password" className="finput" type="password" autoComplete="new-password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" required />
+          </div>
+          <div className="field">
+            <label className="flabel" htmlFor="services">What do you offer? <span style={{ color: "var(--faint)", fontWeight: 500 }}>(optional)</span></label>
+            <textarea
+              id="services"
+              className="finput"
+              rows={3}
+              value={servicesInfo}
+              onChange={(e) => setServicesInfo(e.target.value)}
+              placeholder="Services, prices, timings — the AI uses this to reply to your leads."
+              style={{ resize: "vertical" }}
             />
           </div>
 
-          <div>
-            <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 6 }}>WhatsApp / Contact Number</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="+91 98765 43210"
-              required
-              style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #cbd5e1" }}
-            />
-          </div>
+          {signup.isError && <div className="auth-err">{authErrorMessage(signup.error)}</div>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: "#155EEF",
-              color: "white",
-              border: "none",
-              borderRadius: 8,
-              fontWeight: 600,
-              cursor: "pointer",
-              marginTop: 8,
-              opacity: loading ? 0.7 : 1,
-            }}
-          >
-            {loading ? "Setting things up…" : "Continue →"}
+          <button type="submit" disabled={signup.isPending} className="big" style={{ width: "100%", opacity: signup.isPending ? 0.7 : 1 }}>
+            {signup.isPending ? "Setting things up…" : "Create my workspace →"}
           </button>
         </form>
-      </div>
-    </div>
+
+        <div className="auth-alt">
+          Already have an account? <Link href="/login">Log in</Link>
+        </div>
+    </AuthShell>
   );
 }

@@ -1,12 +1,12 @@
 (function () {
   const scripts = document.getElementsByTagName('script');
   let siteKey = null;
-  let scriptUrl = null;
+  let apiBase = null;
   let currentScript = null;
   for (let i = 0; i < scripts.length; i++) {
     if (scripts[i].getAttribute('data-site-key') && scripts[i].src.indexOf('blog.js') !== -1) {
       siteKey = scripts[i].getAttribute('data-site-key');
-      scriptUrl = scripts[i].src;
+      apiBase = (scripts[i].getAttribute('data-api') || '').replace(/\/+$/, '');
       currentScript = scripts[i];
       break;
     }
@@ -17,7 +17,10 @@
     return;
   }
 
-  const srcHost = new URL(scriptUrl).origin;
+  if (!apiBase) {
+    console.error('Leadworks Blog: Missing data-api attribute on script tag.');
+    return;
+  }
 
   const style = document.createElement('style');
   style.innerHTML = `
@@ -95,7 +98,7 @@
   async function loadList() {
     root.innerHTML = '<div class="lw-blog-empty">Loading posts…</div>';
     try {
-      const res = await fetch(srcHost + '/api/blog-embed?siteKey=' + encodeURIComponent(siteKey));
+      const res = await fetch(apiBase + '/api/public/blog?siteKey=' + encodeURIComponent(siteKey));
       const data = await res.json();
       renderList(data.posts || []);
     } catch (e) {
@@ -106,7 +109,7 @@
   async function openPost(slug) {
     root.innerHTML = '<div class="lw-blog-empty">Loading…</div>';
     try {
-      const res = await fetch(srcHost + '/api/blog-embed/' + encodeURIComponent(slug) + '?siteKey=' + encodeURIComponent(siteKey));
+      const res = await fetch(apiBase + '/api/public/blog/' + encodeURIComponent(slug) + '?siteKey=' + encodeURIComponent(siteKey));
       const data = await res.json();
       if (data.post) renderPost(data.post);
       else root.innerHTML = '<div class="lw-blog-empty">Post not found.</div>';

@@ -8,7 +8,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isLoggedIn } from "@/lib/api";
+import { isLoggedIn } from "@/lib/session";
 
 export function PortalGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();

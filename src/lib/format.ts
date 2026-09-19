@@ -44,3 +44,15 @@ export function maskContact(contact: string): string {
   if (digits.length < 6) return contact;
   return `${digits.slice(0, 4)}••• •${digits.slice(-3)}`;
 }
+
+export function initials(nameOrContact: string | null | undefined): string {
+  const s = (nameOrContact ?? "").trim();
+  if (!s) return "?";
+  const parts = s.split(/[\s@.]+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[1][0] : "")).toUpperCase() || "?";
+}
+
+export function greeting(date = new Date()): string {
+  const h = date.getHours();
+  return h < 5 ? "Working late" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+}

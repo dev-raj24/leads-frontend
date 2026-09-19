@@ -1,153 +1,115 @@
 "use client";
 
-import { useState, KeyboardEvent, useRef, useEffect } from "react";
-import { IconSparkle, IconSend } from "@/components/icons";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { IconClose, IconSend, IconSparkle } from "@/components/icons";
+import { useSendChat } from "@/hooks/chat/mutation";
+import type { ChatTurn } from "@/services/chat";
 
-type Message = {
+interface Message {
   id: number;
-  role: "user" | "assistant" | "summary";
-  content: React.ReactNode;
-};
+  role: "user" | "assistant";
+  content: string;
+}
 
-// console.log
+const SUGGESTIONS = ["Show pending leads", "Who should I call first?", "Draft a follow-up"];
 
-const initialMessages: Message[] = [];
-
-export function AiPanel() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+/** Slide-over AI co-pilot. */
+export function AiPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-
+  const sendChat = useSendChat();
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (endRef.current) {
-      endRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages, isTyping]);
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, sendChat.isPending]);
 
-  const handleSend = () => {
-    if (!input.trim() || isTyping) return;
+  useEffect(() => {
+    if (!open) return;
+    inputRef.current?.focus();
+    const onKey = (e: globalThis.KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
-    const userMessage: Message = {
-      id: Date.now(),
-      role: "user",
-      content: input.trim(),
-    };
+  async function send(text: string) {
+    const content = text.trim();
+    if (!content || sendChat.isPending) return;
 
-    setMessages((prev) => [...prev, userMessage]);
+    const history: ChatTurn[] = [...messages.map(({ role, content }) => ({ role, content })), { role: "user", content }];
+    setMessages((prev) => [...prev, { id: Date.now(), role: "user", content }]);
     setInput("");
-    setIsTyping(true);
 
-    setTimeout(async () => {
-      try {
-        const response = await fetch("http://localhost:4001/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: [
-              ...messages.map((m) => ({
-                role: m.role === "assistant" || m.role === "summary" ? "assistant" : "user",
-                content: typeof m.content === "string" ? m.content : "Data from UI",
-              })),
-              { role: "user", content: input.trim() }
-            ]
-          }),
-        });
+    try {
+      const { reply } = await sendChat.mutateAsync(history);
+      setMessages((prev) => [...prev, { id: Date.now() + 1, role: "assistant", content: reply }]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now() + 1, role: "assistant", content: "Sorry, I'm having trouble connecting right now." },
+      ]);
+    }
+  }
 
-        const data = await response.json();
-
-        if (response.ok && data.reply) {
-          const assistantMessage: Message = {
-            id: Date.now() + 1,
-            role: "assistant",
-            content: data.reply,
-          };
-          setMessages((prev) => [...prev, assistantMessage]);
-        } else {
-          throw new Error(data.error || "Failed to fetch response");
-        }
-      } catch (error) {
-        console.error("Chat Error:", error);
-        const errorMessage: Message = {
-          id: Date.now() + 1,
-          role: "assistant",
-          content: "Sorry, I'm having trouble connecting right now.",
-        };
-        setMessages((prev) => [...prev, errorMessage]);
-      } finally {
-        setIsTyping(false);
-      }
-    }, 50);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      handleSend();
+      send(input);
     }
-  };
-
-  const handleSuggestionClick = (text: string) => {
-    setInput(text);
   };
 
   return (
-    <aside className="p-ai" style={{ overflow: "hidden" }}>
-      <div className="p-ait">
-        <IconSparkle size={17} />
-        AI assistant
-        <span className="serif" style={{ fontSize: 12, color: "#98A2B3", marginLeft: "auto" }}>
-          your co-pilot
-        </span>
-      </div>
-
-      <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 14, paddingBottom: 8, paddingRight: 4 }}>
-        {messages.map((m) => {
-          if (m.role === "summary") {
-            return (
-              <div key={m.id} className="p-sum">
-                {m.content}
-              </div>
-            );
-          }
-          if (m.role === "user") {
-            return (
-              <div key={m.id} className="p-bub p-q" style={{ marginLeft: "auto", maxWidth: "88%" }}>
-                {m.content}
-              </div>
-            );
-          }
-          return (
-            <div key={m.id} className="p-bub p-a" style={{ maxWidth: "88%" }}>
-              {m.content}
-            </div>
-          );
-        })}
-        {isTyping && (
-          <div className="p-bub p-a" style={{ maxWidth: "88%" }}>
-            <span style={{ opacity: 0.5 }}>Typing...</span>
+    <>
+      <div className={`drawer-bg ${open ? "open" : ""}`} onClick={onClose} />
+      <aside className={`drawer ${open ? "open" : ""}`} aria-hidden={!open} aria-label="AI assistant">
+        <div className="drawer-h">
+          <span className="av"><IconSparkle size={16} /></span>
+          <div>
+            <strong>AI assistant</strong>
+            <small>Your leads co-pilot</small>
           </div>
-        )}
-        <div ref={endRef} />
-      </div>
+          <button className="iconbtn" onClick={onClose} aria-label="Close"><IconClose size={16} /></button>
+        </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 7, flexShrink: 0 }}>
-        <span className="p-sg" onClick={() => handleSuggestionClick("Show pending leads")}>Show pending leads</span>
-        <span className="p-sg" onClick={() => handleSuggestionClick("This month's report")}>This month&apos;s report</span>
-      </div>
+        <div className="drawer-body">
+          {messages.length === 0 && !sendChat.isPending && (
+            <div className="drawer-empty">
+              <h4>Ask me <em style={{ color: "var(--primary)" }}>anything.</em></h4>
+              <p>I can summarise your leads, draft replies and tell you who to call first.</p>
+            </div>
+          )}
+          {messages.map((m) => (
+            <div key={m.id} className={`bub ${m.role === "user" ? "user" : "bot"}`}>{m.content}</div>
+          ))}
+          {sendChat.isPending && (
+            <div className="bub bot"><span className="typing"><i /><i /><i /></span></div>
+          )}
+          <div ref={endRef} />
+        </div>
 
-      <div className="p-inp" style={{ flexShrink: 0 }}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask about your leads…"
-          style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "var(--ink)", fontSize: "inherit", fontFamily: "inherit" }}
-        />
-        <IconSend size={16} onClick={handleSend} style={{ cursor: "pointer", flexShrink: 0 }} />
-      </div>
-    </aside>
+        <div className="drawer-foot">
+          {messages.length === 0 && (
+            <div className="chips">
+              {SUGGESTIONS.map((s) => (
+                <button key={s} className="chip" onClick={() => send(s)}>{s}</button>
+              ))}
+            </div>
+          )}
+          <div className="composer">
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder="Ask about your leads…"
+            />
+            <button onClick={() => send(input)} disabled={!input.trim() || sendChat.isPending} aria-label="Send">
+              <IconSend size={16} />
+            </button>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }

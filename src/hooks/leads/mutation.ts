@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateLeadStatusService, bulkCreateLeadsService } from "@/services/leads";
-import type { Lead } from "@/types/models";
+import type { Lead, LeadImportRow } from "@/types/models";
 
 export const useUpdateLeadStatus = () => {
   const queryClient = useQueryClient();
@@ -17,7 +17,7 @@ export const useUpdateLeadStatus = () => {
 export const useBulkCreateLeads = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (leads: any[]) => bulkCreateLeadsService(leads),
+    mutationFn: (leads: LeadImportRow["data"][]) => bulkCreateLeadsService(leads),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leads"] });
     },

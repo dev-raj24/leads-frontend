@@ -3,9 +3,12 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconSparkle } from "@/components/icons";
-import { Button } from "@/components/Button";
+import Link from "next/link";
+import { PageHead } from "@/components/portal/PageHead";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useBlogPost } from "@/hooks/blog/query";
 import { useGenerateBlogDraft, useCreateBlogPost, useUpdateBlogPost } from "@/hooks/blog/mutation";
+import { Button } from "@/components/ui/Button";
 
 function BlogFormContent() {
   const router = useRouter();
@@ -79,140 +82,57 @@ function BlogFormContent() {
   const saving = createMutation.isPending || updateMutation.isPending;
 
   if (editId && loadingExisting) {
-    return <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#98A2B3" }}>Loading…</div>;
+    return <div className="pnl pad"><Skeleton width="40%" height={24} /></div>;
   }
 
   return (
     <>
-      <div style={{ marginBottom: 16 }}>
-        <Button href="/blog" variant="outline">
-          ← Back to Blog
-        </Button>
-      </div>
-
-      <div className="p-mh">
-        <span className="p-mt">
-          {editId ? "Edit Post" : "Write with AI"}
-          <em>{editId ? "update this post" : "type a topic, AI drafts it"}</em>
-        </span>
-      </div>
+      <Link href="/blog" className="back">← All posts</Link>
+      <PageHead
+        eyebrow={editId ? "Editing" : "New post"}
+        title={editId ? "Edit post" : <>Write with <em>AI</em></>}
+        sub={editId ? "Update this post and publish the changes." : "Type a topic and AI drafts the whole post for you."}
+      />
 
       {!hasDraft && (
-        <div className="p-card" style={{ padding: 24, marginBottom: 20 }}>
-          <form onSubmit={handleGenerate}>
-            <label style={{ display: "block", fontSize: 12, marginBottom: 6, fontWeight: 700 }}>
-              What should this post be about?
-            </label>
-            <input
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="e.g. How to care for your teeth after a root canal"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                border: "1.5px solid var(--ink)",
-                borderRadius: 8,
-                fontSize: 13,
-                marginBottom: 14,
-              }}
-            />
-            {error && (
-              <div style={{ color: "#D92D20", fontSize: 12.5, fontWeight: 700, marginBottom: 10 }}>{error}</div>
-            )}
-            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <Button type="submit" disabled={generateMutation.isPending || !topic.trim()} icon={<IconSparkle size={14} />}>
-                {generateMutation.isPending ? "Writing…" : "Generate with AI"}
-              </Button>
-              <span
-                style={{ fontSize: 12, color: "#98A2B3", cursor: "pointer", fontWeight: 700 }}
-                onClick={() => {
-                  setTitle(topic || "Untitled post");
-                  setAiGenerated(false);
-                  setHasDraft(true);
-                }}
-              >
-                or write it myself →
-              </span>
-            </div>
-          </form>
-        </div>
+        <form className="pnl pad" onSubmit={handleGenerate} style={{ maxWidth: 760 }}>
+          <div className="field">
+            <label className="flabel" htmlFor="topic">What should this post be about?</label>
+            <input id="topic" className="finput" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g. How to care for your teeth after a root canal" />
+          </div>
+          {error && <div className="auth-err">{error}</div>}
+          <div className="form-foot">
+            <Button type="submit" icon={<IconSparkle size={15} />} disabled={!topic.trim()} loading={generateMutation.isPending} loadingText="Writing…">
+              Generate with AI
+            </Button>
+            <Button variant="secondary" onClick={() => { setTitle(topic || "Untitled post"); setAiGenerated(false); setHasDraft(true); }}>
+              Write it myself
+            </Button>
+          </div>
+        </form>
       )}
 
       {hasDraft && (
-        <div className="p-card" style={{ padding: 24, marginBottom: 24 }}>
-          {aiGenerated && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: 12,
-                color: "#155EEF",
-                fontWeight: 700,
-                marginBottom: 16,
-              }}
-            >
-              <IconSparkle size={14} /> AI-generated draft — review and edit before publishing.
-            </div>
-          )}
+        <div className="pnl pad" style={{ maxWidth: 820 }}>
+          {aiGenerated && <div className="ai-flag"><IconSparkle size={15} /> AI-generated draft — review and edit before publishing.</div>}
 
-          <label style={{ display: "block", fontSize: 12, marginBottom: 4, fontWeight: 700 }}>Title</label>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "9px 12px",
-              border: "1.5px solid var(--ink)",
-              borderRadius: 8,
-              fontSize: 14,
-              fontWeight: 700,
-              marginBottom: 14,
-            }}
-          />
+          <div className="field">
+            <label className="flabel" htmlFor="title">Title</label>
+            <input id="title" className="finput" value={title} onChange={(e) => setTitle(e.target.value)} style={{ fontWeight: 600 }} />
+          </div>
+          <div className="field">
+            <label className="flabel" htmlFor="excerpt">Excerpt</label>
+            <textarea id="excerpt" className="finput" rows={2} value={excerpt} onChange={(e) => setExcerpt(e.target.value)} />
+          </div>
+          <div className="field">
+            <label className="flabel" htmlFor="content">Content</label>
+            <textarea id="content" className="finput" rows={16} value={content} onChange={(e) => setContent(e.target.value)} />
+          </div>
 
-          <label style={{ display: "block", fontSize: 12, marginBottom: 4, fontWeight: 700 }}>Excerpt</label>
-          <textarea
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            rows={2}
-            style={{
-              width: "100%",
-              padding: "9px 12px",
-              border: "1.5px solid var(--ink)",
-              borderRadius: 8,
-              fontSize: 13,
-              marginBottom: 14,
-              fontFamily: "inherit",
-            }}
-          />
-
-          <label style={{ display: "block", fontSize: 12, marginBottom: 4, fontWeight: 700 }}>Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={16}
-            style={{
-              width: "100%",
-              padding: 12,
-              border: "1.5px solid var(--ink)",
-              borderRadius: 8,
-              fontSize: 13.5,
-              lineHeight: 1.6,
-              marginBottom: 16,
-              fontFamily: "inherit",
-            }}
-          />
-
-          {error && <div style={{ color: "#D92D20", fontSize: 12.5, fontWeight: 700, marginBottom: 10 }}>{error}</div>}
-
-          <div style={{ display: "flex", gap: 10 }}>
-            <Button variant="secondary" disabled={saving} onClick={() => handleSave("draft")}>
-              {saving ? "Saving…" : "Save as Draft"}
-            </Button>
-            <Button disabled={saving} onClick={() => handleSave("published")}>
-              {saving ? "Publishing…" : "Publish to Website"}
-            </Button>
+          {error && <div className="auth-err">{error}</div>}
+          <div className="form-foot">
+            <Button variant="secondary" loading={saving} loadingText="Saving…" onClick={() => handleSave("draft")}>Save as draft</Button>
+            <Button loading={saving} loadingText="Publishing…" onClick={() => handleSave("published")}>Publish to website</Button>
           </div>
         </div>
       )}
@@ -222,7 +142,7 @@ function BlogFormContent() {
 
 export default function BlogFormPage() {
   return (
-    <Suspense fallback={<div>Loading…</div>}>
+    <Suspense fallback={null}>
       <BlogFormContent />
     </Suspense>
   );

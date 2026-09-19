@@ -1,92 +1,92 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { IconSparkle, IconGlobe, IconWhatsapp } from "@/components/icons";
+import { IconArrowRight, IconInbox, IconSparkle } from "@/components/icons";
+import { EmptyState } from "@/components/portal/EmptyState";
+import { LeadTable } from "@/components/portal/LeadTable";
+import { PageHead } from "@/components/portal/PageHead";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useLeads } from "@/hooks/leads/query";
-import { timeAgo, statusLabel, sourceLabel } from "@/lib/format";
-
-const sourceIcon: Record<string, typeof IconGlobe> = {
-  form: IconGlobe,
-  whatsapp: IconWhatsapp,
-  chat_widget: IconGlobe,
-  missed_call: IconGlobe,
-};
+import { getUser } from "@/lib/session";
+import { greeting, timeAgo } from "@/lib/format";
+import { Button } from "@/components/ui/Button";
 
 export default function DashboardPage() {
-  const { data, isLoading: loading, isError: error } = useLeads();
-  const leads = data?.leads ?? [];
+  const { data, isLoading, isError } = useLeads();
+  const [handle, setHandle] = useState("");
+  useEffect(() => setHandle(getUser()?.email.split("@")[0] ?? ""), []);
+
+  const leads = useMemo(() => data?.leads ?? [], [data]);
 
   const stats = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayCount = leads.filter((l) => new Date(l.createdAt) >= today).length;
-    const pending = leads.filter((l) => l.status === "new" || l.status === "replied").length;
-    const won = leads.filter((l) => l.status === "won").length;
-    return { todayCount, pending, won };
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    return {
+      today: leads.filter((l) => new Date(l.createdAt) >= startOfDay).length,
+      waiting: leads.filter((l) => l.status === "new").length,
+      talking: leads.filter((l) => l.status === "replied").length,
+      won: leads.filter((l) => l.status === "won").length,
+    };
   }, [leads]);
 
   const hottest = leads.find((l) => l.status === "new");
-  const recent = leads.slice(0, 5);
+  const dateLabel = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
+  const v = (n: number) => (isLoading ? "–" : n);
 
   return (
     <>
-      <div className="p-mh">
-        <span className="p-mt">
-          Home<em>here&apos;s today at a glance</em>
-        </span>
-      </div>
+      <PageHead
+        eyebrow={dateLabel}
+        title={<>{greeting()}{handle && <>, <em>{handle}.</em></>}</>}
+        sub={
+          isLoading || isError
+            ? "Here's your workspace at a glance."
+            : stats.waiting > 0
+              ? `${stats.waiting} new ${stats.waiting === 1 ? "lead is" : "leads are"} waiting for you.`
+              : "You're all caught up — no new leads waiting."
+        }
+      />
 
-      <div className="p-sts">
-        <div className="p-st f"><div className="p-sl">TODAY</div><div className="p-sv">{loading ? "—" : stats.todayCount}</div></div>
-        <div className="p-st"><div className="p-sl">PENDING</div><div className="p-sv">{loading ? "—" : stats.pending}</div></div>
-        <div className="p-st"><div className="p-sl">WON</div><div className="p-sv">{loading ? "—" : stats.won}</div></div>
+      <div className="kpis">
+        <div className="kpi f"><div className="kpi-l">Today</div><div className="kpi-v">{v(stats.today)}</div><div className="kpi-d">new enquiries</div></div>
+        <div className="kpi"><div className="kpi-l">Waiting</div><div className="kpi-v">{v(stats.waiting)}</div><div className="kpi-d">not yet replied</div></div>
+        <div className="kpi"><div className="kpi-l">In conversation</div><div className="kpi-v">{v(stats.talking)}</div><div className="kpi-d">replied</div></div>
+        <div className="kpi"><div className="kpi-l">Won</div><div className="kpi-v">{v(stats.won)}</div><div className="kpi-d">deals closed</div></div>
       </div>
 
       {hottest && (
-        <div className="p-card" style={{ padding: 16, marginBottom: 16, background: "#F5F8FF", borderColor: "#14161A" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 13, marginBottom: 6 }}>
-            <IconSparkle size={16} /> AI note
+        <div className="hot">
+          <span className="hot-ic"><IconSparkle size={20} /></span>
+          <div className="hot-t">
+            <small>Reply first</small>
+            <b>{hottest.name ?? hottest.contact}</b>
+            {hottest.message ? <> asked &ldquo;{hottest.message}&rdquo;</> : " sent an enquiry"} · {timeAgo(hottest.createdAt)} ago
           </div>
-          <div style={{ fontSize: 13, lineHeight: 1.55, color: "#475467" }}>
-            <b style={{ color: "#14161A" }}>{hottest.name ?? hottest.contact}</b> is a new lead
-            {hottest.message ? <> — asked: &quot;{hottest.message}&quot;</> : null}, {timeAgo(hottest.createdAt)} ago.{" "}
-            <Link href={`/leads/${hottest.id}`} style={{ color: "#155EEF", fontWeight: 800 }}>Open it →</Link>
-          </div>
+          <Button href={`/leads/${hottest.id}`} variant="ink" size="sm" iconRight={<IconArrowRight size={14} />}>Open</Button>
         </div>
       )}
 
-      {loading && <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#98A2B3" }}>Loading…</div>}
+      <div className="toolbar" style={{ marginTop: 32 }}>
+        <div className="sec-t" style={{ margin: 0 }}>Recent leads</div>
+        {leads.length > 0 && <Button href="/leads" variant="secondary" size="sm" iconRight={<IconArrowRight size={14} />}>View all</Button>}
+      </div>
 
-      {!loading && error && (
-        <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#D92D20" }}>
-          Couldn&apos;t reach the API — make sure leadworks-api is running and DATABASE_URL is set.
+      {isLoading && (
+        <div className="pnl pad"><Skeleton height={18} width="40%" /><Skeleton height={14} width="70%" style={{ marginTop: 14 }} /><Skeleton height={14} width="55%" style={{ marginTop: 14 }} /></div>
+      )}
+      {isError && <div className="state-err">Couldn&apos;t reach the API — make sure leadworks-api is running and DATABASE_URL is set.</div>}
+      {!isLoading && !isError && leads.length === 0 && (
+        <div className="pnl">
+          <EmptyState
+            icon={<IconInbox size={26} />}
+            title="No leads yet"
+            text="Once your widget or form starts capturing enquiries, they'll show up here."
+            action={<Button href="/settings">Get your embed code</Button>}
+          />
         </div>
       )}
-
-      {!loading && !error && recent.length === 0 && (
-        <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#98A2B3" }}>
-          No leads yet — once your widget/form starts capturing enquiries, they&apos;ll show up here.
-        </div>
-      )}
-
-      {!loading && !error && recent.length > 0 && (
-        <div className="p-card">
-          <div className="p-rw h"><span>Lead</span><span>Source</span><span>Status</span><span style={{ textAlign: "right" }}>Time</span></div>
-          {recent.map((lead, i) => {
-            const SourceIcon = sourceIcon[lead.source] ?? IconGlobe;
-            const [label, cls] = statusLabel(lead.status);
-            return (
-              <Link key={lead.id} href={`/leads/${lead.id}`} className={`p-rw ${i === 0 ? "hl" : ""}`}>
-                <div><div className="p-nm">{lead.name ?? lead.contact}</div><div className="p-ms">{lead.message ?? "—"}</div></div>
-                <span className="p-src"><SourceIcon size={15} />{sourceLabel(lead.source)}</span>
-                <span className={`pp ${cls}`}>{label}</span>
-                <span className="p-tm">{timeAgo(lead.createdAt)}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {!isLoading && !isError && leads.length > 0 && <LeadTable leads={leads.slice(0, 5)} />}
     </>
   );
 }

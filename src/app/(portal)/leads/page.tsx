@@ -1,69 +1,54 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { IconSearch, IconPlus, IconGlobe, IconWhatsapp, IconChat } from "@/components/icons";
-import { ApiError } from "@/utils/apiUtils";
+import { IconInbox, IconPlus, IconSearch } from "@/components/icons";
+import { EmptyState } from "@/components/portal/EmptyState";
+import { LeadTable } from "@/components/portal/LeadTable";
+import { PageHead } from "@/components/portal/PageHead";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useLeads } from "@/hooks/leads/query";
-import { timeAgo, statusLabel, sourceLabel } from "@/lib/format";
+import { apiErrorCode } from "@/lib/errors";
 import LeadImportModal from "./LeadImportModal";
-
-const sourceIcon: Record<string, typeof IconGlobe> = {
-  form: IconGlobe,
-  whatsapp: IconWhatsapp,
-  chat_widget: IconChat,
-  missed_call: IconGlobe,
-};
+import { Button } from "@/components/ui/Button";
 
 const FILTERS = [
   { key: "all", label: "All" },
   { key: "new", label: "New" },
-  { key: "replied", label: "Pending" },
+  { key: "replied", label: "Replied" },
   { key: "won", label: "Won" },
+  { key: "closed", label: "Closed" },
 ];
 
 export default function LeadsPage() {
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [showImport, setShowImport] = useState(false);
+  const { data, isLoading, error, refetch } = useLeads();
 
-  const { data, isLoading: loading, error: queryError, refetch } = useLeads();
-  const leads = data?.leads ?? [];
-  const error = queryError
-    ? queryError instanceof ApiError
-      ? (queryError.body as { error?: string })?.error ?? "network_error"
-      : "network_error"
-    : null;
-
+  const leads = useMemo(() => data?.leads ?? [], [data]);
   const visible = useMemo(() => {
+    const q = search.trim().toLowerCase();
     return leads
       .filter((l) => filter === "all" || l.status === filter)
-      .filter((l) => {
-        if (!search.trim()) return true;
-        const q = search.toLowerCase();
-        return (l.name ?? "").toLowerCase().includes(q) || (l.message ?? "").toLowerCase().includes(q);
-      });
+      .filter(
+        (l) =>
+          !q ||
+          (l.name ?? "").toLowerCase().includes(q) ||
+          l.contact.toLowerCase().includes(q) ||
+          (l.message ?? "").toLowerCase().includes(q)
+      );
   }, [leads, filter, search]);
+
+  const errCode = error ? apiErrorCode(error) ?? "network_error" : null;
 
   return (
     <>
-      <div className="p-mh">
-        <span className="p-mt">Leads</span>
-        <div className="p-tools">
-          <span className="p-srch">
-            <IconSearch size={14} />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search leads…"
-              style={{ border: "none", outline: "none", background: "none", font: "inherit", width: 120 }}
-            />
-          </span>
-          <button className="p-add" onClick={() => setShowImport(true)}>
-            <IconPlus size={14} />Import Leads
-          </button>
-        </div>
-      </div>
+      <PageHead
+        eyebrow="Inbox"
+        title="Leads"
+        sub={isLoading ? "Loading your enquiries…" : `${leads.length} ${leads.length === 1 ? "enquiry" : "enquiries"} across every source.`}
+        actions={<Button icon={<IconPlus size={15} />} onClick={() => setShowImport(true)}>Import leads</Button>}
+      />
 
       {showImport && (
         <LeadImportModal
@@ -75,50 +60,39 @@ export default function LeadsPage() {
         />
       )}
 
-      <div className="p-filts">
-        {FILTERS.map((f) => (
-          <span key={f.key} className={`p-fl ${filter === f.key ? "on" : ""}`} onClick={() => setFilter(f.key)} style={{ cursor: "pointer" }}>
-            {f.label}
-          </span>
-        ))}
+      <div className="toolbar">
+        <div className="seg" role="tablist">
+          {FILTERS.map((f) => (
+            <button key={f.key} className={filter === f.key ? "on" : ""} onClick={() => setFilter(f.key)}>{f.label}</button>
+          ))}
+        </div>
+        <label className="search">
+          <IconSearch size={15} />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, contact, message" />
+        </label>
       </div>
 
-      {loading && <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#98A2B3" }}>Loading leads…</div>}
-
-      {!loading && error && (
-        <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#D92D20" }}>
-          {error === "database_not_configured"
-            ? "Backend has no database configured yet — see leadworks-api/.env.example."
+      {isLoading && (
+        <div className="pnl pad">{[60, 80, 50, 70].map((w, i) => <Skeleton key={i} height={16} width={`${w}%`} style={{ marginBottom: 18 }} />)}</div>
+      )}
+      {!isLoading && errCode && (
+        <div className="state-err">
+          {errCode === "database_not_configured"
+            ? "The backend has no database configured yet — see leadworks-api/.env.example."
             : "Couldn't reach the API. Make sure leadworks-api is running."}
         </div>
       )}
-
-      {!loading && !error && visible.length === 0 && (
-        <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#98A2B3" }}>
-          No leads yet. Once your site's widget or form starts sending enquiries, they'll show up here.
+      {!isLoading && !errCode && visible.length === 0 && (
+        <div className="pnl">
+          <EmptyState
+            icon={<IconInbox size={26} />}
+            title={leads.length === 0 ? "No leads yet" : "Nothing matches"}
+            text={leads.length === 0 ? "Once your site's widget or form sends enquiries — or you import a sheet — they'll show up here." : "Try a different filter or search term."}
+            action={leads.length === 0 ? <Button icon={<IconPlus size={15} />} onClick={() => setShowImport(true)}>Import leads</Button> : undefined}
+          />
         </div>
       )}
-
-      {!loading && !error && visible.length > 0 && (
-        <div className="p-card">
-          <div className="p-rw h"><span>Lead</span><span>Source</span><span>Status</span><span style={{ textAlign: "right" }}>Time</span></div>
-          {visible.map((lead, i) => {
-            const SourceIcon = sourceIcon[lead.source] ?? IconGlobe;
-            const [label, cls] = statusLabel(lead.status);
-            return (
-              <Link key={lead.id} href={`/leads/${lead.id}`} className={`p-rw ${i === 0 ? "hl" : ""}`}>
-                <div>
-                  <div className="p-nm">{lead.name ?? lead.contact}</div>
-                  <div className="p-ms">{lead.message ?? "—"}</div>
-                </div>
-                <span className="p-src"><SourceIcon size={15} />{sourceLabel(lead.source)}</span>
-                <span className={`pp ${cls}`}>{label}</span>
-                <span className="p-tm">{timeAgo(lead.createdAt)}</span>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {!isLoading && !errCode && visible.length > 0 && <LeadTable leads={visible} />}
     </>
   );
 }

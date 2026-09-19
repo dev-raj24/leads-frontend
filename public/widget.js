@@ -1,11 +1,11 @@
 (async function() {
   const scripts = document.getElementsByTagName('script');
   let siteKey = null;
-  let scriptUrl = null;
+  let apiBase = null;
   for (let i = 0; i < scripts.length; i++) {
     if (scripts[i].getAttribute('data-site-key')) {
       siteKey = scripts[i].getAttribute('data-site-key');
-      scriptUrl = scripts[i].src;
+      apiBase = (scripts[i].getAttribute('data-api') || '').replace(/\/+$/, '');
       break;
     }
   }
@@ -15,12 +15,18 @@
     return;
   }
 
-  const srcHost = new URL(scriptUrl).origin;
+  if (!apiBase) {
+    console.error('Leadworks Widget: Missing data-api attribute on script tag.');
+    return;
+  }
+
+  // Offer text comes from the owner's dashboard — never inject it as raw HTML.
+  const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // Fetch dynamic config
   let config = null;
   try {
-    const res = await fetch(`${srcHost}/api/widget-config?siteKey=${siteKey}`);
+    const res = await fetch(`${apiBase}/api/public/widget-config?siteKey=${encodeURIComponent(siteKey)}`);
     if (res.ok) {
       config = await res.json();
     }
@@ -238,18 +244,18 @@
       document.body.style.paddingTop = '52px'; // approximate height of the top banner
       
       banner.innerHTML = `
-        <span class="lw-banner-text">🎉 <b>${offer.title}</b> ${offer.body}</span>
-        <button class="lw-banner-btn" id="lw-banner-claim-btn">${offer.actionText}</button>
+        <span class="lw-banner-text">🎉 <b>${esc(offer.title)}</b> ${esc(offer.body)}</span>
+        <button class="lw-banner-btn" id="lw-banner-claim-btn">${esc(offer.actionText)}</button>
         <span class="lw-close" id="lw-banner-close" style="font-size: 14px; cursor: pointer; margin-left: 8px;">✕</span>
       `;
     } else if (offer.displayMode === 'bottom-left') {
       banner.className = 'lw-banner-bottom-left';
       banner.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
-          <span class="lw-banner-text">🎉 <b>${offer.title}</b><br/>${offer.body}</span>
+          <span class="lw-banner-text">🎉 <b>${esc(offer.title)}</b><br/>${esc(offer.body)}</span>
           <span class="lw-close" id="lw-banner-close" style="font-size: 12px; margin-top: 2px; cursor: pointer;">✕</span>
         </div>
-        <button class="lw-banner-btn" id="lw-banner-claim-btn">${offer.actionText}</button>
+        <button class="lw-banner-btn" id="lw-banner-claim-btn">${esc(offer.actionText)}</button>
       `;
     }
     
@@ -316,7 +322,7 @@
     sendBtn.disabled = true;
 
     try {
-      const res = await fetch(srcHost + '/api/ingest/lead', {
+      const res = await fetch(apiBase + '/api/ingest/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ site_key: siteKey, name, contact, message })

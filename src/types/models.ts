@@ -95,3 +95,32 @@ export interface Site {
   settings: Record<string, unknown>;
   createdAt: string;
 }
+
+export interface LeadImportRow {
+  rowNumber: number;
+  isValid: boolean;
+  errors: string[];
+  data: {
+    name?: string;
+    contact: string;
+    message?: string;
+    source: LeadSource;
+    customFields?: Record<string, unknown>;
+  };
+}
+
+export interface LeadImportPreview {
+  total: number;
+  validCount: number;
+  invalidCount: number;
+  rows: LeadImportRow[];
+}
+
+export interface Followup {
+  id: string;
+  leadId: string;
+  leadName: string;
+  runAt: string;
+  status: "pending" | "sent" | "cancelled";
+  template: string | null;
+}

@@ -1,25 +1,25 @@
-import { IconChat } from "@/components/icons";
+import { PageHead } from "@/components/portal/PageHead";
+import { Button } from "@/components/ui/Button";
+
+const STEPS = [
+  ["Bubble on your site", "A chat bubble appears on every page, powered by the same AI that knows your business."],
+  ["Answers 24/7", "Visitors get instant answers about services, prices and timings — even at 2am."],
+  ["Every chat becomes a lead", "Conversations are captured automatically into your inbox with full history."],
+];
 
 export default function AiWidgetPage() {
   return (
     <>
-      <div className="p-mh">
-        <span className="p-mt">AI chat widget<em>talks to visitors, captures leads</em></span>
+      <PageHead eyebrow="Module" title={<>AI chat <em>widget</em></>} sub="Talks to your visitors and captures their details as leads." actions={<Button href="/settings">Turn it on in Settings</Button>} />
+      <div className="pnl">
+        {STEPS.map(([t, d], i) => (
+          <div key={t} className="li">
+            <span className="av display" style={{ fontSize: 20 }}>{i + 1}</span>
+            <div className="li-main"><div className="li-title">{t}</div><div className="li-sub" style={{ whiteSpace: "normal" }}>{d}</div></div>
+          </div>
+        ))}
       </div>
-      <div className="p-card" style={{ padding: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 800, fontSize: 14, marginBottom: 10 }}>
-          <IconChat size={17} style={{ color: "#155EEF" }} /> How it works
-        </div>
-        <p style={{ fontSize: 13.5, lineHeight: 1.65, color: "#475467" }}>
-          A chat bubble appears on your website, powered by the same AI that knows your business.
-          Visitors get answers 24/7 — and every conversation becomes a lead in your inbox
-          automatically, even at 2am.
-        </p>
-        <p style={{ fontSize: 13.5, lineHeight: 1.65, color: "#475467", marginTop: 10 }}>
-          Turn it on from <b>Settings → Modules</b> once you&apos;re ready. Available on the Growth
-          plan.
-        </p>
-      </div>
+      <p className="hint">Available on the Pro plan.</p>
     </>
   );
 }

@@ -1,4 +1,9 @@
 import "./globals.css";
+import { Inter, Instrument_Serif } from "next/font/google";
+import ReactQueryProvider from "@/providers/ReactQueryProvider";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const display = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-display", display: "swap" });
 
 export const metadata = {
   title: "Leadworks — Every lead, one place",
@@ -6,15 +11,11 @@ export const metadata = {
     "Your website, WhatsApp and forms — every enquiry lands in one inbox. AI sends the first reply and never forgets a follow-up.",
 };
 
-import ReactQueryProvider from "@/providers/ReactQueryProvider";
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${display.variable}`}>
       <body>
-        <ReactQueryProvider>
-          {children}
-        </ReactQueryProvider>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 import { callApi } from "@/utils/apiUtils";
 import leadsEndpoints from "@/utils/apiUtils/endpoints/leads";
 import { ApiEndpoint } from "@/types/api";
-import type { Lead, LeadSource, LeadStatus } from "@/types/models";
+import type { Lead, LeadImportPreview, LeadImportRow, LeadStatus } from "@/types/models";
 
 export async function fetchLeadsService(status?: string): Promise<{ leads: Lead[] }> {
   return callApi({
@@ -41,7 +41,7 @@ export async function downloadLeadTemplateService(): Promise<void> {
   window.URL.revokeObjectURL(url);
 }
 
-export async function uploadLeadPreviewService(file: File): Promise<any> {
+export async function uploadLeadPreviewService(file: File): Promise<LeadImportPreview> {
   const formData = new FormData();
   formData.append("file", file);
   return callApi({
@@ -50,7 +50,7 @@ export async function uploadLeadPreviewService(file: File): Promise<any> {
   });
 }
 
-export async function bulkCreateLeadsService(leads: any[]): Promise<{ ok: boolean; count: number }> {
+export async function bulkCreateLeadsService(leads: LeadImportRow["data"][]): Promise<{ ok: boolean; count: number }> {
   return callApi({
     uriEndPoint: { ...leadsEndpoints.bulk.v1 } as ApiEndpoint,
     body: { leads },

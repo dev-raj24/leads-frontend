@@ -2,79 +2,100 @@
 
 import { useState } from "react";
 import { IconClose } from "@/components/icons";
+import { useBulkCreateLeads } from "@/hooks/leads/mutation";
+import { downloadLeadTemplateService, uploadLeadPreviewService } from "@/services/leads";
+import type { LeadImportPreview } from "@/types/models";
+import { Button } from "@/components/ui/Button";
 
 interface LeadImportModalProps {
-  isOpen?: boolean;
   onClose: () => void;
-  onSuccess?: () => void;
   onImported?: () => void;
 }
 
-export function LeadImportModal({ isOpen = true, onClose, onSuccess, onImported }: LeadImportModalProps) {
-  const [step, setStep] = useState(1);
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<{ validCount: number } | null>(null);
-  const [loading, setLoading] = useState(false);
+/** Excel import: pick a file → server validates it (preview) → confirm to save the valid rows. */
+export function LeadImportModal({ onClose, onImported }: LeadImportModalProps) {
+  const [preview, setPreview] = useState<LeadImportPreview | null>(null);
+  const [fileName, setFileName] = useState("");
+  const [parsing, setParsing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const bulk = useBulkCreateLeads();
 
-  if (!isOpen) return null;
-
-  const handleConfirm = async () => {
-    setLoading(true);
+  async function handleFile(file: File) {
+    setError(null);
+    setParsing(true);
+    setFileName(file.name);
     try {
-      if (onSuccess) onSuccess();
-      if (onImported) onImported();
-      onClose();
-    } catch (e) {
-      console.error(e);
+      setPreview(await uploadLeadPreviewService(file));
+    } catch {
+      setPreview(null);
+      setError("Couldn't read that file. Please upload an .xlsx built from the template.");
     } finally {
-      setLoading(false);
+      setParsing(false);
     }
-  };
+  }
+
+  function confirm() {
+    if (!preview) return;
+    const rows = preview.rows.filter((r) => r.isValid).map((r) => r.data);
+    bulk.mutate(rows, {
+      onSuccess: () => onImported?.(),
+      onError: () => setError("Import failed — please try again."),
+    });
+  }
+
+  const invalid = preview?.rows.filter((r) => !r.isValid) ?? [];
 
   return (
-    <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
-      <div style={{ background: "white", borderRadius: 16, padding: 24, width: "100%", maxWidth: 500, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 700 }}>Import Leads (CSV)</h3>
-          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer" }}><IconClose size={18} /></button>
+    <div className="modal-bg" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div className="modal-h">
+          <h3>Import leads</h3>
+          <button className="iconbtn" onClick={onClose} aria-label="Close"><IconClose size={16} /></button>
         </div>
+        <p className="lead">
+          Upload an Excel sheet of existing enquiries.{" "}
+          <Button variant="secondary" size="sm" style={{ marginLeft: 4 }} onClick={() => downloadLeadTemplateService()}>Download template</Button>
+        </p>
 
-        {step === 1 && (
-          <div>
-            <p style={{ fontSize: 14, color: "#475467", marginBottom: 16 }}>Upload a CSV file containing your leads (columns: Name, Email/Phone, Status).</p>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  setFile(e.target.files[0]);
-                  setPreview({ validCount: 10 });
-                  setStep(3);
-                }
-              }}
-              style={{ width: "100%", padding: 12, border: "1px dashed #d0d5dd", borderRadius: 8 }}
-            />
-          </div>
+        {!preview && (
+          <label className="drop">
+            <input type="file" accept=".xlsx" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+            <b>{parsing ? "Reading your file…" : "Choose an .xlsx file"}</b>
+            {parsing ? fileName : "Columns: Name, Contact*, Message, Source"}
+          </label>
         )}
 
-        {step === 3 && (
-          <div style={{ display: "flex", gap: 12, marginTop: 24, justifyContent: "flex-end" }}>
-            <button 
-              onClick={() => { setStep(1); setPreview(null); }}
-              disabled={loading}
-              style={{ padding: "10px 16px", background: "#fff", border: "1px solid #D0D5DD", borderRadius: 8, cursor: "pointer", fontWeight: 500 }}
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleConfirm}
-              disabled={loading || preview?.validCount === 0}
-              style={{ padding: "10px 16px", background: "#14161A", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontWeight: 500, opacity: preview?.validCount === 0 ? 0.5 : 1 }}
-            >
-              {loading ? "Importing..." : `Import ${preview?.validCount || 0} Leads`}
-            </button>
-          </div>
+        {preview && (
+          <>
+            <div className="stat-row">
+              <div className="stat-chip">Rows<b>{preview.total}</b></div>
+              <div className="stat-chip ok">Ready<b>{preview.validCount}</b></div>
+              <div className="stat-chip bad">Skipped<b>{preview.invalidCount}</b></div>
+            </div>
+            {invalid.length > 0 && (
+              <div className="errlist">
+                {invalid.map((r) => (
+                  <div key={r.rowNumber}><b>Row {r.rowNumber}</b> — {r.errors.join(", ")}</div>
+                ))}
+              </div>
+            )}
+          </>
         )}
+
+        {error && <div className="auth-err" style={{ marginTop: 14 }}>{error}</div>}
+
+        <div className="modal-foot">
+          {preview ? (
+            <>
+              <Button variant="secondary" onClick={() => { setPreview(null); setError(null); }} disabled={bulk.isPending}>Choose another</Button>
+              <Button onClick={confirm} disabled={preview.validCount === 0} loading={bulk.isPending} loadingText="Importing…">
+                {`Import ${preview.validCount} lead${preview.validCount === 1 ? "" : "s"}`}
+              </Button>
+            </>
+          ) : (
+            <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,219 +1,313 @@
 import Link from "next/link";
+import "./marketing.css";
 import { Logo } from "@/components/Logo";
 import { PricingSection } from "@/components/PricingSection";
-import {
-  IconSparkle, IconArrowRight, IconPlay, IconBolt, IconRobot, IconRefresh,
-  IconInbox, IconTag, IconChat, IconMail, IconClock, IconQuestion, IconPhone,
-  IconRupee, IconWhatsapp, IconChart, IconClose, IconCheck,
-} from "@/components/icons";
+import { RevealOnScroll } from "@/components/RevealOnScroll";
+import { IconArrowRight, IconCheck, IconClose } from "@/components/icons";
+
+const PROOF = [
+  { n: "10", u: "sec", t: "average first-reply time" },
+  { n: "78", u: "%", t: "of customers pick whoever replies first" },
+  { n: "0", u: "", t: "leads lost in a forgotten inbox" },
+  { n: "2", u: "×", t: "more deals closed with instant follow-up" },
+];
+
+const BEFORE = [
+  <>Enquiries buried in an <b>email inbox</b> you rarely open</>,
+  <>First reply after <b>4–6 hours</b> — the lead has gone cold</>,
+  <>&ldquo;Did anyone follow up?&rdquo; — <b>nobody knows</b></>,
+  <>WhatsApp enquiries lost in <b>personal chats</b></>,
+  <>Every missed lead is <b>money handed to a competitor</b></>,
+];
+const AFTER = [
+  <>Every lead from every source in <b>one clean inbox</b></>,
+  <>AI replies in <b>10 seconds</b> — even at 2am</>,
+  <>Follow-ups <b>scheduled automatically</b> — nothing forgotten</>,
+  <>WhatsApp enquiries <b>captured into the same inbox</b></>,
+  <>A morning summary of <b>exactly who to call today</b></>,
+];
+
+const STEPS = [
+  { t: "Connect your site", d: "Paste one tiny snippet into your website — five minutes, zero code. Got old leads in Excel? Import them in one go." },
+  { t: "Teach the AI", d: "Answer a few questions about your business — services, timings, prices. That's all the AI needs to speak for you." },
+  { t: "Close deals", d: "Leads flow in, AI replies instantly, follow-ups happen on time. Each morning a summary tells you who's hot." },
+];
+
+const FAQ = [
+  ["Will this work with my existing website?", "Yes — that's the whole point. Whether your site is WordPress, Wix or hand-coded years ago, you paste one small snippet and your contact form starts sending leads to your inbox. Nothing about your site changes."],
+  ["What if the AI says something wrong to my customer?", "The AI only uses what you tell it — your services, prices and timings. It never invents answers, and for anything it's unsure about it says the owner will call back and pings you. You can review every follow-up before it's sent."],
+  ["I get most enquiries on WhatsApp. Does this help?", "Yes — on the Pro plan your WhatsApp business number connects to the same inbox. Website, WhatsApp and chat leads all live together."],
+  ["Do I need a developer?", "No installs, no developer. If you can copy-paste, you can set up Leadworks in about five minutes — and if you get stuck, we'll do it with you on a call, free."],
+  ["What happens to my data if I cancel?", "Your leads are yours. Export everything to Excel in one click, any time. We keep your data for 30 days after cancelling in case you change your mind, then delete it permanently."],
+];
+
+const QUOTES = [
+  { q: "Turns out I was replying to enquiries six hours late. Now the AI answers before I even see my phone — bookings doubled in two months.", n: "Dr. Rachit Mehra", r: "Dental clinic, Indore", i: "RM", c: "#0b5d4b", big: true },
+  { q: "The morning summary is my favourite thing. Tea in one hand, phone in the other — I know exactly who to call before 10am.", n: "Shalini Kapoor", r: "Salon owner, Pune", i: "SK", c: "#10151c" },
+  { q: "Half my enquiries were lost between family chats. Last month I closed nine deals from old leads the follow-up AI revived.", n: "Arjun Verma", r: "Real estate consultant, Jaipur", i: "AV", c: "#8a5a12" },
+];
 
 export default function MarketingHome() {
+  const feature = QUOTES[0];
+  const rest = QUOTES.slice(1);
+
   return (
-    <>
-      <nav className="nav">
-        <div className="nwrap">
-          <div className="brand"><Logo size={27} /></div>
-          <div className="lnk">
-            <Link href="#why">Why</Link>
-            <Link href="#features">Features</Link>
-            <Link href="#how">How it works</Link>
-            <Link href="#voices">Customers</Link>
-            <Link href="#pricing">Pricing</Link>
-            <Link href="#faq">FAQ</Link>
+    <div className="m">
+      <RevealOnScroll />
+
+      <nav className="m-nav">
+        <div className="m-wrap m-nav-in">
+          <Logo size={34} />
+          <div className="m-links">
+            <a href="#why">Why Leadworks</a>
+            <a href="#features">Features</a>
+            <a href="#how">How it works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
           </div>
-          <Link href="/login"><button className="ncta">Start free</button></Link>
+          <div className="m-nav-cta">
+            <Link href="/login" className="m-login">Log in</Link>
+            <Link href="/onboarding" className="m-btn solid sm">Start free</Link>
+          </div>
         </div>
       </nav>
 
-      <header className="hero dots">
-        <div className="hwrap">
-          <div className="hcol">
-            <span className="eb"><IconSparkle size={15} /> The AI lead platform for small business</span>
+      {/* HERO */}
+      <header className="m-hero">
+        <div className="m-wrap m-hero-grid">
+          <div className="m-hero-copy">
+            <span className="m-pill"><b>New</b> AI replies to every lead in 10 seconds</span>
             <h1>
               Every lead,<br />
-              <span className="ser">
-                one place.
-                <svg className="scrib" viewBox="0 0 200 12" preserveAspectRatio="none" height="11">
-                  <path d="M3,9 C40,3 80,10 120,5 C155,1 180,7 197,4" fill="none" stroke="#155EEF" strokeWidth="3" strokeLinecap="round" />
-                </svg>
-              </span>
+              <em className="mark">in one place.</em>
             </h1>
-            <p className="sub">
-              Your website, WhatsApp and forms — every enquiry lands in <b>one inbox</b>. AI sends
-              the first reply in seconds and never forgets a follow-up. You just close the deal.
+            <p className="m-lede">
+              Your website, WhatsApp and forms — every enquiry lands in <b>one inbox</b>. AI sends the
+              first reply in seconds and never forgets a follow-up. You just close the deal.
             </p>
-            <div className="ctas">
-              <Link href="/login"><button className="big">Start free <IconArrowRight size={16} /></button></Link>
-              <button className="gho"><IconPlay size={14} style={{ marginRight: 4 }} />or watch the 2-min demo</button>
+            <div className="m-hero-cta">
+              <Link href="/onboarding" className="m-btn solid">Start free <IconArrowRight size={16} /></Link>
+              <a href="#product" className="m-btn line">See how it works</a>
             </div>
-            <div className="trust">No code needed &nbsp;·&nbsp; 5-minute setup &nbsp;·&nbsp; Cancel anytime</div>
-          </div>
-
-          <div className="stk">
-            <div className="ly t1">
-              <div className="lh2"><span>Rohit Sharma</span><span className="pp n">NEW</span></div>
-              <div className="lm">How much does a root canal cost? · Website · 2 min ago</div>
-              <div className="ait"><IconRobot size={15} /> AI replied in 10 seconds ✓</div>
-            </div>
-            <div className="ly t2">
-              <div className="lh2"><span>Priya Nair</span><span className="pp w">WON</span></div>
-              <div className="lm">Can I get an appointment tomorrow? · WhatsApp · 40 min</div>
-            </div>
-            <div className="ly t3">
-              <div className="lh2"><span>Aman Gupta</span><span className="pp r">REPLIED</span></div>
-              <div className="lm">Need a braces consultation · AI chat · 1 hr</div>
+            <div className="m-ticks">
+              <span><IconCheck size={15} /> No code needed</span>
+              <span><IconCheck size={15} /> 5-minute setup</span>
+              <span><IconCheck size={15} /> Cancel anytime</span>
             </div>
           </div>
-        </div>
 
-        <div className="statbar">
-          <div className="sb"><div className="sbv">10<em>sec</em></div><div className="sbl">Average first reply time</div></div>
-          <div className="sb"><div className="sbv">78%</div><div className="sbl">of customers choose whoever replies first</div></div>
-          <div className="sb"><div className="sbv">0</div><div className="sbl">leads lost in email again</div></div>
-          <div className="sb"><div className="sbv">2<em>×</em></div><div className="sbl">more deals closed with instant follow-up</div></div>
+          <div className="hv" id="product" aria-hidden="true">
+            <div className="hv-inbox">
+              <div className="hv-head">Inbox <small>3 new today</small></div>
+              <div className="hv-row on"><span className="hv-av">RS</span><div><strong>Rohit Sharma</strong><small>How much is a root canal?</small></div><span className="pp n">NEW</span></div>
+              <div className="hv-row"><span className="hv-av">PN</span><div><strong>Priya Nair</strong><small>Appointment tomorrow?</small></div><span className="pp w">WON</span></div>
+              <div className="hv-row"><span className="hv-av">AG</span><div><strong>Aman Gupta</strong><small>Need a braces consultation</small></div><span className="pp r">REPLIED</span></div>
+            </div>
+            <div className="hv-chat">
+              <div className="hv-chat-top"><span className="hv-av">RS</span><div>Rohit Sharma<small>via website form · 2:04 AM</small></div></div>
+              <div className="hv-msgs">
+                <div className="bub in">Hi, how much does a root canal cost?<time>2:04</time></div>
+                <div className="bub out">Hi Rohit! A root canal starts at ₹4,500. Shall I book you a slot tomorrow at 11 AM?<time>2:04 ✓✓</time></div>
+              </div>
+            </div>
+            <div className="hv-chip"><i /> AI replied in 9 seconds</div>
+          </div>
         </div>
       </header>
 
-      <div className="strip">
-        <span>ONE INBOX</span><span className="s">instant alerts</span><span>AI AUTO-REPLY</span>
-        <span className="s">follow-ups on autopilot</span><span>WHATSAPP CAPTURE</span>
-        <span className="s">daily summary</span><span>OFFERS &amp; BANNERS</span>
-        <span className="s">ask your AI anything</span><span>ONE INBOX</span>
+      <div className="m-wrap">
+        <div className="m-proof">
+          {PROOF.map((p) => (
+            <div key={p.t}>
+              <div className="m-num">{p.n}<small>{p.u}</small></div>
+              <p>{p.t}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <section className="sec" id="why">
-        <div className="sechead"><h2>Sound <em>familiar?</em></h2></div>
-        <p className="seclede">
-          You paid for a website. Enquiries go to an email you check twice a week. By the time you
-          reply, the customer has already booked with someone else. Here&apos;s what changes:
-        </p>
-        <div className="ba">
-          <div className="bacol bad">
-            <div className="bat"><IconClose size={20} style={{ color: "#D92D20" }} />Life before Leadworks</div>
-            <div className="bali"><IconMail size={16} /><span>Enquiries buried in an <b>email inbox</b> you rarely open</span></div>
-            <div className="bali"><IconClock size={16} /><span>First reply after <b>4–6 hours</b> — the lead has gone cold</span></div>
-            <div className="bali"><IconQuestion size={16} /><span>&quot;Did anyone follow up with that customer?&quot; — <b>nobody knows</b></span></div>
-            <div className="bali"><IconPhone size={16} /><span>WhatsApp enquiries lost in <b>personal chats</b></span></div>
-            <div className="bali"><IconRupee size={16} /><span>Every missed lead is <b>money handed to a competitor</b></span></div>
+      {/* PROBLEM */}
+      <section className="m-sec" id="why">
+        <div className="m-wrap">
+          <div className="m-head rv">
+            <span className="m-kicker">The problem</span>
+            <h2 className="m-h2">Sound <em>familiar?</em></h2>
+            <p className="m-sub">You paid for a website. Enquiries go to an email you check twice a week. By the time you reply, the customer has booked with someone else.</p>
           </div>
-          <div className="bacol good">
-            <div className="bat"><IconCheck size={20} style={{ color: "#155EEF" }} />Life with Leadworks</div>
-            <div className="bali"><IconInbox size={16} /><span>Every lead from every source in <b>one clean inbox</b></span></div>
-            <div className="bali"><IconBolt size={16} /><span>AI replies in <b>10 seconds</b> — even at 2am</span></div>
-            <div className="bali"><IconRefresh size={16} /><span>Follow-ups <b>scheduled automatically</b> — nothing forgotten</span></div>
-            <div className="bali"><IconWhatsapp size={16} /><span>WhatsApp enquiries <b>captured into the same inbox</b></span></div>
-            <div className="bali"><IconChart size={16} /><span>A morning summary tells you <b>exactly who to call today</b></span></div>
+          <div className="cmp rv">
+            <div className="cmp-col before">
+              <h3>Before</h3>
+              <ul>{BEFORE.map((t, i) => <li key={i}><IconClose size={18} /><span>{t}</span></li>)}</ul>
+            </div>
+            <div className="cmp-col after">
+              <h3>With Leadworks</h3>
+              <ul>{AFTER.map((t, i) => <li key={i}><IconCheck size={18} /><span>{t}</span></li>)}</ul>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="sec" id="features" style={{ paddingTop: 0 }}>
-        <div className="sechead"><h2>The work you forget,<br /><em>AI never does.</em></h2></div>
-        <p className="seclede">
-          Six things Leadworks quietly handles for you every single day — so you can run your
-          business instead of chasing your inbox.
-        </p>
-        <div className="fgrid">
-          <div className="fc pop"><div className="fi"><IconBolt size={22} style={{ color: "#155EEF" }} /></div><div className="ft">Instant alerts</div><div className="fd">The moment a lead arrives, it&apos;s on your WhatsApp and email. Day or night, weekend or holiday — nothing slips through.</div></div>
-          <div className="fc"><div className="fi"><IconRobot size={22} style={{ color: "#155EEF" }} /></div><div className="ft">AI auto-reply</div><div className="fd">AI sends a warm, personal first response in 10 seconds — with your services, prices and timings. Customers think you never sleep.</div></div>
-          <div className="fc"><div className="fi"><IconRefresh size={22} style={{ color: "#155EEF" }} /></div><div className="ft">Follow-ups on autopilot</div><div className="fd">No reply after 2 days? AI drafts a gentle nudge and sends it with your approval. Cold leads come back warm.</div></div>
-          <div className="fc"><div className="fi"><IconInbox size={22} style={{ color: "#155EEF" }} /></div><div className="ft">One inbox, every source</div><div className="fd">Website forms, WhatsApp messages, AI chat conversations — every lead in one place with full history and status.</div></div>
-          <div className="fc"><div className="fi"><IconTag size={22} style={{ color: "#155EEF" }} /></div><div className="ft">Offers &amp; banners</div><div className="fd">Running a weekend discount? Push a banner to your website in one click from your phone. No developer, no waiting.</div></div>
-          <div className="fc"><div className="fi"><IconChat size={22} style={{ color: "#155EEF" }} /></div><div className="ft">Ask your AI anything</div><div className="fd">&quot;How many leads this week?&quot; &quot;Who should I call first?&quot; — plain-language answers from your own business data.</div></div>
-        </div>
-      </section>
-
-      <section className="how" id="how">
-        <div className="sec">
-          <div className="sechead"><h2>Three steps, <em>that&apos;s it.</em></h2></div>
-          <div className="steps">
-            <div className="step"><div className="snum">1.</div><div className="stt">Connect your site</div><div className="sdd">Paste one tiny snippet into your website — takes 5 minutes, zero code. Got old leads in email or Excel? Import them in one go.</div></div>
-            <div className="step"><div className="snum">2.</div><div className="stt">Teach the AI</div><div className="sdd">Answer a few questions about your business — what you do, your services, timings and prices. That&apos;s all the AI needs to speak for you.</div></div>
-            <div className="step"><div className="snum">3.</div><div className="stt">Close deals</div><div className="sdd">Leads flow in, AI replies instantly, follow-ups happen on time. Every morning a summary lands on your WhatsApp: who&apos;s hot, who to call.</div></div>
+      {/* FEATURES — bento */}
+      <section className="m-sec" id="features" style={{ paddingTop: 0 }}>
+        <div className="m-wrap">
+          <div className="m-head rv">
+            <span className="m-kicker">Features</span>
+            <h2 className="m-h2">The work you forget,<br /><em>AI never does.</em></h2>
+          </div>
+          <div className="bento">
+            <div className="bt green s3 rv">
+              <span className="bt-tag">AI auto-reply</span>
+              <h3>A warm first reply, in ten seconds.</h3>
+              <p>Uses your services, prices and timings. Customers think you never sleep.</p>
+              <div className="bt-chat">
+                <div className="bub in">Do you have weekend slots?<time>Sat 9:12</time></div>
+                <div className="bub out">Yes! Saturdays 10 AM – 4 PM. Want me to hold 11:30 for you?<time>Sat 9:12 ✓✓</time></div>
+              </div>
+            </div>
+            <div className="bt lime s3 rv">
+              <span className="bt-tag">Instant alerts</span>
+              <h3>Know the moment a lead lands.</h3>
+              <p>On WhatsApp and email — day or night, weekend or holiday.</p>
+              <div className="bt-big">0<small> missed</small></div>
+            </div>
+            <div className="bt s2 rv">
+              <span className="bt-tag">Follow-ups</span>
+              <h3>Cold leads come back warm.</h3>
+              <p>No reply in 2 days? AI drafts a gentle nudge you approve in one tap.</p>
+            </div>
+            <div className="bt s2 rv">
+              <span className="bt-tag">One inbox</span>
+              <h3>Every source, one place.</h3>
+              <p>Forms, WhatsApp and chat — with full history and status.</p>
+            </div>
+            <div className="bt s2 rv">
+              <span className="bt-tag">Offers &amp; banners</span>
+              <h3>Weekend discount? Live in a click.</h3>
+              <p>Push a banner to your site from your phone. No developer.</p>
+            </div>
+            <div className="bt ink s6 rv">
+              <div className="bt-split">
+                <div>
+                  <span className="bt-tag">Ask your AI</span>
+                  <h3>Plain-language answers from your own business data.</h3>
+                </div>
+                <div className="qa-row">
+                  <span className="qa-chip">How many leads this week?</span>
+                  <span className="qa-chip a">14 — 9 replied, 3 won. Call Aman Gupta first.</span>
+                  <span className="qa-chip">Who should I call first?</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="sec" id="voices">
-        <div className="sechead"><h2>People who stopped <em>losing leads.</em></h2></div>
-        <div className="tgrid">
-          <div className="tc">
-            <div className="stars">★★★★★</div>
-            <p className="tq">&quot;I used to check email once a day. Turns out I was replying to enquiries <b>6 hours late</b>. Now the AI answers before I even see my phone — bookings doubled in two months.&quot;</p>
-            <div className="twho"><span className="tav" style={{ background: "#155EEF" }}>RM</span><div><div className="tn">Dr. Rachit Mehra</div><div className="tb">Dental clinic, Indore</div></div></div>
+      {/* HOW */}
+      <section className="m-sec" id="how" style={{ paddingTop: 0 }}>
+        <div className="m-wrap">
+          <div className="m-head rv">
+            <span className="m-kicker">How it works</span>
+            <h2 className="m-h2">Three steps, <em>that&apos;s it.</em></h2>
           </div>
-          <div className="tc">
-            <div className="stars">★★★★★</div>
-            <p className="tq">&quot;The morning WhatsApp summary is my favourite thing. Tea in one hand, phone in the other — I know <b>exactly who to call</b> before 10am. It&apos;s like having a receptionist who never takes leave.&quot;</p>
-            <div className="twho"><span className="tav" style={{ background: "#14161A" }}>SK</span><div><div className="tn">Shalini Kapoor</div><div className="tb">Salon owner, Pune</div></div></div>
-          </div>
-          <div className="tc">
-            <div className="stars">★★★★★</div>
-            <p className="tq">&quot;Half my enquiries came on WhatsApp and got lost between family chats. Now everything sits in one inbox with a status. Last month I closed <b>9 deals from old leads</b> the follow-up AI revived.&quot;</p>
-            <div className="twho"><span className="tav" style={{ background: "#0E9F6E" }}>AV</span><div><div className="tn">Arjun Verma</div><div className="tb">Real estate consultant, Jaipur</div></div></div>
+          <div className="steps3">
+            {STEPS.map((s, i) => (
+              <div className="st rv" key={s.t}>
+                <div className="m-num">0{i + 1}</div>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="sec" id="pricing" style={{ paddingTop: 0 }}>
-        <div className="sechead"><h2>Honest <em>pricing.</em></h2></div>
-        <p className="seclede">Start free. Upgrade when the leads do. No contracts, no surprises — cancel in two clicks.</p>
-        <PricingSection />
-      </section>
-
-      <section className="sec" id="faq" style={{ paddingTop: 0 }}>
-        <div className="sechead"><h2>Fair <em>questions.</em></h2></div>
-        <div className="faq">
-          <details className="qa" open>
-            <summary>Will this work with my existing website? <IconArrowRight size={16} /></summary>
-            <p>Yes — that&apos;s the whole point. Whether your site was built in WordPress, Wix, or hand-coded years ago, you paste one small snippet and your existing contact form starts sending leads to your inbox. Nothing about your site changes.</p>
-          </details>
-          <details className="qa">
-            <summary>What if the AI says something wrong to my customer? <IconArrowRight size={16} /></summary>
-            <p>The AI only uses the information you give it — your services, prices, timings. It never invents answers. For anything it&apos;s unsure about, it politely says the owner will call back, and pings you. You can also review every follow-up before it&apos;s sent.</p>
-          </details>
-          <details className="qa">
-            <summary>I get most enquiries on WhatsApp, not my website. Does this help? <IconArrowRight size={16} /></summary>
-            <p>Yes — on the Growth plan, your WhatsApp business number connects to the same inbox. Website, WhatsApp and chat leads all live together, so nothing gets lost between personal chats.</p>
-          </details>
-          <details className="qa">
-            <summary>Do I need to install anything or hire a developer? <IconArrowRight size={16} /></summary>
-            <p>No installs, no developer. If you can copy-paste, you can set up Leadworks in about 5 minutes. And if you get stuck, we&apos;ll do the setup with you on a call — free.</p>
-          </details>
-          <details className="qa">
-            <summary>What happens to my data if I cancel? <IconArrowRight size={16} /></summary>
-            <p>Your leads are yours. Export everything to Excel/CSV in one click, any time — including after you cancel. We keep your data for 30 days post-cancellation in case you change your mind, then delete it permanently.</p>
-          </details>
+      {/* QUOTES */}
+      <section className="m-sec" id="voices" style={{ paddingTop: 0 }}>
+        <div className="m-wrap">
+          <div className="m-head rv">
+            <span className="m-kicker">Customers</span>
+            <h2 className="m-h2">People who stopped <em>losing leads.</em></h2>
+          </div>
+          <div className="quotes">
+            <div className="q-feature rv">
+              <blockquote>{feature.q}</blockquote>
+              <div className="q-who">
+                <span className="q-av" style={{ background: feature.c }}>{feature.i}</span>
+                <div><strong>{feature.n}</strong><small>{feature.r}</small></div>
+              </div>
+            </div>
+            <div className="q-side rv">
+              {rest.map((q) => (
+                <div key={q.n}>
+                  <p>&ldquo;{q.q}&rdquo;</p>
+                  <div className="q-who">
+                    <span className="q-av" style={{ background: q.c }}>{q.i}</span>
+                    <div><strong>{q.n}</strong><small>{q.r}</small></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="sec" style={{ paddingTop: 0 }}>
-        <div className="note">
-          <span className="pin">📌</span>
-          <p>
-            &quot;We build websites for small businesses. The sites looked great — but we kept
-            watching owners lose enquiries in messy inboxes and forgotten chats. Leadworks is the
-            tool we wished existed for our own clients. So we built it.&quot;
-          </p>
-          <div className="sig">— Rajdeep, Founder</div>
-          <div className="sigr">Leadworks · built in India, for small businesses everywhere</div>
+      {/* PRICING */}
+      <section className="m-sec" id="pricing" style={{ paddingTop: 0 }}>
+        <div className="m-wrap">
+          <div className="m-head center rv">
+            <span className="m-kicker">Pricing</span>
+            <h2 className="m-h2">Honest <em>pricing.</em></h2>
+            <p className="m-sub">Start free. Upgrade when the leads do. No contracts — cancel in two clicks.</p>
+          </div>
+          <PricingSection />
         </div>
       </section>
 
-      <section className="endcta dots">
-        <h2>Don&apos;t miss <em>the next lead.</em></h2>
-        <p className="endsub">Your next customer is filling the form right now. Be the first to reply.</p>
-        <div className="ctas" style={{ justifyContent: "center", marginTop: 26 }}>
-          <Link href="/login"><button className="big">Start free <IconArrowRight size={16} /></button></Link>
-          <button className="gho">watch the demo</button>
+      {/* FAQ */}
+      <section className="m-sec" id="faq" style={{ paddingTop: 0 }}>
+        <div className="m-wrap faq2">
+          <div className="m-head rv" style={{ marginBottom: 0 }}>
+            <span className="m-kicker">FAQ</span>
+            <h2 className="m-h2">Fair <em>questions.</em></h2>
+            <p className="m-sub">Anything else? Write to hello@leadworks.in and a human replies.</p>
+          </div>
+          <div className="faq2-list rv">
+            {FAQ.map(([q, a], i) => (
+              <details key={q} open={i === 0}>
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
-      <footer className="foot">
-        <span>© 2026 Leadworks</span>
-        <span className="serif" style={{ color: "#475467" }}>small business, big dreams.</span>
-        <span>Privacy · Terms · Contact</span>
+      {/* CTA */}
+      <section className="m-wrap" style={{ paddingBottom: 24 }}>
+        <div className="m-cta rv">
+          <h2>Don&apos;t miss <em>the next lead.</em></h2>
+          <p>Your next customer is filling the form right now. Be the first to reply.</p>
+          <div className="m-cta-btns">
+            <Link href="/onboarding" className="m-btn lime">Start free <IconArrowRight size={16} /></Link>
+            <Link href="/login" className="m-btn line">Log in</Link>
+          </div>
+        </div>
+      </section>
+
+      <footer className="m-foot">
+        <div className="m-wrap">
+          <div className="m-foot-grid">
+            <div>
+              <Logo size={30} />
+              <p>The AI lead inbox for small businesses. Built in India, for small businesses everywhere.</p>
+            </div>
+            <div><h4>Product</h4><ul><li><a href="#features">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#how">How it works</a></li></ul></div>
+            <div><h4>Company</h4><ul><li><a href="#voices">Customers</a></li><li><a href="#faq">FAQ</a></li><li><a href="mailto:hello@leadworks.in">Contact</a></li></ul></div>
+            <div><h4>Account</h4><ul><li><Link href="/login">Log in</Link></li><li><Link href="/onboarding">Start free</Link></li></ul></div>
+          </div>
+          <div className="m-foot-bar"><span>© 2026 Leadworks</span><span>Privacy · Terms</span></div>
+        </div>
       </footer>
-    </>
+    </div>
   );
 }

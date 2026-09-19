@@ -2,96 +2,96 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { IconGlobe, IconRobot, IconWhatsapp, IconArrowRight } from "@/components/icons";
-import { ApiError } from "@/utils/apiUtils";
+import { IconArrowRight, IconChat, IconGlobe, IconPhone, IconRobot, IconWhatsapp } from "@/components/icons";
 import { useLead } from "@/hooks/leads/query";
 import { useUpdateLeadStatus } from "@/hooks/leads/mutation";
-import { timeAgo, statusLabel, sourceLabel, maskContact } from "@/lib/format";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { apiErrorCode } from "@/lib/errors";
+import { initials, sourceLabel, statusLabel, timeAgo } from "@/lib/format";
+import type { LeadStatus } from "@/types/models";
+import { Button } from "@/components/ui/Button";
+
+const SOURCE_ICON = { form: IconGlobe, whatsapp: IconWhatsapp, chat_widget: IconChat, missed_call: IconPhone } as const;
 
 export default function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data, isLoading: loading, error: queryError } = useLead(id);
+  const { data, isLoading, error } = useLead(id);
+  const updateStatus = useUpdateLeadStatus();
   const lead = data?.lead ?? null;
-  const updateStatusMutation = useUpdateLeadStatus();
 
-  const error = queryError
-    ? queryError instanceof ApiError && queryError.status === 404
-      ? "not_found"
-      : "network_error"
-    : null;
+  const setStatus = (status: LeadStatus) => lead && updateStatus.mutate({ id: lead.id, status });
 
-  function markWon() {
-    if (!lead) return;
-    updateStatusMutation.mutate({ id: lead.id, status: "won" });
-  }
-
-  if (loading) {
-    return <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#98A2B3" }}>Loading…</div>;
-  }
-  if (error || !lead) {
+  if (isLoading) {
     return (
       <>
-        <div className="p-mh">
-          <Link href="/leads" style={{ fontSize: 13, fontWeight: 700, color: "#475467" }}>← Leads</Link>
-        </div>
-        <div className="p-card" style={{ padding: 20, fontSize: 13, color: "#D92D20" }}>
-          {error === "not_found" ? "This lead doesn't exist." : "Couldn't load this lead — is leadworks-api running?"}
-        </div>
+        <Skeleton width={90} height={14} style={{ marginBottom: 24 }} />
+        <div className="pnl pad"><Skeleton width="40%" height={32} /><Skeleton width="70%" height={14} style={{ marginTop: 18 }} /></div>
+      </>
+    );
+  }
+
+  if (error || !lead) {
+    const notFound = apiErrorCode(error) === "not_found";
+    return (
+      <>
+        <Link href="/leads" className="back">← All leads</Link>
+        <div className="state-err">{notFound ? "This lead doesn't exist." : "Couldn't load this lead — is leadworks-api running?"}</div>
       </>
     );
   }
 
   const [label, cls] = statusLabel(lead.status);
-  const SourceIcon = lead.source === "whatsapp" ? IconWhatsapp : IconGlobe;
+  const SourceIcon = SOURCE_ICON[lead.source] ?? IconGlobe;
+  const isEmail = lead.contact.includes("@");
+  const custom = Object.entries(lead.customFields ?? {});
 
   return (
     <>
-      <div className="p-mh">
-        <Link href="/leads" style={{ fontSize: 13, fontWeight: 700, color: "#475467" }}>
-          ← Leads
-        </Link>
-        <span className={`pp ${cls}`}>{label}</span>
-      </div>
+      <Link href="/leads" className="back">← All leads</Link>
 
-      <div className="p-card" style={{ padding: 20, marginBottom: 16 }}>
-        <div style={{ fontSize: 19, fontWeight: 800 }}>{lead.name ?? "Unknown"}</div>
-        <div style={{ fontSize: 12, color: "#98A2B3", marginTop: 4, display: "flex", alignItems: "center", gap: 6 }}>
-          <SourceIcon size={14} /> {sourceLabel(lead.source)} · {maskContact(lead.contact)} · {timeAgo(lead.createdAt)} ago
-        </div>
-      </div>
+      <div className="ld">
+        <div className="pnl">
+          <div className="lead-h">
+            <span className="av">{initials(lead.name ?? lead.contact)}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2>{lead.name ?? "Unknown lead"}</h2>
+              <small>
+                <SourceIcon size={13} style={{ verticalAlign: "-2px" }} /> {sourceLabel(lead.source)} · {timeAgo(lead.createdAt)} ago
+              </small>
+            </div>
+            <span className={`pp ${cls}`}>{label}</span>
+          </div>
 
-      <div style={{ borderLeft: "2px dashed #E4E7EC", marginLeft: 8, paddingLeft: 16, display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
-        <div>
-          <div style={{ fontWeight: 800, fontSize: 11 }}>{(lead.name ?? "LEAD").toUpperCase()} · {timeAgo(lead.createdAt)} ago</div>
-          <div style={{ color: "#475467", marginTop: 3, fontSize: 13.5, lineHeight: 1.5 }}>
-            &quot;{lead.message ?? "No message left."}&quot;
+          <div className="thread">
+            <span className="thread-note">{new Date(lead.createdAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
+            <div className="bub in">{lead.message ?? "No message left."}</div>
+          </div>
+
+          <div className="aidraft">
+            <b><IconRobot size={16} style={{ color: "var(--primary)" }} /> AI reply</b>
+            <p>Drafting replies with AI isn&apos;t switched on yet — once it is, a suggested response for this enquiry will appear here for you to send.</p>
           </div>
         </div>
-      </div>
 
-      <div className="p-card" style={{ padding: 16, background: "#FFFDF4", borderColor: "#14161A", marginBottom: 16 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 7, fontWeight: 800, fontSize: 12.5, marginBottom: 7 }}>
-          <IconRobot size={15} style={{ color: "#155EEF" }} /> AI reply
+        <div>
+          <div className="pnl">
+            <div className="dl">
+              <div className="dl-r"><span>Contact</span><span>{isEmail ? <a href={`mailto:${lead.contact}`}>{lead.contact}</a> : <a href={`tel:${lead.contact}`}>{lead.contact}</a>}</span></div>
+              <div className="dl-r"><span>Source</span><span>{sourceLabel(lead.source)}</span></div>
+              <div className="dl-r"><span>Received</span><span>{timeAgo(lead.createdAt)} ago</span></div>
+              <div className="dl-r"><span>Last activity</span><span>{timeAgo(lead.lastActivityAt)} ago</span></div>
+              {custom.map(([k, v]) => <div className="dl-r" key={k}><span>{k}</span><span>{String(v)}</span></div>)}
+            </div>
+            <div className="side-acts">
+              <Button block onClick={() => setStatus("won")} disabled={lead.status === "won"} loading={updateStatus.isPending} loadingText="Saving…">
+                {lead.status === "won" ? "✓ Won" : "Mark as won"}
+              </Button>
+              {lead.status === "new" && <Button block variant="secondary" onClick={() => setStatus("replied")} disabled={updateStatus.isPending}>Mark as replied</Button>}
+              {lead.status !== "closed" && lead.status !== "won" && <Button block variant="secondary" onClick={() => setStatus("closed")} disabled={updateStatus.isPending}>Close lead</Button>}
+              <Button block variant="secondary" disabled iconRight={<IconArrowRight size={14} />}>Schedule follow-up</Button>
+            </div>
+          </div>
         </div>
-        <div style={{ fontSize: 13.5, lineHeight: 1.55, color: "#475467" }}>
-          AI auto-reply drafting isn&apos;t wired up yet in this build (see
-          INTEGRATION_PLAN.md, Phase D) — this card will show a real drafted
-          reply once <code>/api/ai/draft-reply</code> exists.
-        </div>
-      </div>
-
-      <div style={{ display: "flex", gap: 8 }}>
-        <button
-          className="pbtn dark"
-          style={{ flex: 1, fontSize: 12.5, opacity: updateStatusMutation.isPending ? 0.6 : 1 }}
-          onClick={markWon}
-          disabled={updateStatusMutation.isPending || lead.status === "won"}
-        >
-          {lead.status === "won" ? "✓ Won" : updateStatusMutation.isPending ? "Saving…" : "✓ Mark as Won"}
-        </button>
-        <button className="pbtn lite" style={{ flex: 1, fontSize: 12.5, border: "1.5px solid #14161A", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }} disabled>
-          Schedule follow-up <IconArrowRight size={13} />
-        </button>
       </div>
     </>
   );

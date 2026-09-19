@@ -1,75 +1,86 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Logo } from "@/components/Logo";
-import { IconHome, IconUsers, IconChat, IconTag, IconRefresh, IconSettings, IconBlog } from "@/components/icons";
-import { clearToken, isLoggedIn } from "@/lib/session";
-import { fetchLeadsService } from "@/services/leads";
+import { IconSparkle } from "@/components/icons";
+import { clearSession, getUser } from "@/lib/session";
 import { useLeads } from "@/hooks/leads/query";
+import type { AuthUser } from "@/types/models";
+import { Button } from "@/components/ui/Button";
 
-const items = [
-  { href: "/dashboard", label: "Home", icon: IconHome },
-  { href: "/leads", label: "Leads", icon: IconUsers },
-  { href: "/ai-widget", label: "AI chat widget", icon: IconChat },
-  { href: "/blog", label: "AI Blog", icon: IconBlog },
-  { href: "/offers", label: "Offers", icon: IconTag },
-  { href: "/follow-ups", label: "Follow-ups", icon: IconRefresh, count: 3 },
-  { href: "/settings", label: "Settings", icon: IconSettings },
+const TABS = [
+  { href: "/dashboard", label: "Home" },
+  { href: "/leads", label: "Leads" },
+  { href: "/follow-ups", label: "Follow-ups" },
+  { href: "/offers", label: "Offers" },
+  { href: "/blog", label: "AI Blog" },
+  { href: "/ai-widget", label: "Chat widget" },
+  { href: "/settings", label: "Settings" },
 ];
 
-export function PortalNav() {
+export function PortalNav({ onOpenAi }: { onOpenAi: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [leadsCount, setLeadsCount] = useState<number>(0);
+  const queryClient = useQueryClient();
+  const { data } = useLeads();
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // localStorage isn't available during SSR — read it after mount.
+  useEffect(() => setUser(getUser()), []);
 
   useEffect(() => {
-    // Only run if we have a token to avoid unnecessary 401s
-    if (typeof window !== "undefined" && window.localStorage.getItem("lw_token")) {
-      fetchLeadsService()
-        .then(res => setLeadsCount(res.leads.length))
-        .catch(() => {});
-    }
-  }, []);
+    if (!menuOpen) return;
+    const close = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [menuOpen]);
 
-  function handleLogout() {
-    clearToken();
+  function logout() {
+    clearSession();
+    queryClient.clear();
     router.push("/login");
   }
 
+  const newCount = data?.leads.filter((l) => l.status === "new").length ?? 0;
+  const email = user?.email ?? "";
+
   return (
-    <aside className="p-side">
-      <div className="p-brand"><Logo size={22} /></div>
-      <div className="p-hey">Welcome back, Raj 👋</div>
-      {items.map(({ href, label, icon: Icon, count }) => {
-        const active = pathname?.startsWith(href);
-        const displayCount = href === "/leads" ? leadsCount : count;
-        
-        return (
-          <Link key={href} href={href} className={`p-nav ${active ? "on" : ""}`}>
-            <Icon size={17} />
-            {label}
-            {displayCount ? <span className="cnt">{displayCount}</span> : null}
-          </Link>
-        );
-      })}
-      <button
-        onClick={handleLogout}
-        style={{
-          background: "none", border: "none", cursor: "pointer", textAlign: "left",
-          fontSize: 11.5, fontWeight: 700, color: "#98A2B3", padding: "8px 4px", marginTop: 4,
-        }}
-      >
-        Log out
-      </button>
-      <div className="p-usr">
-        <span className="p-av">R</span>
-        <span>
-          Raj&apos;s Clinic
-          <small>Pro plan</small>
-        </span>
+    <header className="ps-top">
+      <div className="ps-top-in">
+        <span className="ps-logo-text"><Logo size={31} /></span>
+
+        <nav className="ps-nav" aria-label="Main">
+          {TABS.map(({ href, label }) => (
+            <Link key={href} href={href} className={`ps-tab ${pathname?.startsWith(href) ? "on" : ""}`}>
+              {label}
+              {href === "/leads" && newCount > 0 ? <span className="cnt">{newCount}</span> : null}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ps-right">
+          <Button variant="lime" size="sm" icon={<IconSparkle size={14} />} onClick={onOpenAi}>Ask AI</Button>
+          <div className="ps-menu" ref={menuRef}>
+            <button className="ps-av" onClick={() => setMenuOpen((o) => !o)} aria-label="Account menu">
+              {(email[0] ?? "?").toUpperCase()}
+            </button>
+            {menuOpen && (
+              <div className="ps-pop">
+                <div className="ps-pop-h">{email || "Signed in"}</div>
+                <button onClick={() => router.push("/settings")}>Settings</button>
+                <button onClick={logout}>Log out</button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </aside>
+    </header>
   );
 }
