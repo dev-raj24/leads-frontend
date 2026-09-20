@@ -116,11 +116,34 @@ export interface LeadImportPreview {
   rows: LeadImportRow[];
 }
 
+export type FollowupStatus = "pending" | "approved" | "processing" | "sent" | "manual" | "cancelled";
+
 export interface Followup {
   id: string;
   leadId: string;
   leadName: string;
+  leadContact: string;
   runAt: string;
-  status: "pending" | "sent" | "cancelled";
+  status: FollowupStatus;
   template: string | null;
+  channel: string | null;
+  sentAt: string | null;
+}
+
+export interface BusinessProfile {
+  about: string;
+  services: string;
+  timings: string;
+  tone: string;
+  faqs: string;
+}
+
+export interface Message {
+  id: string;
+  leadId: string;
+  channel: string;
+  direction: "inbound" | "outbound";
+  body: string;
+  aiGenerated: boolean;
+  createdAt: string;
 }

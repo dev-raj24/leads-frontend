@@ -47,11 +47,11 @@
       font-family: system-ui, -apple-system, sans-serif;
     }
     #lw-bubble {
+      color: #d9f470;
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background-color: #155eef;
-      color: white;
+      background-color: #0b5d4b;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -77,8 +77,10 @@
     #lw-chat.open {
       display: flex;
     }
+    .lw-powered { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-top: 1px solid #eaecf0; font-size: 11px; color: #6a707a; background: #fff; }
+    .lw-powered b { color: #10151c; font-weight: 600; }
     .lw-header {
-      background: #155eef;
+      background: #0b5d4b;
       color: white;
       padding: 16px;
       font-weight: bold;
@@ -130,7 +132,7 @@
     .lw-btn {
       width: 100%;
       padding: 10px;
-      background: #14161a;
+      background: #0b5d4b;
       color: white;
       border: none;
       border-radius: 8px;
@@ -138,7 +140,7 @@
       cursor: pointer;
     }
     .lw-btn:hover { background: #344054; }
-    .lw-success { display: none; text-align: center; margin-top: 40px; color: #155eef; font-weight: bold; }
+    .lw-success { display: none; text-align: center; margin-top: 40px; color: #0b5d4b; font-weight: bold; }
 
     /* Dynamic Banner Styles */
     #lw-banner {
@@ -153,7 +155,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      background-color: var(--lw-banner-color, #14161a);
+      background-color: var(--lw-banner-color, #10151c);
       color: white;
       text-align: center;
       padding: 12px 20px;
@@ -171,7 +173,7 @@
       left: 24px;
       width: auto;
       max-width: 320px;
-      background-color: var(--lw-banner-color, #14161a);
+      background-color: var(--lw-banner-color, #10151c);
       color: white;
       padding: 16px;
       border-radius: 12px;
@@ -189,7 +191,7 @@
     }
     .lw-banner-btn {
       background: white;
-      color: #14161a;
+      color: #10151c;
       border: none;
       border-radius: 6px;
       padding: 8px 14px;
@@ -219,12 +221,14 @@
         <div class="lw-msg-bot">Hi there! 👋 How can we help you today?</div>
         <div class="lw-success" id="lw-success-msg">Thanks! We'll be in touch soon.</div>
         <div class="lw-input-group" id="lw-input-form">
+          <input type="text" id="lw-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0" />
           <input type="text" id="lw-name" class="lw-input" placeholder="Your Name" />
           <input type="text" id="lw-contact" class="lw-input" placeholder="Email or Phone" />
           <textarea id="lw-message" class="lw-input" placeholder="Message..." rows="3"></textarea>
           <button class="lw-btn" id="lw-send-btn">Send Message</button>
         </div>
       </div>
+      <div class="lw-powered"><svg width="14" height="14" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="13" fill="#0B5D4B"/><path d="M11.03 39.5Q10.43 39.5 10.43 39.07Q10.43 38.6 11.29 38.47L12.15 38.34Q13.1 38.21 13.47 37.89Q13.83 37.56 14.01 36.66L19.86 11.34Q20.08 10.44 19.86 10.14Q19.65 9.83 18.78 9.66L17.92 9.49Q17.36 9.36 17.36 9.02Q17.36 8.5 18.14 8.5H25.93Q26.58 8.5 26.45 9.02Q26.36 9.4 25.89 9.49L24.68 9.66Q23.74 9.79 23.39 10.14Q23.05 10.48 22.83 11.38L17.23 35.5Q16.89 37.05 17.66 37.73Q18.44 38.42 19.9 38.42Q21.54 38.42 23.26 37.17Q24.98 35.93 26.1 33.26L27.4 30.24Q27.61 29.68 28.08 29.68Q28.73 29.68 28.51 30.42L26.1 38.51Q25.85 39.5 24.81 39.5Z" fill="#F7F6F2"/><circle cx="33.97" cy="35.90" r="3.6" fill="#D9F470"/></svg> Powered by <b>Leadworks</b></div>
     </div>
     <div id="lw-bubble">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -236,7 +240,7 @@
   const banner = document.createElement('div');
   banner.id = 'lw-banner';
   if (offer && offer.displayMode !== 'none') {
-    banner.style.setProperty('--lw-banner-color', offer.color || '#14161a');
+    banner.style.setProperty('--lw-banner-color', offer.color || '#10151c');
     
     if (offer.displayMode === 'top') {
       banner.className = 'lw-banner-top';
@@ -325,17 +329,27 @@
       const res = await fetch(apiBase + '/api/ingest/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ site_key: siteKey, name, contact, message })
+        body: JSON.stringify({ site_key: siteKey, name, contact, message, website: document.getElementById('lw-website').value })
       });
 
       if (res.ok) {
+        const data = await res.json().catch(() => ({}));
         document.getElementById('lw-input-form').style.display = 'none';
-        document.getElementById('lw-success-msg').style.display = 'block';
+        const success = document.getElementById('lw-success-msg');
+        success.style.display = 'block';
+        if (data.reply) {
+          const bubble = document.createElement('div');
+          bubble.className = 'lw-msg-bot';
+          bubble.textContent = data.reply;
+          success.parentNode.insertBefore(bubble, success);
+        }
+      } else if (res.status === 429) {
+        throw new Error('rate');
       } else {
         throw new Error('Failed');
       }
     } catch (e) {
-      alert("Error sending message. Please try again.");
+      alert(e && e.message === 'rate' ? "Too many messages. Please try again in a minute." : "Error sending message. Please try again.");
       sendBtn.innerText = "Send Message";
       sendBtn.disabled = false;
     }

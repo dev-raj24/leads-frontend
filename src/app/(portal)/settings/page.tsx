@@ -2,17 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { CodeSnippet } from "@/components/ui/CodeSnippet";
+import { BusinessProfileForm } from "@/components/portal/BusinessProfileForm";
 import { PageHead } from "@/components/portal/PageHead";
 import { env } from "@/config/env";
 import { useMySite } from "@/hooks/sites/query";
 import { useUpdateSiteSettings } from "@/hooks/sites/mutation";
 
 const MODULES = [
-  { key: "alerts", label: "Instant alerts", desc: "Get notified on WhatsApp and email the moment a lead arrives", def: true },
-  { key: "autoreply", label: "AI auto-reply", desc: "AI sends the first response within seconds", def: true },
+  { key: "alerts", label: "Instant alerts", desc: "Get an email the moment a lead arrives", def: true },
+  { key: "autoreply", label: "AI auto-reply", desc: "AI writes the first reply within seconds and shows it in your website chat", def: true },
   { key: "widget", label: "AI site chat widget", desc: "24/7 chat and lead capture on your website", def: false },
   { key: "offers", label: "Offers & banners", desc: "Show your live offers on your website", def: true },
-  { key: "autofollow", label: "Auto follow-up", desc: "Send follow-ups without asking for approval first", def: false },
+  { key: "autofollow", label: "Auto follow-up", desc: "Send scheduled follow-ups without waiting for your approval", def: false },
 ];
 
 const embedSnippet = (script: string, apiKey: string) =>
@@ -41,7 +42,10 @@ export default function SettingsPage() {
 
   return (
     <>
-      <PageHead eyebrow="Workspace" title="Settings" sub="Embed Leadworks on your website and choose which modules are switched on." actions={<span className="pp p">PRO</span>} />
+      <PageHead eyebrow="Workspace" title="Settings" sub="Teach the AI about your business, embed Leadworks on your site and choose which modules are on." actions={<span className="pp p">PRO</span>} />
+
+      <div className="sec-t">Teach your AI</div>
+      <BusinessProfileForm />
 
       <div className="sec-t">Website snippet</div>
       <CodeSnippet code={embedSnippet("widget.js", apiKey)} />

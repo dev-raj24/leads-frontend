@@ -10,6 +10,9 @@ const leads = {
   updateStatus: {
     v1: { ...defaults.methods.PATCH, ...defaults.versions.v1, uri: "/leads/:id" },
   },
+  aiReply: {
+    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/leads/:id/ai-reply" },
+  },
   template: {
     v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/leads/template" },
   },

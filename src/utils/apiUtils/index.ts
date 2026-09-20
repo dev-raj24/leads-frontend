@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { hostname } from "./hostname";
 import { ApiEndpoint } from "@/types/api";
-import { getToken } from "@/lib/session";
+import { clearSession, getToken } from "@/lib/session";
 
 const authHeader = (): Record<string, string> => {
   const token = getToken();
@@ -91,6 +91,10 @@ export const callApi = async ({
     return response.data;
   } catch (error: any) {
     if (error?.response) {
+      if (error.response.status === 401 && authHeader().Authorization && typeof window !== "undefined") {
+        clearSession();
+        window.location.assign("/login");
+      }
       throw new ApiError(error.response.status, error.response.data);
     }
     throw error;
