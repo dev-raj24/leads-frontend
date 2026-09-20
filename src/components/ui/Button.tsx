@@ -3,12 +3,12 @@
 import Link from "next/link";
 import type React from "react";
 
-export type ButtonVariant = "primary" | "secondary" | "ink" | "lime" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "ink" | "lime" | "danger" | "ghost";
 
 export interface ButtonProps {
   children?: React.ReactNode;
   variant?: ButtonVariant;
-  size?: "md" | "sm";
+  size?: "md" | "sm" | "lg";
   /** Renders a Next <Link> instead of a <button>. */
   href?: string;
   onClick?: (e: React.MouseEvent) => void;
@@ -19,6 +19,9 @@ export interface ButtonProps {
   loadingText?: string;
   /** Stretch to the full width of the parent. */
   block?: boolean;
+  iconOnly?: boolean;
+  ariaLabel?: string;
+  title?: string;
   icon?: React.ReactNode;
   iconRight?: React.ReactNode;
   className?: string;
@@ -31,6 +34,7 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   ink: "ink",
   lime: "lime",
   danger: "danger",
+  ghost: "ghost",
 };
 
 /** The one button used across the portal. Styles live in portal.css (`.btn`). */
@@ -45,12 +49,15 @@ export function Button({
   loading = false,
   loadingText,
   block = false,
+  iconOnly = false,
+  ariaLabel,
+  title,
   icon,
   iconRight,
   className = "",
   style,
 }: ButtonProps) {
-  const cls = ["btn", VARIANT_CLASS[variant], size === "sm" ? "sm" : "", block ? "block" : "", className]
+  const cls = ["btn", VARIANT_CLASS[variant], size === "md" ? "" : size, block ? "block" : "", iconOnly ? "icon" : "", className]
     .filter(Boolean)
     .join(" ");
   const content = (
@@ -63,13 +70,13 @@ export function Button({
 
   if (href) {
     return (
-      <Link href={href} className={cls} style={style} onClick={onClick}>
+      <Link href={href} className={cls} style={style} onClick={onClick} aria-label={ariaLabel} title={title}>
         {content}
       </Link>
     );
   }
   return (
-    <button type={type} onClick={onClick} disabled={disabled || loading} className={cls} style={style}>
+    <button type={type} onClick={onClick} disabled={disabled || loading} className={cls} style={style} aria-label={ariaLabel} title={title}>
       {content}
     </button>
   );

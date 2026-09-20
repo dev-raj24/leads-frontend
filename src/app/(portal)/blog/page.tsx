@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { IconBlog, IconEdit, IconPlus, IconSparkle, IconTrash } from "@/components/icons";
-import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { EmptyState } from "@/components/portal/EmptyState";
 import { PageHead } from "@/components/portal/PageHead";
+import { Button } from "@/components/ui/Button";
 import { ListSkeleton } from "@/components/ui/Skeleton";
+import { Table, type Column } from "@/components/ui/Table";
 import { useBlogPosts } from "@/hooks/blog/query";
 import { useDeleteBlogPost } from "@/hooks/blog/mutation";
 import { timeAgo } from "@/lib/format";
@@ -18,10 +19,47 @@ export default function BlogPage() {
   const [deleting, setDeleting] = useState<BlogPost | null>(null);
   const posts: BlogPost[] = data?.posts ?? [];
 
-  function confirmDelete() {
-    if (!deleting) return;
-    deletePost.mutate(deleting.id, { onSettled: () => setDeleting(null) });
-  }
+  const columns: Column<BlogPost>[] = [
+    {
+      key: "post",
+      header: "Post",
+      width: "minmax(0, 2fr)",
+      sort: (p) => p.title.toLowerCase(),
+      cell: (p) => (
+        <div className="cell-t">
+          <strong>{p.title} {p.aiGenerated && <IconSparkle size={13} style={{ color: "var(--primary)", verticalAlign: "-1px" }} />}</strong>
+          <small>{p.excerpt || "No excerpt"}</small>
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      width: "110px",
+      sort: (p) => p.status,
+      cell: (p) => <span className={`pp ${p.status === "published" ? "w" : "c"}`}>{p.status === "published" ? "● LIVE" : "DRAFT"}</span>,
+    },
+    {
+      key: "created",
+      header: "Created",
+      width: "110px",
+      hideOnMobile: true,
+      sort: (p) => new Date(p.createdAt).getTime(),
+      cell: (p) => <span className="ago" style={{ textAlign: "left" }}>{timeAgo(p.createdAt)} ago</span>,
+    },
+    {
+      key: "actions",
+      header: "",
+      width: "150px",
+      align: "right",
+      cell: (p) => (
+        <div className="row-actions">
+          <Button href={`/blog/new?id=${p.id}`} variant="secondary" size="sm" icon={<IconEdit size={14} />}>Edit</Button>
+          <Button variant="ghost" size="sm" iconOnly ariaLabel="Delete post" icon={<IconTrash size={16} />} onClick={() => setDeleting(p)} />
+        </div>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -46,24 +84,7 @@ export default function BlogPage() {
       )}
 
       {!isLoading && posts.length > 0 && (
-        <div className="pnl">
-          {posts.map((post) => (
-            <div key={post.id} className={`li ${post.status === "published" ? "live" : ""}`}>
-              <div className="li-main">
-                <div className="li-title">
-                  {post.title}
-                  <span className={`pp ${post.status === "published" ? "w" : "c"}`}>{post.status === "published" ? "● LIVE" : "DRAFT"}</span>
-                  {post.aiGenerated && <IconSparkle size={14} style={{ color: "var(--primary)" }} />}
-                </div>
-                <div className="li-sub">{post.excerpt || "No excerpt"} · {timeAgo(post.createdAt)} ago</div>
-              </div>
-              <div className="li-act">
-                <Button href={`/blog/new?id=${post.id}`} variant="secondary" size="sm" icon={<IconEdit size={14} />}>Edit</Button>
-                <button className="iconbtn" onClick={() => setDeleting(post)} aria-label="Delete post"><IconTrash size={17} /></button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Table columns={columns} rows={posts} rowKey={(p) => p.id} pageSize={10} defaultSort={{ key: "created", dir: "desc" }} itemLabel="posts" />
       )}
 
       <ConfirmModal
@@ -72,7 +93,7 @@ export default function BlogPage() {
         message={deleting ? `"${deleting.title}" will be removed, including from your website. This can't be undone.` : ""}
         confirmText="Delete post"
         isLoading={deletePost.isPending}
-        onConfirm={confirmDelete}
+        onConfirm={() => deleting && deletePost.mutate(deleting.id, { onSettled: () => setDeleting(null) })}
         onClose={() => setDeleting(null)}
       />
     </>

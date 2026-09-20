@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { IconInbox, IconPlus, IconSearch } from "@/components/icons";
 import { EmptyState } from "@/components/portal/EmptyState";
 import { LeadTable } from "@/components/portal/LeadTable";
@@ -19,9 +20,11 @@ const FILTERS = [
   { key: "closed", label: "Closed" },
 ];
 
-export default function LeadsPage() {
+function LeadsContent() {
+  const params = useSearchParams();
   const [filter, setFilter] = useState("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(params.get("q") ?? "");
+  useEffect(() => setSearch(params.get("q") ?? ""), [params]);
   const [showImport, setShowImport] = useState(false);
   const { data, isLoading, error, refetch } = useLeads();
 
@@ -38,6 +41,13 @@ export default function LeadsPage() {
           (l.message ?? "").toLowerCase().includes(q)
       );
   }, [leads, filter, search]);
+
+  const counts = useMemo(() => {
+    const result: Record<string, number> = { all: leads.length };
+    for (const l of leads) result[l.status] = (result[l.status] ?? 0) + 1;
+    for (const f of FILTERS) result[f.key] ??= 0;
+    return result;
+  }, [leads]);
 
   const errCode = error ? apiErrorCode(error) ?? "network_error" : null;
 
@@ -63,7 +73,10 @@ export default function LeadsPage() {
       <div className="toolbar">
         <div className="seg" role="tablist">
           {FILTERS.map((f) => (
-            <button key={f.key} className={filter === f.key ? "on" : ""} onClick={() => setFilter(f.key)}>{f.label}</button>
+            <button key={f.key} className={filter === f.key ? "on" : ""} onClick={() => setFilter(f.key)}>
+              {f.label}
+              {counts[f.key] !== undefined && <em className="seg-n">{counts[f.key]}</em>}
+            </button>
           ))}
         </div>
         <label className="search">
@@ -92,7 +105,15 @@ export default function LeadsPage() {
           />
         </div>
       )}
-      {!isLoading && !errCode && visible.length > 0 && <LeadTable leads={visible} />}
+      {!isLoading && !errCode && visible.length > 0 && <LeadTable leads={visible} pageSize={10} />}
     </>
+  );
+}
+
+export default function LeadsPage() {
+  return (
+    <Suspense fallback={null}>
+      <LeadsContent />
+    </Suspense>
   );
 }
