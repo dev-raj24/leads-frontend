@@ -41,7 +41,7 @@ export default function OnboardingPage() {
           </div>
           <div className="field">
             <label className="flabel" htmlFor="password">Password</label>
-            <input id="password" className="finput" type="password" autoComplete="new-password" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" required />
+            <input id="password" className="finput" type="password" autoComplete="new-password" minLength={8} maxLength={72} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" required />
           </div>
           <div className="field">
             <label className="flabel" htmlFor="services">What do you offer? <span style={{ color: "var(--faint)", fontWeight: 500 }}>(optional)</span></label>

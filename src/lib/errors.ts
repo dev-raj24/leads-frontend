@@ -9,7 +9,8 @@ export function apiErrorCode(err: unknown): string | null {
 const MESSAGES: Record<string, string> = {
   invalid_credentials: "Wrong email or password.",
   email_in_use: "An account with this email already exists. Try logging in.",
-  weak_password: "Password must be at least 6 characters.",
+  weak_password: "Password must be 8 to 72 characters.",
+  rate_limited: "Too many attempts. Please wait a few minutes and try again.",
   invalid_email: "Please enter a valid email address.",
   missing_business_name: "Please enter your business name.",
   database_not_configured: "The backend has no database configured yet — see leadworks-api/.env.example.",

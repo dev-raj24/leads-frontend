@@ -1,7 +1,7 @@
 import { callApi } from "@/utils/apiUtils";
 import leadsEndpoints from "@/utils/apiUtils/endpoints/leads";
 import { ApiEndpoint } from "@/types/api";
-import type { Lead, LeadImportPreview, LeadImportRow, LeadStatus } from "@/types/models";
+import type { Lead, LeadImportPreview, LeadImportRow, LeadStatus, Message } from "@/types/models";
 
 export async function fetchLeadsService(status?: string): Promise<{ leads: Lead[] }> {
   return callApi({
@@ -10,7 +10,7 @@ export async function fetchLeadsService(status?: string): Promise<{ leads: Lead[
   });
 }
 
-export async function fetchLeadService(id: string): Promise<{ lead: Lead }> {
+export async function fetchLeadService(id: string): Promise<{ lead: Lead; messages: Message[] }> {
   return callApi({
     uriEndPoint: { ...leadsEndpoints.get.v1 } as ApiEndpoint,
     pathParams: { id },
@@ -54,5 +54,12 @@ export async function bulkCreateLeadsService(leads: LeadImportRow["data"][]): Pr
   return callApi({
     uriEndPoint: { ...leadsEndpoints.bulk.v1 } as ApiEndpoint,
     body: { leads },
+  });
+}
+
+export async function draftLeadReplyService(id: string): Promise<{ reply: string }> {
+  return callApi({
+    uriEndPoint: { ...leadsEndpoints.aiReply.v1 } as ApiEndpoint,
+    pathParams: { id },
   });
 }
