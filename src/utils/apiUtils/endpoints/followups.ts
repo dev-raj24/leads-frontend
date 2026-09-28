@@ -16,6 +16,12 @@ const followups = {
   markSent: {
     v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/followups/:id/mark-sent" },
   },
+  draft: {
+    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/followups/:id/draft" },
+  },
+  sendEmail: {
+    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/followups/:id/send-email" },
+  },
 };
 
 export default followups;

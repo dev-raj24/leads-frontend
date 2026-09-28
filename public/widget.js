@@ -329,7 +329,7 @@
       const res = await fetch(apiBase + '/api/ingest/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ site_key: siteKey, name, contact, message, website: document.getElementById('lw-website').value })
+        body: JSON.stringify({ site_key: siteKey, name, contact, message, source: 'chat_widget', website: document.getElementById('lw-website').value })
       });
 
       if (res.ok) {

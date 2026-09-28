@@ -3,9 +3,12 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { IconLock, IconTag } from "@/components/icons";
+import { EmptyState } from "@/components/portal/EmptyState";
 import { PageHead } from "@/components/portal/PageHead";
 import { useGetOffers } from "@/hooks/offer/query";
 import { useCreateOffer, useUpdateOffer } from "@/hooks/offer/mutation";
+import { useTenant } from "@/hooks/tenant/query";
 import type { OfferPayload } from "@/types/models";
 import { Button } from "@/components/ui/Button";
 
@@ -24,6 +27,8 @@ function OfferForm() {
   const router = useRouter();
   const editId = useSearchParams().get("id");
   const { data } = useGetOffers();
+  const { data: tenantData } = useTenant();
+  const isPro = tenantData?.tenant.plan === "pro";
   const createOffer = useCreateOffer();
   const updateOffer = useUpdateOffer();
 
@@ -59,6 +64,23 @@ function OfferForm() {
     const opts = { onSuccess: () => router.push("/offers"), onError: () => setError("Couldn't save the offer — is leadworks-api running?") };
     if (editId) updateOffer.mutate({ id: editId, ...form, active }, opts);
     else createOffer.mutate({ ...form, active }, opts);
+  }
+
+  if (!editId && !isPro) {
+    return (
+      <>
+        <Link href="/offers" className="back">← All offers</Link>
+        <PageHead eyebrow="New" title={<>Create an <em>offer</em></>} sub="It appears on your website as soon as it's live." />
+        <div className="pnl">
+          <EmptyState
+            icon={<IconLock size={26} />}
+            title="Offers & banners is a Pro feature"
+            text="Upgrade to Pro to create banners, promo codes and WhatsApp offer buttons for your website."
+            action={<Button href="/account" icon={<IconTag size={15} />}>View plans</Button>}
+          />
+        </div>
+      </>
+    );
   }
 
   return (

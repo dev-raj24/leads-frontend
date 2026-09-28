@@ -13,6 +13,9 @@ const leads = {
   aiReply: {
     v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/leads/:id/ai-reply" },
   },
+  sendReply: {
+    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/leads/:id/reply" },
+  },
   template: {
     v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/leads/template" },
   },

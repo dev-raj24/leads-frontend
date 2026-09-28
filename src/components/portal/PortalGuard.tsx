@@ -1,27 +1,32 @@
 "use client";
 
-// PortalGuard — client-side gate for every (portal) page. There's no
-// backend session cookie (frontend and API are different origins), so we
-// check for the JWT in localStorage on mount and bounce to /login if it's
-// missing. This runs once per portal page load, not per navigation inside
-// the portal (Next.js keeps the layout mounted across client nav).
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isLoggedIn } from "@/lib/session";
+import { useTenant } from "@/hooks/tenant/query";
 
 export function PortalGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const { data, isLoading, isError } = useTenant();
 
   useEffect(() => {
     if (!isLoggedIn()) {
       router.replace("/login");
       return;
     }
-    setChecked(true);
+    setAuthChecked(true);
   }, [router]);
 
-  if (!checked) return null;
+  useEffect(() => {
+    if (authChecked && data && !data.tenant.onboardingCompleted) {
+      router.replace("/onboarding/business");
+    }
+  }, [authChecked, data, router]);
+
+  if (!authChecked) return null;
+  if (isLoading) return null;
+  if (!isError && data && !data.tenant.onboardingCompleted) return null;
+
   return <>{children}</>;
 }

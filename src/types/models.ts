@@ -19,6 +19,17 @@ export interface Lead {
   lastActivityAt: string;
 }
 
+export interface CustomerSummary {
+  contact: string;
+  name: string | null;
+  leadCount: number;
+  wonCount: number;
+  isCustomer: boolean;
+  lastSource: LeadSource;
+  firstSeenAt: string;
+  lastActivityAt: string;
+}
+
 export interface Offer {
   id: string;
   tenantId: string;
@@ -130,9 +141,16 @@ export interface Followup {
   sentAt: string | null;
 }
 
+export interface ServiceItem {
+  name: string;
+  description: string;
+  price: string;
+  hidePrice: boolean;
+}
+
 export interface BusinessProfile {
   about: string;
-  services: string;
+  services: ServiceItem[];
   timings: string;
   tone: string;
   faqs: string;
@@ -164,4 +182,15 @@ export interface StatsOverview {
   daily: Array<{ date: string; leads: number; won: number }>;
   byStatus: Array<{ status: string; count: number }>;
   bySource: Array<{ source: string; count: number }>;
+}
+
+export type Plan = "free" | "pro";
+
+export interface Tenant {
+  id: string;
+  name: string;
+  plan: Plan;
+  industry: string | null;
+  onboardingCompleted: boolean;
+  createdAt: string;
 }

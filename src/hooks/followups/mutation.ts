@@ -3,7 +3,9 @@ import {
   approveFollowupService,
   cancelFollowupService,
   createFollowupService,
+  draftFollowupService,
   markFollowupSentService,
+  sendFollowupEmailService,
 } from "@/services/followups";
 
 const useRefreshing = <TVars, TResult>(fn: (vars: TVars) => Promise<TResult>) => {
@@ -22,4 +24,10 @@ export const useApproveFollowup = () =>
 
 export const useCancelFollowup = () => useRefreshing((id: string) => cancelFollowupService(id));
 
-export const useMarkFollowupSent = () => useRefreshing((id: string) => markFollowupSentService(id));
+export const useMarkFollowupSent = () =>
+  useRefreshing(({ id, template }: { id: string; template?: string }) => markFollowupSentService(id, template));
+
+export const useDraftFollowup = () => useMutation({ mutationFn: (id: string) => draftFollowupService(id) });
+
+export const useSendFollowupEmail = () =>
+  useRefreshing(({ id, template }: { id: string; template?: string }) => sendFollowupEmailService(id, template));

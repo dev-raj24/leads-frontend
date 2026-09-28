@@ -8,26 +8,31 @@
 }
 
 /* ---- admin shell ------------------------------------------------------ */
+/* Fixed shell (sidebar + topbar never move) with one independently
+   scrolling content pane — avoids the sidebar jittering with the page's
+   own scroll/rubber-band bounce that a sticky-in-document layout gets. */
 .ad {
   display: grid;
   grid-template-columns: 264px minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100vh;
   background: var(--bg);
 }
 .ad-main {
   min-width: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 .ad-content {
+  flex: 1;
+  overflow-y: auto;
   padding: 28px 32px 80px;
   width: 100%;
   max-width: 1320px;
 }
 
 .sb {
-  position: sticky;
-  top: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -111,6 +116,12 @@
   padding: 12px;
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.sb-user:hover,
+.sb-user.on {
+  background: rgba(0, 0, 0, 0.34);
 }
 .sb-av {
   width: 36px;
@@ -159,8 +170,7 @@
 }
 
 .tb {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 40;
   display: flex;
   align-items: center;
@@ -914,6 +924,172 @@ a.tr:hover {
   font-family: var(--font-display), Georgia, serif;
   font-size: 18px;
   color: var(--ink);
+}
+
+/* ---- opening hours picker (Google-style row) ---------------------------- */
+.hrs {
+  display: flex;
+  flex-direction: column;
+}
+.hrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.hrow:last-of-type {
+  border-bottom: none;
+}
+.hrow-day {
+  width: 92px;
+  flex-shrink: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.hrow-closed {
+  font-size: 13.5px;
+  color: var(--faint);
+}
+.hrow-24 {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--grey);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.hrow-times {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.hrow-times select.finput {
+  width: 128px;
+  padding: 8px 28px 8px 10px;
+}
+.hrow-copy {
+  margin-left: auto;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.hrow-copy:hover {
+  text-decoration: underline;
+}
+@media (max-width: 560px) {
+  .hrow-copy {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* ---- services editor ----------------------------------------------------- */
+.svc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.svc-row {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #faf9f5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.svc-top {
+  display: flex;
+  gap: 8px;
+}
+.svc-top .finput {
+  flex: 1;
+  min-width: 0;
+}
+.svc-price {
+  max-width: 140px;
+  flex: 0 0 auto !important;
+}
+.svc-desc {
+  font-size: 13px;
+}
+.svc-hide {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.svc-hide input {
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+
+.chk {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 17px;
+  height: 17px;
+  border: 1.5px solid #c9c5ba;
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.chk:hover {
+  border-color: var(--primary);
+}
+.chk:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.chk:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1.5px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.chk:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.svc-add {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px dashed #c9c5ba;
+  background: none;
+  padding: 9px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+}
+.svc-add:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary-line);
 }
 
 /* ---- forms ------------------------------------------------------------ */
@@ -1843,4 +2019,126 @@ select.finput {
 .seg button.on .seg-n {
   color: var(--primary);
   background: var(--primary-soft);
+}
+
+/* ---- account page ------------------------------------------------------ */
+.acct-field {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.acct-field:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.acct-field:first-child {
+  padding-top: 0;
+}
+.acct-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+}
+.acct-row span {
+  color: var(--muted);
+}
+.acct-row strong {
+  font-weight: 600;
+}
+.acct-row-val {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.acct-edit {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+}
+.acct-edit:hover {
+  text-decoration: underline;
+}
+
+.acct-edit-panel {
+  max-width: 360px;
+}
+.acct-edit-panel .field {
+  margin-bottom: 14px;
+}
+.acct-edit-panel .field:last-of-type {
+  margin-bottom: 12px;
+}
+.acct-inline-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.acct-plan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+.acct-plan-current {
+  flex: 1 1 260px;
+}
+.acct-plan-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: 24px;
+  margin-top: 12px;
+}
+.acct-features {
+  list-style: none;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13.5px;
+}
+.acct-features li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.acct-features li svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.acct-features.locked li svg {
+  color: var(--faint);
+}
+.acct-features.locked li {
+  color: var(--muted);
+}
+
+.acct-upsell {
+  flex: 1 1 240px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+}
+.acct-upsell-t {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lime-ink);
+}
+.acct-upsell .btn {
+  margin-top: 18px;
+  width: 100%;
+  justify-content: center;
+}
+
+.acct-pw-form {
+  max-width: 360px;
+}
+.acct-pw-form .btn {
+  margin-top: 6px;
 }

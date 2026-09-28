@@ -63,3 +63,11 @@ export async function draftLeadReplyService(id: string): Promise<{ reply: string
     pathParams: { id },
   });
 }
+
+export async function sendLeadReplyService(id: string, text: string): Promise<{ lead: Lead }> {
+  return callApi({
+    uriEndPoint: { ...leadsEndpoints.sendReply.v1 } as ApiEndpoint,
+    pathParams: { id },
+    body: { text },
+  });
+}

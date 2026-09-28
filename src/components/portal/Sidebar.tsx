@@ -8,14 +8,17 @@ import {
   IconBlog,
   IconChat,
   IconHome,
+  IconIdBadge,
   IconLogout,
   IconRefresh,
   IconSettings,
   IconTag,
+  IconUser,
   IconUsers,
 } from "@/components/icons";
 import { useFollowups } from "@/hooks/followups/query";
 import { useLeads } from "@/hooks/leads/query";
+import { useTenant } from "@/hooks/tenant/query";
 import { clearSession } from "@/lib/session";
 import type { AuthUser } from "@/types/models";
 
@@ -32,6 +35,7 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
   const queryClient = useQueryClient();
   const { data: leads } = useLeads();
   const { data: followups } = useFollowups();
+  const { data: tenantData } = useTenant();
 
   const newLeads = leads?.leads.filter((l) => l.status === "new").length ?? 0;
   const openFollowups = followups?.followups.filter((f) => f.status === "pending" || f.status === "manual").length ?? 0;
@@ -42,6 +46,7 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
       title: "Inbox",
       items: [
         { href: "/leads", label: "Leads", icon: IconUsers, badge: newLeads },
+        { href: "/customers", label: "Customers", icon: IconIdBadge },
         { href: "/follow-ups", label: "Follow-ups", icon: IconRefresh, badge: openFollowups },
       ],
     },
@@ -53,7 +58,13 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
         { href: "/ai-widget", label: "Chat widget", icon: IconChat },
       ],
     },
-    { title: "Workspace", items: [{ href: "/settings", label: "Settings", icon: IconSettings }] },
+    {
+      title: "Workspace",
+      items: [
+        { href: "/settings", label: "Settings", icon: IconSettings },
+        { href: "/account", label: "Account", icon: IconUser },
+      ],
+    },
   ];
 
   const logout = () => {
@@ -83,14 +94,27 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
         ))}
       </nav>
 
-      <div className="sb-user">
+      <Link href="/account" onClick={onNavigate} className={`sb-user ${pathname?.startsWith("/account") ? "on" : ""}`}>
         <span className="sb-av">{(email[0] ?? "?").toUpperCase()}</span>
         <div className="sb-user-t">
           <strong>{email.split("@")[0] || "Account"}</strong>
-          <small>{user?.role === "staff" ? "Staff" : "Owner"} · Pro plan</small>
+          <small>
+            {user?.role === "staff" ? "Staff" : "Owner"} · {tenantData?.tenant.plan === "pro" ? "Pro plan" : "Free plan"}
+          </small>
         </div>
-        <button className="sb-out" onClick={logout} aria-label="Log out" title="Log out"><IconLogout size={17} /></button>
-      </div>
+        <button
+          className="sb-out"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            logout();
+          }}
+          aria-label="Log out"
+          title="Log out"
+        >
+          <IconLogout size={17} />
+        </button>
+      </Link>
     </aside>
   );
 }

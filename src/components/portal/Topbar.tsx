@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/Button";
 const TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   leads: "Leads",
+  customers: "Customers",
   "follow-ups": "Follow-ups",
   offers: "Offers",
   blog: "AI Blog",
   "ai-widget": "Chat widget",
   settings: "Settings",
+  account: "Account",
 };
 
 export function Topbar({ onMenu, onAsk }: { onMenu: () => void; onAsk: () => void }) {

@@ -394,3 +394,28 @@ export const IconLogout = ({ size, className, style, ...props }: P) => (
     <path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M16 8l4 4-4 4M20 12H9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+export const IconLock = ({ size, className, style, ...props }: P) => (
+  <svg {...base(size)} className={className} style={style} {...props}>
+    <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+export const IconUser = ({ size, className, style, ...props }: P) => (
+  <svg {...base(size)} className={className} style={style} {...props}>
+    <circle cx="12" cy="8" r="3.6" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M4.5 20c0-4.1 3.4-7.4 7.5-7.4s7.5 3.3 7.5 7.4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+export const IconIdBadge = ({ size, className, style, ...props }: P) => (
+  <svg {...base(size)} className={className} style={style} {...props}>
+    <rect x="4" y="3" width="16" height="18" rx="3" stroke="currentColor" strokeWidth="1.8" />
+    <circle cx="12" cy="10.5" r="2.5" stroke="currentColor" strokeWidth="1.7" />
+    <path d="M8 17c.6-2 2-3 4-3s3.4 1 4 3" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+  </svg>
+);
+export const IconCard = ({ size, className, style, ...props }: P) => (
+  <svg {...base(size)} className={className} style={style} {...props}>
+    <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M3 10h18" stroke="currentColor" strokeWidth="1.8" />
+  </svg>
+);

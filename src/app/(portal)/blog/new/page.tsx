@@ -2,12 +2,13 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { IconSparkle } from "@/components/icons";
+import { IconLock, IconSparkle } from "@/components/icons";
 import Link from "next/link";
 import { PageHead } from "@/components/portal/PageHead";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useBlogPost } from "@/hooks/blog/query";
 import { useGenerateBlogDraft, useCreateBlogPost, useUpdateBlogPost } from "@/hooks/blog/mutation";
+import { useTenant } from "@/hooks/tenant/query";
 import { Button } from "@/components/ui/Button";
 
 function BlogFormContent() {
@@ -16,6 +17,8 @@ function BlogFormContent() {
   const editId = searchParams.get("id");
 
   const { data: existingPost, isLoading: loadingExisting } = useBlogPost(editId ?? "");
+  const { data: tenantData } = useTenant();
+  const isPro = tenantData?.tenant.plan === "pro";
   const generateMutation = useGenerateBlogDraft();
   const createMutation = useCreateBlogPost();
   const updateMutation = useUpdateBlogPost();
@@ -100,9 +103,21 @@ function BlogFormContent() {
             <label className="flabel" htmlFor="topic">What should this post be about?</label>
             <input id="topic" className="finput" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g. How to care for your teeth after a root canal" />
           </div>
+          {!isPro && (
+            <p className="hint">
+              <IconLock size={12} style={{ verticalAlign: "-1px", marginRight: 4 }} />
+              AI writing is a Pro feature. <Link href="/account">Upgrade to Pro →</Link>
+            </p>
+          )}
           {error && <div className="auth-err">{error}</div>}
           <div className="form-foot">
-            <Button type="submit" icon={<IconSparkle size={15} />} disabled={!topic.trim()} loading={generateMutation.isPending} loadingText="Writing…">
+            <Button
+              type="submit"
+              icon={isPro ? <IconSparkle size={15} /> : <IconLock size={13} />}
+              disabled={!topic.trim() || !isPro}
+              loading={generateMutation.isPending}
+              loadingText="Writing…"
+            >
               Generate with AI
             </Button>
             <Button variant="secondary" onClick={() => { setTitle(topic || "Untitled post"); setAiGenerated(false); setHasDraft(true); }}>

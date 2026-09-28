@@ -21,6 +21,14 @@ export async function cancelFollowupService(id: string): Promise<{ followup: Fol
   return callApi({ uriEndPoint: endpoint("cancel"), pathParams: { id } });
 }
 
-export async function markFollowupSentService(id: string): Promise<{ followup: Followup }> {
-  return callApi({ uriEndPoint: endpoint("markSent"), pathParams: { id } });
+export async function markFollowupSentService(id: string, template?: string): Promise<{ followup: Followup }> {
+  return callApi({ uriEndPoint: endpoint("markSent"), pathParams: { id }, body: template ? { template } : {} });
+}
+
+export async function draftFollowupService(id: string): Promise<{ draft: string }> {
+  return callApi({ uriEndPoint: endpoint("draft"), pathParams: { id } });
+}
+
+export async function sendFollowupEmailService(id: string, template?: string): Promise<{ followup: Followup }> {
+  return callApi({ uriEndPoint: endpoint("sendEmail"), pathParams: { id }, body: template ? { template } : {} });
 }

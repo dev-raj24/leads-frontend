@@ -1,71 +1,102 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
 import { useSignup } from "@/hooks/auth/mutation";
 import { authErrorMessage } from "@/lib/errors";
 
+interface SignupFields {
+  businessName: string;
+  email: string;
+  password: string;
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function OnboardingPage() {
   const router = useRouter();
   const signup = useSignup();
-  const [businessName, setBusinessName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [servicesInfo, setServicesInfo] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFields>();
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function onSubmit(values: SignupFields) {
     signup.mutate(
-      { businessName, email, password, servicesInfo: servicesInfo.trim() || undefined },
-      { onSuccess: () => router.push("/dashboard") }
+      { businessName: values.businessName.trim(), email: values.email.trim().toLowerCase(), password: values.password },
+      { onSuccess: () => router.push("/onboarding/business") }
     );
   }
 
   return (
-    <AuthShell>
-        <h2>
-          Set up your <em>workspace.</em>
-        </h2>
-        <div className="auth-sub">Two minutes, no card. Your AI learns your business from this.</div>
+    <AuthShell step={1}>
+      <h2>
+        Set up your <em>workspace.</em>
+      </h2>
+      <div className="auth-sub">Two minutes, no card. Next we&apos;ll teach the AI about your business.</div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="field">
-            <label className="flabel" htmlFor="business">Business name</label>
-            <input id="business" className="finput" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="e.g. Sharma Dental Clinic" required />
-          </div>
-          <div className="field">
-            <label className="flabel" htmlFor="email">Work email</label>
-            <input id="email" className="finput" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbusiness.in" required />
-          </div>
-          <div className="field">
-            <label className="flabel" htmlFor="password">Password</label>
-            <input id="password" className="finput" type="password" autoComplete="new-password" minLength={8} maxLength={72} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" required />
-          </div>
-          <div className="field">
-            <label className="flabel" htmlFor="services">What do you offer? <span style={{ color: "var(--faint)", fontWeight: 500 }}>(optional)</span></label>
-            <textarea
-              id="services"
-              className="finput"
-              rows={3}
-              value={servicesInfo}
-              onChange={(e) => setServicesInfo(e.target.value)}
-              placeholder="Services, prices, timings — the AI uses this to reply to your leads."
-              style={{ resize: "vertical" }}
-            />
-          </div>
-
-          {signup.isError && <div className="auth-err">{authErrorMessage(signup.error)}</div>}
-
-          <button type="submit" disabled={signup.isPending} className="big" style={{ width: "100%", opacity: signup.isPending ? 0.7 : 1 }}>
-            {signup.isPending ? "Setting things up…" : "Create my workspace →"}
-          </button>
-        </form>
-
-        <div className="auth-alt">
-          Already have an account? <Link href="/login">Log in</Link>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div className="field">
+          <label className="flabel" htmlFor="business">Business name</label>
+          <input
+            id="business"
+            className={`finput ${errors.businessName ? "err" : ""}`}
+            placeholder="e.g. Sharma Dental Clinic"
+            aria-invalid={!!errors.businessName}
+            {...register("businessName", {
+              required: "Please enter your business name.",
+              maxLength: { value: 120, message: "Business name must be 120 characters or fewer." },
+            })}
+          />
+          {errors.businessName && <div className="ferr">{errors.businessName.message}</div>}
         </div>
+        <div className="field">
+          <label className="flabel" htmlFor="email">Work email</label>
+          <input
+            id="email"
+            className={`finput ${errors.email ? "err" : ""}`}
+            type="email"
+            autoComplete="email"
+            placeholder="you@yourbusiness.in"
+            aria-invalid={!!errors.email}
+            {...register("email", {
+              required: "Please enter your email.",
+              pattern: { value: EMAIL_RE, message: "Please enter a valid email address." },
+            })}
+          />
+          {errors.email && <div className="ferr">{errors.email.message}</div>}
+        </div>
+        <div className="field">
+          <label className="flabel" htmlFor="password">Password</label>
+          <input
+            id="password"
+            className={`finput ${errors.password ? "err" : ""}`}
+            type="password"
+            autoComplete="new-password"
+            placeholder="At least 8 characters"
+            aria-invalid={!!errors.password}
+            {...register("password", {
+              required: "Please choose a password.",
+              minLength: { value: 8, message: "Password must be at least 8 characters." },
+              maxLength: { value: 72, message: "Password must be 72 characters or fewer." },
+            })}
+          />
+          {errors.password && <div className="ferr">{errors.password.message}</div>}
+        </div>
+
+        {signup.isError && <div className="auth-err">{authErrorMessage(signup.error)}</div>}
+
+        <button type="submit" disabled={signup.isPending} className="big" style={{ width: "100%", opacity: signup.isPending ? 0.7 : 1 }}>
+          {signup.isPending ? "Setting things up…" : "Continue →"}
+        </button>
+      </form>
+
+      <div className="auth-alt">
+        Already have an account? <Link href="/login">Log in</Link>
+      </div>
     </AuthShell>
   );
 }

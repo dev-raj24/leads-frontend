@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { AiPanel } from "@/components/portal/AiPanel";
 import { Sidebar } from "@/components/portal/Sidebar";
 import { Topbar } from "@/components/portal/Topbar";
-import { getUser } from "@/lib/session";
+import { getUser, onUserUpdated } from "@/lib/session";
 import type { AuthUser } from "@/types/models";
 
 export function PortalShell({ children }: { children: React.ReactNode }) {
@@ -14,7 +14,10 @@ export function PortalShell({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const pathname = usePathname();
 
-  useEffect(() => setUser(getUser()), []);
+  useEffect(() => {
+    setUser(getUser());
+    return onUserUpdated(setUser);
+  }, []);
   useEffect(() => setNavOpen(false), [pathname]);
 
   return (

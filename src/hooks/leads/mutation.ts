@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateLeadStatusService, bulkCreateLeadsService, draftLeadReplyService } from "@/services/leads";
+import { updateLeadStatusService, bulkCreateLeadsService, draftLeadReplyService, sendLeadReplyService } from "@/services/leads";
 import type { Lead, LeadImportRow } from "@/types/models";
 
 export const useUpdateLeadStatus = () => {
@@ -26,3 +26,14 @@ export const useBulkCreateLeads = () => {
 
 export const useDraftLeadReply = () =>
   useMutation({ mutationFn: (id: string) => draftLeadReplyService(id) });
+
+export const useSendLeadReply = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, text }: { id: string; text: string }) => sendLeadReplyService(id, text),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["lead"] });
+    },
+  });
+};

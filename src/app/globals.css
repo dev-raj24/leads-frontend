@@ -159,6 +159,18 @@ button:disabled {
   border-color: var(--primary);
   box-shadow: var(--ring);
 }
+.finput.err {
+  border-color: var(--red);
+}
+.finput.err:focus {
+  box-shadow: 0 0 0 4px rgba(196, 50, 28, 0.12);
+}
+.ferr {
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--red);
+}
 
 /* Status / label pills */
 .pp {
@@ -253,16 +265,27 @@ button:disabled {
   background: var(--bg);
 }
 .auth-aside {
-  position: relative;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
   overflow: hidden;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   padding: 44px 52px;
   color: #fff;
   background:
     radial-gradient(70% 50% at 100% 0%, rgba(217, 244, 112, 0.18), transparent 70%),
     var(--primary);
+}
+.auth-logo {
+  position: absolute;
+  top: 44px;
+  left: 52px;
+}
+.auth-mid {
+  width: 100%;
 }
 .auth-quote {
   font-family: var(--font-display), Georgia, serif;
@@ -293,6 +316,9 @@ button:disabled {
   flex-shrink: 0;
 }
 .auth-fine {
+  position: absolute;
+  bottom: 44px;
+  left: 52px;
   font-size: 12.5px;
   color: rgba(255, 255, 255, 0.6);
 }
@@ -308,6 +334,9 @@ button:disabled {
 .auth-box {
   width: 100%;
   max-width: 400px;
+}
+.auth-box.wide {
+  max-width: 640px;
 }
 .auth-box h2 {
   font-family: var(--font-display), Georgia, serif;
@@ -371,6 +400,47 @@ button:disabled {
 .auth-alt a {
   color: var(--primary);
   font-weight: 700;
+}
+.auth-steps {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin-bottom: 28px;
+}
+.auth-steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--faint);
+}
+.auth-steps li span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--faint);
+  border: 1.5px solid var(--line);
+}
+.auth-steps li.on {
+  color: var(--ink);
+}
+.auth-steps li.on span {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.auth-steps li.done {
+  color: var(--muted);
+}
+.auth-steps li.done span {
+  color: var(--primary);
+  background: var(--primary-soft);
+  border-color: var(--primary-line);
 }
 @media (max-width: 860px) {
   .auth-wrap {

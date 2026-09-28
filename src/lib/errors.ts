@@ -13,7 +13,20 @@ const MESSAGES: Record<string, string> = {
   rate_limited: "Too many attempts. Please wait a few minutes and try again.",
   invalid_email: "Please enter a valid email address.",
   missing_business_name: "Please enter your business name.",
+  business_name_too_long: "Business name must be 120 characters or fewer.",
+  invalid_or_expired_token: "This reset link is invalid or has expired. Please request a new one.",
+  missing_industry: "Please choose what kind of business this is.",
+  invalid_plan: "Please choose a plan.",
   database_not_configured: "The backend has no database configured yet — see leadworks-api/.env.example.",
+  wrong_current_password: "Your current password is incorrect.",
+  missing_current_password: "Please enter your current password.",
+  pro_required: "This feature is only available on the Pro plan.",
+  not_manual: "This follow-up isn't waiting to be sent manually anymore.",
+  no_email_on_file: "This contact doesn't have an email on file — copy the message and send it yourself.",
+  mail_not_configured: "Email sending isn't set up yet — copy the message and send it yourself.",
+  send_failed: "Couldn't send the email — copy the message and send it yourself.",
+  missing_text: "Write a reply before sending.",
+  text_too_long: "That reply is too long — keep it under 4000 characters.",
 };
 
 export function authErrorMessage(err: unknown): string {
