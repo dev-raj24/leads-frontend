@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { useChatThread } from "@/hooks/chatWidget/query";
 import { useReplyToChat } from "@/hooks/chatWidget/mutation";
 import { authErrorMessage } from "@/lib/errors";
-import { timeAgo } from "@/lib/format";
+import { initials, timeAgo } from "@/lib/format";
 
 interface ChatThreadModalProps {
   leadId: string;
@@ -19,9 +19,21 @@ export function ChatThreadModal({ leadId, onClose }: ChatThreadModalProps) {
   const { data, isLoading } = useChatThread(leadId);
   const reply = useReplyToChat();
   const [text, setText] = useState("");
+  const [shown, setShown] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
   const messages = data?.messages ?? [];
   const lead = data?.lead;
+  const anonymous = lead ? lead.qualified === false : false;
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setShown(true));
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end" });
@@ -35,56 +47,56 @@ export function ChatThreadModal({ leadId, onClose }: ChatThreadModalProps) {
   }
 
   return (
-    <div className="modal-bg" onClick={onClose}>
-      <div className="modal" style={{ maxWidth: 560, position: "relative" }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
-        <div className="modal-h">
-          <div>
-            <h3 style={{ fontSize: 24 }}>{lead?.name || "Website visitor"}</h3>
-            <p className="hint" style={{ margin: "2px 0 0" }}>{!lead ? "Loading…" : lead.qualified === false ? "No contact details yet" : lead.contact}</p>
+    <>
+      <div className={`drawer-bg ${shown ? "open" : ""}`} onClick={onClose} />
+      <aside className={`drawer wide ${shown ? "open" : ""}`} aria-label="Chat conversation">
+        <div className="drawer-h">
+          <span className="av">{initials(lead?.name ?? (anonymous ? "Visitor" : lead?.contact ?? "V"))}</span>
+          <div style={{ minWidth: 0 }}>
+            <strong>{lead?.name || "Website visitor"}</strong>
+            <small>{!lead ? "Loading…" : anonymous ? "No contact details yet" : lead.contact}</small>
           </div>
+          <button type="button" className="iconbtn" onClick={onClose} aria-label="Close"><IconClose size={16} /></button>
         </div>
-        <button type="button" className="iconbtn" onClick={onClose} aria-label="Close" style={{ position: "absolute", top: 20, right: 20 }}>
-          <IconClose size={16} />
-        </button>
 
-        <div className="thread" style={{ padding: 16, maxHeight: 340, overflowY: "auto", borderRadius: 12, marginTop: 12 }}>
+        <div className="drawer-body chat-body">
           {isLoading && <Skeleton height={48} />}
           {messages.map((m) => {
             const inbound = m.direction === "inbound";
+            const who = inbound ? "Visitor" : m.aiGenerated ? "AI" : "Team";
             return (
-              <div key={m.id} className={`bub ${inbound ? "in" : "out"}`}>
+              <div key={m.id} className={`bub ${inbound ? "in" : "out"} ${!inbound && !m.aiGenerated ? "team" : ""}`}>
                 {m.body}
-                <time>
-                  {inbound ? "Visitor" : m.aiGenerated ? "AI reply" : "Team"} · {timeAgo(m.createdAt)} ago
-                </time>
+                <time>{who} · {timeAgo(m.createdAt)} ago</time>
               </div>
             );
           })}
           <div ref={endRef} />
         </div>
 
-        <form onSubmit={send} style={{ marginTop: 14 }}>
-          <div className="field" style={{ marginBottom: 8 }}>
-            <label className="flabel" htmlFor="chat-reply">Reply as the team</label>
-            <textarea
-              id="chat-reply"
-              className="finput"
-              rows={3}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Type a reply — the visitor sees it in their chat bubble within seconds."
-            />
-          </div>
-          <p className="hint" style={{ margin: "0 0 4px" }}>
-            Once you reply, the AI pauses on this chat for 30 minutes so it doesn&apos;t talk over you.
+        <form onSubmit={send} className="drawer-foot">
+          <textarea
+            id="chat-reply"
+            className="finput"
+            rows={3}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send(e);
+            }}
+            aria-label="Reply as the team"
+            placeholder="Reply as the team. The visitor sees it in their chat bubble within seconds."
+          />
+          <p className="hint" style={{ margin: "8px 0 0" }}>
+            When you reply, the AI stays quiet on this chat for 30 minutes.
           </p>
           {reply.isError && <p className="hint" style={{ color: "var(--red)" }}>{authErrorMessage(reply.error)}</p>}
-          <div className="modal-foot">
-            <Link href={`/leads/${leadId}`} className="hint" style={{ marginRight: "auto" }}>Open lead →</Link>
+          <div className="drawer-actions">
+            <Link href={`/leads/${leadId}`} className="hint">{anonymous ? "Open details" : "Open lead"} →</Link>
             <Button type="submit" disabled={!text.trim()} loading={reply.isPending} loadingText="Sending…">Send reply</Button>
           </div>
         </form>
-      </div>
-    </div>
+      </aside>
+    </>
   );
 }

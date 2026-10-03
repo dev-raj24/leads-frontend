@@ -81,6 +81,7 @@ const SKIP_REASON: Record<string, string> = {
   unsubscribed: "they asked not to get automatic emails",
   automated_address: "it is a no-reply address",
   invalid_address: "there is no email address",
+  email_not_verified: "your email is not confirmed yet",
   monthly_limit: "the monthly lead limit was reached",
 };
 
@@ -93,10 +94,12 @@ export function eventLabel(type: string, payload: Record<string, unknown>): stri
       return "Shared contact details, became a lead";
     case "owner_alerted":
       return "You were emailed about this lead";
+    case "owner_alert_skipped":
+      return `No alert emailed to you: ${reason}`;
     case "owner_alert_failed":
       return "We couldn't email you about this lead";
     case "ai_reply_sent":
-      return payload.channel === "email" ? "AI replied by email" : "AI replied";
+      return payload.channel === "email" ? "AI replied by email" : "AI wrote a reply (not emailed: no email address to send it to)";
     case "ai_reply_skipped":
       return `AI reply skipped: ${reason}`;
     case "ai_reply_email_skipped":

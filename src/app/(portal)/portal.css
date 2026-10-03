@@ -2342,3 +2342,34 @@ select.finput {
   display: block;
   color: var(--muted, #5b6b62);
 }
+
+.drawer.wide {
+  width: min(520px, calc(100vw - 24px));
+}
+.drawer-body.chat-body {
+  background: #f4f1ea;
+  gap: 12px;
+}
+.drawer-body.chat-body .bub {
+  max-width: 86%;
+}
+.drawer-body.chat-body .bub.in {
+  align-self: flex-start;
+}
+.drawer-body.chat-body .bub.out {
+  align-self: flex-end;
+}
+.drawer-body.chat-body .bub.out.team {
+  background: var(--primary);
+  color: #fff;
+}
+.drawer-body.chat-body .bub.out.team time {
+  color: rgba(255, 255, 255, 0.75);
+}
+.drawer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
