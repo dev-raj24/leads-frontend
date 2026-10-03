@@ -7,27 +7,45 @@ export interface PlanInfo {
   price: string;
   per: string;
   features: string[];
+  locked: string[];
   featured: boolean;
 }
 
-/** The one source of truth for what free vs. Pro includes — pricing page and Account page both read this. */
+/** The one source of truth for what Free vs Pro includes — pricing, onboarding and Account all read this. Keep it in step with backend/src/config/plans.ts. */
 export const PLANS: PlanInfo[] = [
   {
     id: "free",
-    name: "Starter",
-    blurb: "For solo owners getting started with lead capture.",
+    name: "Free",
+    blurb: "For owners who want every enquiry in one place and reply themselves.",
     price: "₹0",
     per: "forever",
-    features: ["Up to 50 leads / month", "Web chat widget", "Unified inbox", "Instant email alerts"],
+    features: [
+      "Up to 50 leads a month",
+      "Website enquiry forms",
+      "One inbox for every lead",
+      "Instant email alert for each new lead",
+      "Reply by email from the dashboard",
+      "Customer list and follow-up reminders",
+    ],
+    locked: ["AI reply in seconds", "AI chat on your website", "Offers and popups", "AI blog", "Automatic follow-ups"],
     featured: false,
   },
   {
     id: "pro",
     name: "Pro",
-    blurb: "Everything on autopilot — replies, follow-ups and WhatsApp.",
+    blurb: "Replies in seconds, a chat that answers visitors, and follow-ups that run themselves.",
     price: "₹999",
     per: "/ month",
-    features: ["Unlimited leads", "AI instant responder", "WhatsApp integration", "Automated follow-ups", "AI blog & offer banners"],
+    features: [
+      "Up to 1,000 leads a month",
+      "AI writes the first reply in seconds",
+      "AI chat on your website, with your team able to step in",
+      "Offers as a floating card or popup with a lead form",
+      "AI blog that publishes to your site",
+      "Automatic follow-ups when nobody has replied",
+      "Banner and chat colours matched to your website",
+    ],
+    locked: [],
     featured: true,
   },
 ];

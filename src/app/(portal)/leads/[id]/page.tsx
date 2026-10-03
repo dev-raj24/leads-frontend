@@ -8,7 +8,7 @@ import { useCreateFollowup } from "@/hooks/followups/mutation";
 import { useDraftLeadReply, useSendLeadReply, useUpdateLeadStatus } from "@/hooks/leads/mutation";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { apiErrorCode, authErrorMessage } from "@/lib/errors";
-import { initials, sourceLabel, statusLabel, timeAgo } from "@/lib/format";
+import { eventLabel, initials, sourceLabel, statusLabel, timeAgo } from "@/lib/format";
 import type { LeadStatus } from "@/types/models";
 import { Button } from "@/components/ui/Button";
 
@@ -29,6 +29,10 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   const [copied, setCopied] = useState(false);
   const lead = data?.lead ?? null;
   const messages = data?.messages ?? [];
+  const timeline = (data?.events ?? []).flatMap((e) => {
+    const label = eventLabel(e.type, e.payload);
+    return label ? [{ id: e.id, label, at: e.createdAt }] : [];
+  });
 
   const setStatus = (status: LeadStatus) => lead && updateStatus.mutate({ id: lead.id, status });
 
@@ -154,6 +158,25 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
               View full customer history →
             </Link>
           </div>
+
+          {timeline.length > 0 && (
+            <div>
+              <div className="sec-t">Timeline</div>
+              <div className="pnl pad">
+                <div className="tl">
+                  {timeline.map((t) => (
+                    <div className="tl-r" key={t.id}>
+                      <i />
+                      <span>
+                        {t.label}
+                        <small>{timeAgo(t.at)} ago</small>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div>
             <div className="sec-t">Actions</div>

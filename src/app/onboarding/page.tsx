@@ -89,6 +89,10 @@ export default function OnboardingPage() {
 
         {signup.isError && <div className="auth-err">{authErrorMessage(signup.error)}</div>}
 
+        <p className="hint" style={{ margin: "0 0 14px" }}>
+          By continuing you agree to the <Link href="/terms" target="_blank">Terms</Link> and <Link href="/privacy" target="_blank">Privacy policy</Link>.
+        </p>
+
         <button type="submit" disabled={signup.isPending} className="big" style={{ width: "100%", opacity: signup.isPending ? 0.7 : 1 }}>
           {signup.isPending ? "Setting things up…" : "Continue →"}
         </button>

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 const TITLES: Record<string, string> = {
   dashboard: "Dashboard",
   leads: "Leads",
+  chats: "Chats",
   customers: "Customers",
   "follow-ups": "Follow-ups",
   offers: "Offers",

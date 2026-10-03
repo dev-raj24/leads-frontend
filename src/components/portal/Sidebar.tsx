@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Logo } from "@/components/Logo";
 import {
   IconBlog,
+  IconBolt,
   IconChat,
   IconHome,
   IconIdBadge,
@@ -16,6 +17,7 @@ import {
   IconUser,
   IconUsers,
 } from "@/components/icons";
+import { useChatConversations } from "@/hooks/chatWidget/query";
 import { useFollowups } from "@/hooks/followups/query";
 import { useLeads } from "@/hooks/leads/query";
 import { useTenant } from "@/hooks/tenant/query";
@@ -36,8 +38,10 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
   const { data: leads } = useLeads();
   const { data: followups } = useFollowups();
   const { data: tenantData } = useTenant();
+  const { data: chats } = useChatConversations();
 
   const newLeads = leads?.leads.filter((l) => l.status === "new").length ?? 0;
+  const chatsWaiting = chats?.conversations.filter((c) => c.needsReply).length ?? 0;
   const openFollowups = followups?.followups.filter((f) => f.status === "pending" || f.status === "manual").length ?? 0;
 
   const groups: Array<{ title: string; items: NavItem[] }> = [
@@ -46,6 +50,7 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
       title: "Inbox",
       items: [
         { href: "/leads", label: "Leads", icon: IconUsers, badge: newLeads },
+        { href: "/chats", label: "Chats", icon: IconChat, badge: chatsWaiting },
         { href: "/customers", label: "Customers", icon: IconIdBadge },
         { href: "/follow-ups", label: "Follow-ups", icon: IconRefresh, badge: openFollowups },
       ],
@@ -55,7 +60,7 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
       items: [
         { href: "/offers", label: "Offers", icon: IconTag },
         { href: "/blog", label: "AI Blog", icon: IconBlog },
-        { href: "/ai-widget", label: "Chat widget", icon: IconChat },
+        { href: "/ai-widget", label: "Chat widget", icon: IconBolt },
       ],
     },
     {

@@ -5,6 +5,9 @@ export const useLeads = (status?: string) =>
   useQuery({
     queryKey: ["leads", status ?? "all"],
     queryFn: () => fetchLeadsService(status),
+    refetchInterval: 10_000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
   });
 
 export const useLead = (id: string) =>

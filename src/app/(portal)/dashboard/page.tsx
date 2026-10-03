@@ -16,6 +16,7 @@ import {
 import { EmptyState } from "@/components/portal/EmptyState";
 import { LeadTable } from "@/components/portal/LeadTable";
 import { PageHead } from "@/components/portal/PageHead";
+import { SetupChecklist } from "@/components/portal/SetupChecklist";
 import { BarChart } from "@/components/ui/BarChart";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -87,6 +88,8 @@ export default function DashboardPage() {
       />
 
       {(statsError || leadsError) && <div className="state-err" style={{ marginBottom: 18 }}>Couldn&apos;t reach the API — make sure leadworks-api is running.</div>}
+
+      <SetupChecklist />
 
       <div className="grid stats">
         <div className="g-3">

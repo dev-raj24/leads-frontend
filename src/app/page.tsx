@@ -4,53 +4,52 @@ import { Logo } from "@/components/Logo";
 import { PricingSection } from "@/components/PricingSection";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { IconArrowRight, IconCheck, IconClose } from "@/components/icons";
+import { site } from "@/config/site";
 
 const PROOF = [
-  { n: "10", u: "sec", t: "average first-reply time" },
-  { n: "78", u: "%", t: "of customers pick whoever replies first" },
-  { n: "0", u: "", t: "leads lost in a forgotten inbox" },
-  { n: "2", u: "×", t: "more deals closed with instant follow-up" },
+  { n: "1", u: "inbox", t: "for website forms, chats and offers" },
+  { n: "1", u: "script", t: "on your site, no developer needed" },
+  { n: "₹0", u: "", t: "to start, no card" },
+  { n: "24/7", u: "", t: "website chat that answers visitors, on Pro" },
 ];
 
 const BEFORE = [
   <>Enquiries buried in an <b>email inbox</b> you rarely open</>,
   <>First reply after <b>4–6 hours</b> — the lead has gone cold</>,
   <>&ldquo;Did anyone follow up?&rdquo; — <b>nobody knows</b></>,
-  <>WhatsApp enquiries lost in <b>personal chats</b></>,
+  <>Website chats and offer forms <b>nobody tracks</b></>,
   <>Every missed lead is <b>money handed to a competitor</b></>,
 ];
 const AFTER = [
   <>Every lead from every source in <b>one clean inbox</b></>,
-  <>AI replies in <b>10 seconds</b> — even at 2am</>,
+  <>AI replies in <b>seconds</b> on Pro — even at 2am</>,
   <>Follow-ups <b>scheduled automatically</b> — nothing forgotten</>,
-  <>WhatsApp enquiries <b>captured into the same inbox</b></>,
-  <>A morning summary of <b>exactly who to call today</b></>,
+  <>Website chats and offer forms <b>land in the same place</b></>,
+  <>A clear list of <b>who is still waiting for a reply</b></>,
 ];
 
 const STEPS = [
   { t: "Connect your site", d: "Paste one tiny snippet into your website — five minutes, zero code. Got old leads in Excel? Import them in one go." },
   { t: "Teach the AI", d: "Answer a few questions about your business — services, timings, prices. That's all the AI needs to speak for you." },
-  { t: "Close deals", d: "Leads flow in, AI replies instantly, follow-ups happen on time. Each morning a summary tells you who's hot." },
+  { t: "Close deals", d: "Leads flow in and you get an email each time. On Pro, AI replies in seconds and follow-ups go out on time. You see exactly who is still waiting." },
 ];
 
 const FAQ = [
-  ["Will this work with my existing website?", "Yes — that's the whole point. Whether your site is WordPress, Wix or hand-coded years ago, you paste one small snippet and your contact form starts sending leads to your inbox. Nothing about your site changes."],
-  ["What if the AI says something wrong to my customer?", "The AI only uses what you tell it — your services, prices and timings. It never invents answers, and for anything it's unsure about it says the owner will call back and pings you. You can review every follow-up before it's sent."],
-  ["I get most enquiries on WhatsApp. Does this help?", "Yes — on the Pro plan your WhatsApp business number connects to the same inbox. Website, WhatsApp and chat leads all live together."],
-  ["Do I need a developer?", "No installs, no developer. If you can copy-paste, you can set up Leadworks in about five minutes — and if you get stuck, we'll do it with you on a call, free."],
-  ["What happens to my data if I cancel?", "Your leads are yours. Export everything to Excel in one click, any time. We keep your data for 30 days after cancelling in case you change your mind, then delete it permanently."],
+  ["Will this work with my existing website?", "Yes. Whether your site is WordPress, Wix, Webflow or hand-coded, you paste one small snippet and your forms, chat and offers start sending leads to your inbox. The settings page tells you when it has detected the script."],
+  ["What if the AI says something wrong to my customer?", "The AI only answers from what you tell it: your services, prices and hours. If something isn't covered, it says the team will follow up. It stays off until you have filled in your business profile, and you can see every reply it sent. Automatic follow-ups are off until you switch them on."],
+  ["Does it work with WhatsApp?", "Not yet. Today Leadworks collects enquiries from your website forms, your website chat and your offers. WhatsApp is on our list, and we'd rather tell you that plainly than promise it."],
+  ["Do I need a developer?", `No. If you can copy and paste, you can set it up in about five minutes. If you get stuck, write to ${site.supportEmail} and we will help.`],
+  ["What happens to my data if I cancel?", "Your account moves to Free and your leads, chats and settings stay. Pro-only parts on your website, like the chat bubble and offers, stop showing. If you want everything deleted, write to us and we will delete it."],
+  ["What happens if I go over 50 leads on the Free plan?", "Nothing is lost. Every lead is still saved and shown in your inbox. Paid automations such as AI replies pause until next month or until you upgrade."],
 ];
 
-const QUOTES = [
-  { q: "Turns out I was replying to enquiries six hours late. Now the AI answers before I even see my phone — bookings doubled in two months.", n: "Dr. Rachit Mehra", r: "Dental clinic, Indore", i: "RM", c: "#0b5d4b", big: true },
-  { q: "The morning summary is my favourite thing. Tea in one hand, phone in the other — I know exactly who to call before 10am.", n: "Shalini Kapoor", r: "Salon owner, Pune", i: "SK", c: "#10151c" },
-  { q: "Half my enquiries were lost between family chats. Last month I closed nine deals from old leads the follow-up AI revived.", n: "Arjun Verma", r: "Real estate consultant, Jaipur", i: "AV", c: "#8a5a12" },
+const USES = [
+  { t: "Clinics and dentists", d: "Patients ask about prices and slots at night. The AI answers from your hours and price list, and the front desk sees who still needs a call in the morning." },
+  { t: "Salons, studios and gyms", d: "Put a weekend offer on your site as a floating card with a sign-up form. Everyone who fills it lands in your inbox with the offer tagged." },
+  { t: "Coaching, real estate and services", d: "Enquiries come from forms and chat. Each one gets an email alert, a reply, and a follow-up so a warm lead does not go cold." },
 ];
 
 export default function MarketingHome() {
-  const feature = QUOTES[0];
-  const rest = QUOTES.slice(1);
-
   return (
     <div className="m">
       <RevealOnScroll />
@@ -76,14 +75,14 @@ export default function MarketingHome() {
       <header className="m-hero">
         <div className="m-wrap m-hero-grid">
           <div className="m-hero-copy">
-            <span className="m-pill"><b>New</b> AI replies to every lead in 10 seconds</span>
+            <span className="m-pill"><b>New</b> AI writes the first reply in seconds</span>
             <h1>
               Every lead,<br />
               <em className="mark">in one place.</em>
             </h1>
             <p className="m-lede">
-              Your website, WhatsApp and forms — every enquiry lands in <b>one inbox</b>. AI sends the
-              first reply in seconds and never forgets a follow-up. You just close the deal.
+              Your website forms, chat and offers — every enquiry lands in <b>one inbox</b>. You get an email the moment it arrives, AI can send the
+              first reply in seconds, and follow-ups don&apos;t get forgotten. You just close the deal.
             </p>
             <div className="m-hero-cta">
               <Link href="/onboarding" className="m-btn solid">Start free <IconArrowRight size={16} /></Link>
@@ -92,7 +91,7 @@ export default function MarketingHome() {
             <div className="m-ticks">
               <span><IconCheck size={15} /> No code needed</span>
               <span><IconCheck size={15} /> 5-minute setup</span>
-              <span><IconCheck size={15} /> Cancel anytime</span>
+              <span><IconCheck size={15} /> Free to start</span>
             </div>
           </div>
 
@@ -110,7 +109,7 @@ export default function MarketingHome() {
                 <div className="bub out">Hi Rohit! A root canal starts at ₹4,500. Shall I book you a slot tomorrow at 11 AM?<time>2:04 ✓✓</time></div>
               </div>
             </div>
-            <div className="hv-chip"><i /> AI replied in 9 seconds</div>
+            <div className="hv-chip"><i /> AI replied in seconds</div>
           </div>
         </div>
       </header>
@@ -152,13 +151,13 @@ export default function MarketingHome() {
         <div className="m-wrap">
           <div className="m-head rv">
             <span className="m-kicker">Features</span>
-            <h2 className="m-h2">The work you forget,<br /><em>AI never does.</em></h2>
+            <h2 className="m-h2">The work you forget,<br /><em>gets done for you.</em></h2>
           </div>
           <div className="bento">
             <div className="bt green s3 rv">
-              <span className="bt-tag">AI auto-reply</span>
-              <h3>A warm first reply, in ten seconds.</h3>
-              <p>Uses your services, prices and timings. Customers think you never sleep.</p>
+              <span className="bt-tag">AI auto-reply · Pro</span>
+              <h3>A warm first reply, in seconds.</h3>
+              <p>Pro. Uses your services, prices and timings, and sends it by email. Customers hear back while they are still interested.</p>
               <div className="bt-chat">
                 <div className="bub in">Do you have weekend slots?<time>Sat 9:12</time></div>
                 <div className="bub out">Yes! Saturdays 10 AM – 4 PM. Want me to hold 11:30 for you?<time>Sat 9:12 ✓✓</time></div>
@@ -167,23 +166,23 @@ export default function MarketingHome() {
             <div className="bt lime s3 rv">
               <span className="bt-tag">Instant alerts</span>
               <h3>Know the moment a lead lands.</h3>
-              <p>On WhatsApp and email — day or night, weekend or holiday.</p>
-              <div className="bt-big">0<small> missed</small></div>
+              <p>An email for every new lead and every new chat, day or night. Free on every plan.</p>
+              <div className="bt-big">1<small> email per lead</small></div>
             </div>
             <div className="bt s2 rv">
               <span className="bt-tag">Follow-ups</span>
               <h3>Cold leads come back warm.</h3>
-              <p>No reply in 2 days? AI drafts a gentle nudge you approve in one tap.</p>
+              <p>No reply in 2 days? A follow-up is ready for you to approve, or send automatically on Pro. It stops when they reply or opt out.</p>
             </div>
             <div className="bt s2 rv">
               <span className="bt-tag">One inbox</span>
               <h3>Every source, one place.</h3>
-              <p>Forms, WhatsApp and chat — with full history and status.</p>
+              <p>Forms, website chat and offers, with the full conversation and status. Chats stay separate until the visitor shares contact details.</p>
             </div>
             <div className="bt s2 rv">
-              <span className="bt-tag">Offers &amp; banners</span>
+              <span className="bt-tag">Offers · Pro</span>
               <h3>Weekend discount? Live in a click.</h3>
-              <p>Push a banner to your site from your phone. No developer.</p>
+              <p>A floating card or popup on your site, with an optional lead form. Colours match your website.</p>
             </div>
             <div className="bt ink s6 rv">
               <div className="bt-split">
@@ -221,32 +220,20 @@ export default function MarketingHome() {
         </div>
       </section>
 
-      {/* QUOTES */}
+      {/* USES */}
       <section className="m-sec" id="voices" style={{ paddingTop: 0 }}>
         <div className="m-wrap">
           <div className="m-head rv">
-            <span className="m-kicker">Customers</span>
-            <h2 className="m-h2">People who stopped <em>losing leads.</em></h2>
+            <span className="m-kicker">Who it&apos;s for</span>
+            <h2 className="m-h2">Built for businesses that <em>live on enquiries.</em></h2>
           </div>
-          <div className="quotes">
-            <div className="q-feature rv">
-              <blockquote>{feature.q}</blockquote>
-              <div className="q-who">
-                <span className="q-av" style={{ background: feature.c }}>{feature.i}</span>
-                <div><strong>{feature.n}</strong><small>{feature.r}</small></div>
+          <div className="steps3">
+            {USES.map((u) => (
+              <div className="st rv" key={u.t}>
+                <h3>{u.t}</h3>
+                <p>{u.d}</p>
               </div>
-            </div>
-            <div className="q-side rv">
-              {rest.map((q) => (
-                <div key={q.n}>
-                  <p>&ldquo;{q.q}&rdquo;</p>
-                  <div className="q-who">
-                    <span className="q-av" style={{ background: q.c }}>{q.i}</span>
-                    <div><strong>{q.n}</strong><small>{q.r}</small></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -257,7 +244,7 @@ export default function MarketingHome() {
           <div className="m-head center rv">
             <span className="m-kicker">Pricing</span>
             <h2 className="m-h2">Honest <em>pricing.</em></h2>
-            <p className="m-sub">Start free. Upgrade when the leads do. No contracts — cancel in two clicks.</p>
+            <p className="m-sub">Start free. Upgrade when you want the AI to do the replying. No contracts: cancel from your account.</p>
           </div>
           <PricingSection />
         </div>
@@ -269,7 +256,7 @@ export default function MarketingHome() {
           <div className="m-head rv" style={{ marginBottom: 0 }}>
             <span className="m-kicker">FAQ</span>
             <h2 className="m-h2">Fair <em>questions.</em></h2>
-            <p className="m-sub">Anything else? Write to hello@leadworks.in and a human replies.</p>
+            <p className="m-sub">Anything else? Write to {site.supportEmail} and a person replies.</p>
           </div>
           <div className="faq2-list rv">
             {FAQ.map(([q, a], i) => (
@@ -302,10 +289,10 @@ export default function MarketingHome() {
               <p>The AI lead inbox for small businesses. Built in India, for small businesses everywhere.</p>
             </div>
             <div><h4>Product</h4><ul><li><a href="#features">Features</a></li><li><a href="#pricing">Pricing</a></li><li><a href="#how">How it works</a></li></ul></div>
-            <div><h4>Company</h4><ul><li><a href="#voices">Customers</a></li><li><a href="#faq">FAQ</a></li><li><a href="mailto:hello@leadworks.in">Contact</a></li></ul></div>
+            <div><h4>Company</h4><ul><li><a href="#voices">Who it&apos;s for</a></li><li><a href="#faq">FAQ</a></li><li><a href={`mailto:${site.supportEmail}`}>Contact</a></li></ul></div>
             <div><h4>Account</h4><ul><li><Link href="/login">Log in</Link></li><li><Link href="/onboarding">Start free</Link></li></ul></div>
           </div>
-          <div className="m-foot-bar"><span>© 2026 Leadworks</span><span>Privacy · Terms</span></div>
+          <div className="m-foot-bar"><span>© 2026 {site.name}</span><span><Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link> · <Link href="/refunds">Refunds</Link></span></div>
         </div>
       </footer>
     </div>

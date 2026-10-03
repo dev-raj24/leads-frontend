@@ -1,32 +1,12 @@
 import Link from "next/link";
 import { IconCheck, IconArrowRight } from "@/components/icons";
-
-const PLANS = [
-  {
-    name: "Starter",
-    blurb: "For solo owners getting started with lead capture.",
-    price: "₹0",
-    per: "forever",
-    features: ["Up to 50 leads / month", "Web chat widget", "Unified inbox", "Instant email alerts"],
-    cta: "Start free",
-    featured: false,
-  },
-  {
-    name: "Pro",
-    blurb: "Everything on autopilot — replies, follow-ups and WhatsApp.",
-    price: "₹999",
-    per: "/ month",
-    features: ["Unlimited leads", "AI instant responder", "WhatsApp integration", "Automated follow-ups", "AI blog & offer banners"],
-    cta: "Get Pro",
-    featured: true,
-  },
-];
+import { PLANS } from "@/config/plans";
 
 export function PricingSection() {
   return (
     <div className="pricing">
       {PLANS.map((p) => (
-        <div key={p.name} className={`plan rv ${p.featured ? "feat" : ""}`}>
+        <div key={p.id} className={`plan rv ${p.featured ? "feat" : ""}`}>
           {p.featured && <span className="plan-tag">Most popular</span>}
           <h3>{p.name}</h3>
           <p className="plan-blurb">{p.blurb}</p>
@@ -41,7 +21,7 @@ export function PricingSection() {
             ))}
           </ul>
           <Link href="/onboarding" className={`m-btn ${p.featured ? "lime" : "solid"}`}>
-            {p.cta} <IconArrowRight size={15} />
+            {p.featured ? "Get Pro" : "Start free"} <IconArrowRight size={15} />
           </Link>
         </div>
       ))}

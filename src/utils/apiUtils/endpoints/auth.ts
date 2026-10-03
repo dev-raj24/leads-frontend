@@ -16,6 +16,15 @@ const auth = {
   changePassword: {
     v1: { ...defaults.methods.PATCH, ...defaults.versions.v1, uri: "/auth/password" },
   },
+  verifyEmail: {
+    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/auth/verify-email" },
+  },
+  resendVerification: {
+    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/auth/resend-verification" },
+  },
+  me: {
+    v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/auth/me" },
+  },
   changeEmail: {
     v1: { ...defaults.methods.PATCH, ...defaults.versions.v1, uri: "/auth/email" },
   },

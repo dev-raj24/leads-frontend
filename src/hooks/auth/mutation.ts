@@ -4,7 +4,9 @@ import {
   changePasswordService,
   forgotPasswordService,
   loginService,
+  resendVerificationService,
   resetPasswordService,
+  verifyEmailService,
   signupService,
   type LoginPayload,
   type SignupPayload,
@@ -39,5 +41,13 @@ export const useChangeEmail = () =>
   useMutation({
     mutationFn: ({ newEmail, currentPassword }: { newEmail: string; currentPassword: string }) =>
       changeEmailService(newEmail, currentPassword),
+    onSuccess: (res) => setUser(res.user),
+  });
+
+export const useResendVerification = () => useMutation({ mutationFn: () => resendVerificationService() });
+
+export const useVerifyEmail = () =>
+  useMutation({
+    mutationFn: (token: string) => verifyEmailService(token),
     onSuccess: (res) => setUser(res.user),
   });

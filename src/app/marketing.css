@@ -989,3 +989,21 @@
     transition: none !important;
   }
 }
+
+.legal h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: 22px;
+  margin: 32px 0 8px;
+}
+.legal p,
+.legal li {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #2c3a33;
+}
+.legal ul {
+  padding-left: 22px;
+  display: grid;
+  gap: 6px;
+}

@@ -8,6 +8,9 @@ import { PLANS } from "@/config/plans";
 import { useChangeEmail, useChangePassword } from "@/hooks/auth/mutation";
 import { useUpdateTenantName } from "@/hooks/tenant/mutation";
 import { useTenant } from "@/hooks/tenant/query";
+import { useBilling } from "@/hooks/billing/query";
+import { useCancelSubscription, useSubscribe } from "@/hooks/billing/mutation";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { authErrorMessage } from "@/lib/errors";
 import { timeAgo } from "@/lib/format";
 import { getUser } from "@/lib/session";
@@ -171,11 +174,17 @@ function ProfileTab({ user, onUserChange }: { user: AuthUser | null; onUserChang
 }
 
 function SubscriptionTab() {
-  const { data } = useTenant();
-  const tenant = data?.tenant;
-  const plan = tenant?.plan ?? "free";
+  const { data: billing } = useBilling();
+  const subscribe = useSubscribe();
+  const cancel = useCancelSubscription();
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
+  const plan = billing?.plan ?? "free";
   const currentPlan = PLANS.find((p) => p.id === plan) ?? PLANS[0];
   const otherPlan = PLANS.find((p) => p.id !== plan)!;
+  const usage = billing?.usage;
+  const pct = usage ? Math.min(100, Math.round((usage.leadsThisMonth / usage.leadsLimit) * 100)) : 0;
+  const renews = billing?.planRenewsAt ? new Date(billing.planRenewsAt).toLocaleDateString("en-IN", { dateStyle: "medium" }) : null;
 
   return (
     <div className="pnl pad acct-plan">
@@ -183,6 +192,18 @@ function SubscriptionTab() {
         <span className={`pp ${plan === "pro" ? "p" : "c"}`}>{plan === "pro" ? "PRO" : "FREE"}</span>
         <h3 className="acct-plan-name">{currentPlan.name} plan</h3>
         <p className="hint" style={{ marginTop: 2 }}>{currentPlan.blurb}</p>
+        {usage && (
+          <div className="meter" aria-label="Leads this month">
+            <div className="meter-t">
+              <span>Leads this month</span>
+              <b>{usage.leadsThisMonth} / {usage.leadsLimit}</b>
+            </div>
+            <div className={`meter-bar ${usage.overLimit ? "over" : usage.nearLimit ? "near" : ""}`}><i style={{ width: `${pct}%` }} /></div>
+          </div>
+        )}
+        {billing?.planStatus === "cancelling" && renews && <p className="hint">Your plan is cancelled and stays active until {renews}. After that you move to Free; nothing is deleted.</p>}
+        {billing?.planStatus === "past_due" && <p className="hint" style={{ color: "var(--red)" }}>Your last payment didn&apos;t go through. Pro stays on for a few days while we retry.</p>}
+        {plan === "pro" && billing?.planStatus === "active" && renews && <p className="hint">Renews on {renews}.</p>}
         <ul className="acct-features">
           {currentPlan.features.map((f) => (
             <li key={f}>
@@ -196,17 +217,46 @@ function SubscriptionTab() {
         <div className="acct-upsell">
           <div className="acct-upsell-t">Unlock with Pro</div>
           <ul className="acct-features locked">
-            {otherPlan.features.map((f) => (
+            {currentPlan.locked.map((f) => (
               <li key={f}>
                 <IconLock size={12} /> {f}
               </li>
             ))}
           </ul>
-          <Button href="/onboarding/plan" variant="lime" icon={<IconCard size={15} />}>
+          <Button
+            variant="lime"
+            icon={<IconCard size={15} />}
+            loading={subscribe.isPending}
+            loadingText="Opening checkout…"
+            disabled={billing ? !billing.canSubscribe : false}
+            onClick={() => subscribe.mutate()}
+          >
             Upgrade to Pro — {otherPlan.price}{otherPlan.per}
           </Button>
+          {billing && !billing.canSubscribe && <p className="hint">Payments aren&apos;t switched on yet. Please check back soon.</p>}
+          {subscribe.isError && <div className="auth-err" style={{ marginTop: 12 }}>{authErrorMessage(subscribe.error)}</div>}
         </div>
       )}
+
+      {plan === "pro" && billing?.planStatus !== "cancelling" && (
+        <div className="acct-upsell">
+          <div className="acct-upsell-t">Cancel anytime</div>
+          <p className="hint" style={{ marginTop: 0 }}>You keep Pro until the end of what you&apos;ve paid for. Your website widgets keep working; Pro-only parts pause quietly and your data stays.</p>
+          <Button variant="secondary" onClick={() => setConfirmCancel(true)}>Cancel subscription</Button>
+          {cancel.isError && <div className="auth-err" style={{ marginTop: 12 }}>{authErrorMessage(cancel.error)}</div>}
+        </div>
+      )}
+
+      <ConfirmModal
+        isOpen={confirmCancel}
+        title="Cancel your Pro plan?"
+        message="You'll keep Pro until the end of the period you've paid for. After that, AI replies, chat, offers and automatic follow-ups pause. Your leads and settings stay."
+        confirmText="Cancel plan"
+        cancelText="Keep Pro"
+        isLoading={cancel.isPending}
+        onConfirm={() => cancel.mutate(undefined, { onSettled: () => setConfirmCancel(false) })}
+        onClose={() => setConfirmCancel(false)}
+      />
     </div>
   );
 }

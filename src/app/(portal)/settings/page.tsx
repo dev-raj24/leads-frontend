@@ -9,12 +9,13 @@ import { env } from "@/config/env";
 import { useMySite } from "@/hooks/sites/query";
 import { useUpdateSiteSettings } from "@/hooks/sites/mutation";
 import { useTenant } from "@/hooks/tenant/query";
+import { useInstallStatus } from "@/hooks/sites/install";
+import { timeAgo } from "@/lib/format";
 
 const MODULES = [
-  { key: "alerts", label: "Instant alerts", desc: "Get an email the moment a lead arrives", def: true, pro: false },
-  { key: "autoreply", label: "AI auto-reply", desc: "AI writes the first reply within seconds and shows it in your website chat", def: true, pro: false },
-  { key: "widget", label: "AI site chat widget", desc: "24/7 chat and lead capture on your website", def: false, pro: false },
-  { key: "offers", label: "Offers & banners", desc: "Show your live offers on your website", def: true, pro: false },
+  { key: "alerts", label: "Instant alerts", desc: "Get an email the moment a lead or a new chat arrives", def: true, pro: false },
+  { key: "autoreply", label: "AI auto-reply", desc: "AI writes the first reply within seconds and emails it to the lead", def: true, pro: true },
+  { key: "widget", label: "AI site chat widget", desc: "A chat bubble on your website that answers visitors around the clock", def: false, pro: true },
   { key: "autofollow", label: "Auto follow-up", desc: "Send scheduled follow-ups without waiting for your approval", def: false, pro: true },
 ];
 
@@ -30,6 +31,12 @@ export default function SettingsPage() {
   const isPro = tenantData?.tenant.plan === "pro";
   const updateSettings = useUpdateSiteSettings();
   const site = data?.site ?? null;
+  const { data: install } = useInstallStatus();
+  const [domains, setDomains] = useState("");
+  const [domainsDirty, setDomainsDirty] = useState(false);
+  useEffect(() => {
+    if (install && !domainsDirty) setDomains(install.allowedDomains.join("\n"));
+  }, [install, domainsDirty]);
 
   const [state, setState] = useState<Record<string, boolean>>(Object.fromEntries(MODULES.map((m) => [m.key, m.def])));
 
@@ -67,11 +74,64 @@ export default function SettingsPage() {
           : "One script for everything — chat bubble, offers and your blog. Paste it just before </body> on every page of your site."}
       </p>
 
+      <div className="sec-t">Is it installed?</div>
+      <div className="pnl pad" style={{ display: "grid", gap: 14 }}>
+        {install?.status.installed ? (
+          <div>
+            <div className="module-t"><span className="pp w" style={{ marginRight: 8 }}>● CONNECTED</span>The script is running on {install.status.lastSeenHost ?? "your site"}</div>
+            <div className="module-d">Last seen {install.status.lastSeenAt ? `${timeAgo(install.status.lastSeenAt)} ago` : "just now"}.</div>
+          </div>
+        ) : (
+          <div>
+            <div className="module-t"><span className="pp c" style={{ marginRight: 8 }}>NOT SEEN YET</span>We haven&apos;t seen the script on any website</div>
+            <div className="module-d">Paste the snippet above before &lt;/body&gt;, then open any page of your site. This turns green within a minute. If you use a site builder, paste it into the &quot;custom code&quot; or &quot;footer&quot; box.</div>
+          </div>
+        )}
+        {(install?.status.blocked.length ?? 0) > 0 && (
+          <div className="auth-err" style={{ margin: 0 }}>
+            <b>Blocked recently:</b>{" "}
+            {install!.status.blocked.map((b) => `${b.host} (${b.count}×, ${timeAgo(b.lastAt)} ago)`).join(", ")}. Visitors on these sites could not use your forms or chat. Add the site below if it is yours.
+          </div>
+        )}
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label className="flabel" htmlFor="allowed-domains">Websites allowed to use your script</label>
+          <textarea
+            id="allowed-domains"
+            className="finput"
+            rows={3}
+            placeholder={"yourshop.com\nwww.yourshop.in"}
+            value={domains}
+            onChange={(e) => {
+              setDomains(e.target.value);
+              setDomainsDirty(true);
+            }}
+          />
+          <p className="hint" style={{ marginTop: 6 }}>One per line. Leave it empty to allow any website. Subdomains are included, so yourshop.com also covers blog.yourshop.com.</p>
+        </div>
+        <div>
+          <Button
+            size="sm"
+            disabled={!site || !domainsDirty}
+            loading={updateSettings.isPending}
+            loadingText="Saving…"
+            onClick={() =>
+              site &&
+              updateSettings.mutate(
+                { siteId: site.id, settings: { ...site.settings, allowedDomains: domains.split(/[\n,]/).map((d) => d.trim()).filter(Boolean) } },
+                { onSuccess: () => setDomainsDirty(false) },
+              )
+            }
+          >
+            Save allowed websites
+          </Button>
+        </div>
+      </div>
+
       <div className="sec-t">Chat widget</div>
       <div className="pnl pad" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <div>
           <div className="module-t">Conversations and design</div>
-          <div className="module-d">See every website chat, reply as your team, and change the bubble&apos;s colours, title and greeting.</div>
+          <div className="module-d">Change the bubble&apos;s colours, title and greeting, and install it. Your conversations are in Chats.</div>
         </div>
         <Button href="/ai-widget" variant="secondary" size="sm">Open chat widget</Button>
       </div>

@@ -40,7 +40,7 @@ export function ChatThreadModal({ leadId, onClose }: ChatThreadModalProps) {
         <div className="modal-h">
           <div>
             <h3 style={{ fontSize: 24 }}>{lead?.name || "Website visitor"}</h3>
-            <p className="hint" style={{ margin: "2px 0 0" }}>{lead?.contact ?? "Loading…"}</p>
+            <p className="hint" style={{ margin: "2px 0 0" }}>{!lead ? "Loading…" : lead.qualified === false ? "No contact details yet" : lead.contact}</p>
           </div>
         </div>
         <button type="button" className="iconbtn" onClick={onClose} aria-label="Close" style={{ position: "absolute", top: 20, right: 20 }}>

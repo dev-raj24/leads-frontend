@@ -6,6 +6,7 @@ import "@/app/marketing.css";
 import { Logo } from "@/components/Logo";
 import { IconCheck } from "@/components/icons";
 import { useChoosePlan } from "@/hooks/tenant/mutation";
+import { useSubscribe } from "@/hooks/billing/mutation";
 import { isLoggedIn } from "@/lib/session";
 import { PLANS } from "@/config/plans";
 import type { Plan } from "@/types/models";
@@ -13,6 +14,7 @@ import type { Plan } from "@/types/models";
 export default function OnboardingPlanPage() {
   const router = useRouter();
   const choosePlan = useChoosePlan();
+  const subscribe = useSubscribe();
   const [picking, setPicking] = useState<Plan | null>(null);
 
   useEffect(() => {
@@ -21,9 +23,24 @@ export default function OnboardingPlanPage() {
 
   function pick(plan: Plan) {
     setPicking(plan);
-    choosePlan.mutate(plan, {
-      onSuccess: () => router.push("/dashboard"),
-      onSettled: () => setPicking(null),
+    choosePlan.mutate("free", {
+      onSuccess: () => {
+        if (plan === "free") {
+          router.push("/dashboard");
+          return;
+        }
+        subscribe.mutate(undefined, {
+          onSuccess: (res) => {
+            if (!res.url) router.push("/dashboard");
+          },
+          onError: () => router.push("/dashboard"),
+          onSettled: () => setPicking(null),
+        });
+      },
+      onError: () => setPicking(null),
+      onSettled: () => {
+        if (plan === "free") setPicking(null);
+      },
     });
   }
 
@@ -60,7 +77,7 @@ export default function OnboardingPlanPage() {
               <button
                 type="button"
                 className={`m-btn ${p.featured ? "lime" : "solid"}`}
-                disabled={choosePlan.isPending}
+                disabled={choosePlan.isPending || subscribe.isPending}
                 onClick={() => pick(p.id)}
                 style={{ width: "100%", justifyContent: "center" }}
               >

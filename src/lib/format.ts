@@ -74,3 +74,46 @@ export function trendPercent(current: number, previous: number): number | null {
   if (previous === 0) return current === 0 ? 0 : null;
   return (current - previous) / previous;
 }
+
+const SKIP_REASON: Record<string, string> = {
+  profile_incomplete: "your business profile is still empty",
+  already_replied_today: "they already got an automatic reply today",
+  unsubscribed: "they asked not to get automatic emails",
+  automated_address: "it is a no-reply address",
+  invalid_address: "there is no email address",
+  monthly_limit: "the monthly lead limit was reached",
+};
+
+export function eventLabel(type: string, payload: Record<string, unknown>): string | null {
+  const reason = typeof payload.reason === "string" ? (SKIP_REASON[payload.reason] ?? payload.reason) : "";
+  switch (type) {
+    case "created":
+      return "Lead received";
+    case "became_lead":
+      return "Shared contact details, became a lead";
+    case "owner_alerted":
+      return "You were emailed about this lead";
+    case "owner_alert_failed":
+      return "We couldn't email you about this lead";
+    case "ai_reply_sent":
+      return payload.channel === "email" ? "AI replied by email" : "AI replied";
+    case "ai_reply_skipped":
+      return `AI reply skipped: ${reason}`;
+    case "ai_reply_email_skipped":
+      return `Automatic email not sent: ${reason}`;
+    case "automation_paused":
+      return `Automations paused: ${reason}`;
+    case "manual_reply_sent":
+      return "You replied by email";
+    case "followup_sent":
+      return "Follow-up sent";
+    case "followup_skipped":
+      return `Follow-up skipped: ${reason}`;
+    case "offer_submitted":
+      return typeof payload.title === "string" ? `Filled the offer form: ${payload.title}` : "Filled an offer form";
+    case "status_changed":
+      return typeof payload.status === "string" ? `Marked as ${payload.status}` : "Status changed";
+    default:
+      return null;
+  }
+}

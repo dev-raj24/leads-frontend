@@ -60,3 +60,22 @@ export async function changeEmailService(newEmail: string, currentPassword: stri
     body: { newEmail, currentPassword },
   });
 }
+
+export async function verifyEmailService(token: string): Promise<{ user: AuthUser }> {
+  return callApi({
+    uriEndPoint: { ...authEndpoints.verifyEmail.v1 } as ApiEndpoint,
+    body: { token },
+  });
+}
+
+export async function resendVerificationService(): Promise<{ ok: boolean }> {
+  return callApi({
+    uriEndPoint: { ...authEndpoints.resendVerification.v1 } as ApiEndpoint,
+  });
+}
+
+export async function fetchMeService(): Promise<{ user: AuthUser; tenant: Tenant }> {
+  return callApi({
+    uriEndPoint: { ...authEndpoints.me.v1 } as ApiEndpoint,
+  });
+}

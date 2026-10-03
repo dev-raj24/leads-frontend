@@ -14,6 +14,7 @@ export interface Lead {
   source: LeadSource;
   status: LeadStatus;
   score: number;
+  qualified?: boolean;
   customFields?: Record<string, unknown>;
   createdAt: string;
   lastActivityAt: string;
@@ -112,6 +113,7 @@ export interface AuthUser {
   tenantId: string;
   email: string;
   role: string;
+  emailVerified: boolean;
 }
 
 export interface Site {
@@ -208,6 +210,8 @@ export interface Tenant {
   plan: Plan;
   industry: string | null;
   onboardingCompleted: boolean;
+  planStatus?: string;
+  planRenewsAt?: string | null;
   createdAt: string;
 }
 
@@ -227,7 +231,8 @@ export interface ChatDesign {
 export interface ChatConversation {
   leadId: string;
   name: string | null;
-  contact: string;
+  contact: string | null;
+  isLead: boolean;
   status: string;
   messageCount: number;
   lastMessage: string;
@@ -235,4 +240,45 @@ export interface ChatConversation {
   lastFrom: "visitor" | "ai" | "team";
   needsReply: boolean;
   createdAt: string;
+}
+
+export interface LeadEvent {
+  id: string;
+  type: string;
+  payload: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface PlanDef {
+  id: Plan;
+  name: string;
+  priceInr: number;
+  leadsPerMonth: number;
+  aiChatMessagesPerMonth: number;
+  features: { aiReply: boolean; chatWidget: boolean; offers: boolean; blog: boolean; autoFollowup: boolean };
+}
+
+export interface Usage {
+  plan: Plan;
+  leadsThisMonth: number;
+  leadsLimit: number;
+  overLimit: boolean;
+  nearLimit: boolean;
+}
+
+export interface BillingOverview {
+  plan: Plan;
+  planStatus: string;
+  planRenewsAt: string | null;
+  canSubscribe: boolean;
+  billingConfigured: boolean;
+  usage: Usage;
+  plans: PlanDef[];
+}
+
+export interface InstallStatus {
+  installed: boolean;
+  lastSeenAt: string | null;
+  lastSeenHost: string | null;
+  blocked: Array<{ host: string; kind: string; lastAt: string; count: number }>;
 }

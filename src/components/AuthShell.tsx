@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { IconCheck } from "@/components/icons";
 
-const POINTS = ["Every enquiry in one inbox", "AI replies in about 10 seconds", "Follow-ups that never get forgotten"];
+const POINTS = ["Every enquiry in one inbox", "An email the moment a lead arrives", "Follow-ups that never get forgotten"];
 const STEPS = ["Account", "Your business", "Plan"];
 
 interface AuthShellProps {

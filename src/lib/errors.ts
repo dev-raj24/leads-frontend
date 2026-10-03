@@ -26,6 +26,12 @@ const MESSAGES: Record<string, string> = {
   mail_not_configured: "Email sending isn't set up yet — copy the message and send it yourself.",
   send_failed: "Couldn't send the email — copy the message and send it yourself.",
   missing_text: "Write a reply before sending.",
+  payment_required: "Upgrading to Pro goes through checkout. Open Account → Subscription.",
+  billing_not_configured: "Payments aren't switched on yet. Please check back soon.",
+  payment_provider_error: "The payment provider couldn't start checkout. Please try again in a moment.",
+  already_subscribed: "You're already on Pro.",
+  no_active_subscription: "There's no active subscription to cancel.",
+  domain_not_allowed: "That website isn't on your allowed list.",
   text_too_long: "That reply is too long — keep it under 4000 characters.",
 };
 

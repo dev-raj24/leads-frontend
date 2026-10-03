@@ -7,6 +7,7 @@ export const useChatConversations = () =>
     queryKey: ["chat-conversations"],
     queryFn: fetchChatConversationsService,
     refetchInterval: 8000,
+    refetchIntervalInBackground: true,
   });
 
 export const useChatThread = (leadId: string) =>
