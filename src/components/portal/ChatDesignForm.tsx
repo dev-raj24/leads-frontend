@@ -11,7 +11,7 @@ export const DEFAULT_CHAT_DESIGN: ChatDesign = {
   title: "Chat with us",
   subtitle: "We usually reply in a few minutes",
   greeting: "Hi! What's your name and phone or email so we can help?",
-  color: "#0b5d4b",
+  color: "auto",
   position: "right",
   launcher: "icon",
   launcherLabel: "Chat with us",
@@ -70,6 +70,7 @@ export function ChatDesignForm({ site }: { site: Site }) {
           <div className="field full">
             <span className="flabel">Colour</span>
             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <button type="button" className={`pill-opt ${design.color === "auto" ? "on" : ""}`} onClick={() => set("color", "auto")}>Match my website</button>
               {SWATCHES.map((c) => (
                 <button
                   key={c}
@@ -79,8 +80,11 @@ export function ChatDesignForm({ site }: { site: Site }) {
                   style={{ width: 30, height: 30, borderRadius: "50%", background: c, border: design.color === c ? "3px solid var(--lime, #d9f99d)" : "2px solid #fff", boxShadow: "0 0 0 1px #d5d2ca", cursor: "pointer" }}
                 />
               ))}
-              <input type="color" aria-label="Custom colour" value={design.color} onChange={(e) => set("color", e.target.value)} style={{ width: 44, height: 32, border: "1px solid #d5d2ca", borderRadius: 8, background: "#fff", padding: 2, cursor: "pointer" }} />
+              <input type="color" aria-label="Custom colour" value={design.color === "auto" ? "#0b5d4b" : design.color} onChange={(e) => set("color", e.target.value)} style={{ width: 44, height: 32, border: "1px solid #d5d2ca", borderRadius: 8, background: "#fff", padding: 2, cursor: "pointer" }} />
             </div>
+            {design.color === "auto" && (
+              <p className="hint" style={{ margin: "6px 0 0" }}>Uses the main colour your website already has (its theme colour, buttons or header), and picks readable text on top. This preview can&apos;t see your site, so it shows the default green; on your real pages you&apos;ll see your own colour. If nothing is found it falls back to green.</p>
+            )}
           </div>
 
           <div className="field">

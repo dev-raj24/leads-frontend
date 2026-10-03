@@ -49,7 +49,7 @@ const INITIAL: FormState = {
   targetUrl: "",
   whatsappNumber: "",
   promoCode: "",
-  color: "#0b5d4b",
+  color: "auto",
   textColor: "",
   buttonText: "",
   styleVariant: "solid",
@@ -214,11 +214,15 @@ function OfferForm() {
             <div className="field full">
               <span className="flabel">Brand colour</span>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <button type="button" className={`pill-opt ${form.color === "auto" ? "on" : ""}`} onClick={() => set("color", "auto")}>Match my website</button>
                 {SWATCHES.map((c) => (
                   <button key={c} type="button" aria-label={`Use ${c}`} onClick={() => set("color", c)} style={{ width: 30, height: 30, borderRadius: "50%", background: c, border: form.color === c ? "3px solid #d9f99d" : "2px solid #fff", boxShadow: "0 0 0 1px #d5d2ca", cursor: "pointer" }} />
                 ))}
-                <input id="color" aria-label="Custom colour" type="color" value={form.color} onChange={(e) => set("color", e.target.value)} style={{ width: 44, height: 32, border: "1px solid #d5d2ca", borderRadius: 8, background: "#fff", padding: 2, cursor: "pointer" }} />
+                <input id="color" aria-label="Custom colour" type="color" value={form.color === "auto" ? "#0b5d4b" : form.color} onChange={(e) => set("color", e.target.value)} style={{ width: 44, height: 32, border: "1px solid #d5d2ca", borderRadius: 8, background: "#fff", padding: 2, cursor: "pointer" }} />
               </div>
+              {form.color === "auto" && (
+                <p className="hint" style={{ margin: "6px 0 0" }}>Uses the colour your website already has. The preview can&apos;t see your site, so it shows the default green; your real pages show your own colour.</p>
+              )}
             </div>
             <div className="field">
               <label className="flabel" htmlFor="tcolor">Banner text colour <span className="hint" style={{ margin: 0 }}>(auto)</span></label>
