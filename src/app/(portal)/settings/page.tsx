@@ -18,8 +18,11 @@ const MODULES = [
   { key: "autofollow", label: "Auto follow-up", desc: "Send scheduled follow-ups without waiting for your approval", def: false, pro: true },
 ];
 
+const BLOG_MOUNT = "<div data-leadworks-blog></div>";
+const OFFER_MOUNT = "<div data-leadworks-offer></div>";
+
 const embedSnippet = (script: string, apiKey: string) =>
-  `<script src="https://leadworks.app/${script}"\n  data-site-key="${apiKey}"\n  data-api="${env.apiUrl}">\n</script>`;
+  `<script src="${env.apiUrl}/${script}"\n  data-site-key="${apiKey}"\n  data-api="${env.apiUrl}">\n</script>`;
 
 export default function SettingsPage() {
   const { data, isLoading } = useMySite();
@@ -61,12 +64,32 @@ export default function SettingsPage() {
       <p className="hint">
         {!isLoading && !site
           ? "This is a placeholder key — connect leadworks-api to a database and log in to get your real site key."
-          : "Paste this just before </body> on every page of your site."}
+          : "One script for everything — chat bubble, offers and your blog. Paste it just before </body> on every page of your site."}
       </p>
 
-      <div className="sec-t">AI blog embed</div>
-      <CodeSnippet code={embedSnippet("blog.js", apiKey)} />
-      <p className="hint">Paste on your Blog page — every post you publish from AI Blog shows up there automatically.</p>
+      <div className="sec-t">Chat widget</div>
+      <div className="pnl pad" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div>
+          <div className="module-t">Conversations and design</div>
+          <div className="module-d">See every website chat, reply as your team, and change the bubble&apos;s colours, title and greeting.</div>
+        </div>
+        <Button href="/ai-widget" variant="secondary" size="sm">Open chat widget</Button>
+      </div>
+
+      <div className="sec-t">Place things on a page</div>
+      <p className="hint" style={{ marginTop: 0 }}>With the snippet above on the page, drop these wherever you want the content to appear.</p>
+      <div className="pnl pad" style={{ display: "grid", gap: 16 }}>
+        <div>
+          <div className="module-t">Your blog</div>
+          <div className="module-d" style={{ marginBottom: 8 }}>Every post you publish from AI Blog shows up here, with its own page.</div>
+          <CodeSnippet code={BLOG_MOUNT} />
+        </div>
+        <div>
+          <div className="module-t">An offer form</div>
+          <div className="module-d" style={{ marginBottom: 8 }}>Shows your newest live offer as a card with its lead form. Each offer also has its own pinned snippet on its edit page.</div>
+          <CodeSnippet code={OFFER_MOUNT} />
+        </div>
+      </div>
 
       <div className="sec-t">
         Modules {updateSettings.isPending && <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>· saving…</span>}

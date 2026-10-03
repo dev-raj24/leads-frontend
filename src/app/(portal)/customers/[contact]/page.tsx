@@ -2,14 +2,14 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { IconChat, IconGlobe, IconPhone, IconWhatsapp } from "@/components/icons";
+import { IconChat, IconGlobe, IconPhone, IconTag, IconWhatsapp } from "@/components/icons";
 import { useCustomer } from "@/hooks/customers/query";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { apiErrorCode } from "@/lib/errors";
 import { initials, sourceLabel, statusLabel, timeAgo } from "@/lib/format";
 import type { FollowupStatus } from "@/types/models";
 
-const SOURCE_ICON = { form: IconGlobe, whatsapp: IconWhatsapp, chat_widget: IconChat, missed_call: IconPhone } as const;
+const SOURCE_ICON = { form: IconGlobe, whatsapp: IconWhatsapp, chat_widget: IconChat, missed_call: IconPhone, offer: IconTag } as const;
 
 const FOLLOWUP_STATUS: Record<FollowupStatus, [string, string]> = {
   pending: ["p", "NEEDS APPROVAL"],

@@ -12,8 +12,8 @@ import { useGetOffers } from "@/hooks/offer/query";
 import { useDeleteOffer, useUpdateOffer } from "@/hooks/offer/mutation";
 import type { Offer } from "@/types/models";
 
-const ACTION_LABEL: Record<string, string> = { link: "Opens a link", whatsapp: "WhatsApp chat", promo: "Shows promo code" };
-const PLACEMENT_LABEL: Record<string, string> = { top: "Top banner", "bottom-left": "Bottom corner", none: "Hidden" };
+const ACTION_LABEL: Record<string, string> = { link: "Opens a link", whatsapp: "WhatsApp chat", promo: "Shows promo code", form: "Collects leads" };
+const PLACEMENT_LABEL: Record<string, string> = { top: "Floating card", "bottom-left": "Floating card", modal: "Popup", none: "Hidden" };
 
 export default function OffersPage() {
   const { data, isLoading } = useGetOffers();
@@ -55,7 +55,17 @@ export default function OffersPage() {
       header: "Status",
       width: "110px",
       sort: (o) => (o.active ? 0 : 1),
-      cell: (o) => <span className={`pp ${o.active ? "w" : "c"}`}>{o.active ? "● LIVE" : "PAUSED"}</span>,
+      cell: (o) => {
+        const now = Date.now();
+        const [cls, label] = !o.active
+          ? ["c", "PAUSED"]
+          : o.startsAt && new Date(o.startsAt).getTime() > now
+            ? ["n", "SCHEDULED"]
+            : o.endsAt && new Date(o.endsAt).getTime() < now
+              ? ["c", "ENDED"]
+              : ["w", "● LIVE"];
+        return <span className={`pp ${cls}`}>{label}</span>;
+      },
     },
     {
       key: "actions",

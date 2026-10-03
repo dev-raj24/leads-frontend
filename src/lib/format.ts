@@ -30,6 +30,7 @@ const SOURCE_LABEL: Record<string, string> = {
   chat_widget: "Chat",
   whatsapp: "WhatsApp",
   missed_call: "Missed call",
+  offer: "Offer",
 };
 
 export function sourceLabel(source: string): string {

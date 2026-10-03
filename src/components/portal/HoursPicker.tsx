@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface DayState {
   open: boolean;
@@ -99,6 +99,14 @@ export function HoursPicker({ value, onChange }: HoursPickerProps) {
   const [days, setDays] = useState<DayState[]>(
     () => parseHours(value) ?? DAY_KEYS.map((_, i) => (i === 6 ? DEFAULT_CLOSED : DEFAULT_OPEN))
   );
+
+  // With no saved value yet, the defaults above are only local state — the parent form (and
+  // the AI) wouldn't know about them until the owner touches a control. Sync once on mount so
+  // what's displayed always matches what actually gets saved.
+  useEffect(() => {
+    if (!value.trim()) onChange(summarizeHours(days));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function commit(next: DayState[]) {
     setDays(next);

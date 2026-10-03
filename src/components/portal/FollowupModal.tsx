@@ -38,7 +38,7 @@ export function FollowupModal({ followup, onClose }: FollowupModalProps) {
 
   return (
     <div className="modal-bg" onClick={onClose}>
-      <div className="modal" style={{ maxWidth: 520 }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+      <div className="modal" style={{ maxWidth: 520, position: "relative" }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <div className="modal-h">
           <div>
             <h3 style={{ fontSize: 24 }}>{followup.leadName}</h3>

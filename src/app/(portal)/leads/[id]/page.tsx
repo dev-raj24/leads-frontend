@@ -2,7 +2,7 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { IconArrowRight, IconChat, IconGlobe, IconPhone, IconRobot, IconSparkle, IconWhatsapp } from "@/components/icons";
+import { IconArrowRight, IconChat, IconGlobe, IconPhone, IconRobot, IconSparkle, IconTag, IconWhatsapp } from "@/components/icons";
 import { useLead } from "@/hooks/leads/query";
 import { useCreateFollowup } from "@/hooks/followups/mutation";
 import { useDraftLeadReply, useSendLeadReply, useUpdateLeadStatus } from "@/hooks/leads/mutation";
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 
 const FOLLOWUP_OPTIONS: Array<[string, number]> = [["Tomorrow", 24], ["In 2 days", 48], ["Next week", 168]];
 
-const SOURCE_ICON = { form: IconGlobe, whatsapp: IconWhatsapp, chat_widget: IconChat, missed_call: IconPhone } as const;
+const SOURCE_ICON = { form: IconGlobe, whatsapp: IconWhatsapp, chat_widget: IconChat, missed_call: IconPhone, offer: IconTag } as const;
 
 export default function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);

@@ -1,5 +1,5 @@
 import { Table, type Column } from "@/components/ui/Table";
-import { IconChat, IconGlobe, IconPhone, IconWhatsapp } from "@/components/icons";
+import { IconChat, IconGlobe, IconPhone, IconTag, IconWhatsapp } from "@/components/icons";
 import { initials, sourceLabel, statusLabel, timeAgo } from "@/lib/format";
 import type { Lead } from "@/types/models";
 
@@ -8,6 +8,7 @@ const SOURCE_ICON: Record<string, typeof IconGlobe> = {
   whatsapp: IconWhatsapp,
   chat_widget: IconChat,
   missed_call: IconPhone,
+  offer: IconTag,
 };
 
 const COLUMNS: Column<Lead>[] = [

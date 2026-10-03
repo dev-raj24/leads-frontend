@@ -1,7 +1,7 @@
 // types/models.ts — domain types shared across services, hooks, and pages.
 // Mirrors the shapes returned by leadworks-api.
 
-export type LeadSource = "form" | "chat_widget" | "whatsapp" | "missed_call";
+export type LeadSource = "form" | "chat_widget" | "whatsapp" | "missed_call" | "offer";
 export type LeadStatus = "new" | "replied" | "closed" | "won" | "lost";
 
 export interface Lead {
@@ -42,6 +42,13 @@ export interface Offer {
   styleVariant?: string;
   actionType?: string;
   promoCode?: string;
+  buttonText?: string;
+  textColor?: string;
+  successMessage?: string;
+  modalDelay?: number;
+  fontFamily?: string;
+  radius?: string;
+  customCss?: string;
   targetUrl?: string;
   whatsappNumber?: string;
   startsAt: string | null;
@@ -58,8 +65,17 @@ export interface OfferPayload {
   styleVariant?: string;
   actionType?: string;
   promoCode?: string;
+  buttonText?: string;
+  textColor?: string;
+  successMessage?: string;
+  modalDelay?: number;
+  fontFamily?: string;
+  radius?: string;
+  customCss?: string;
   targetUrl?: string;
   whatsappNumber?: string;
+  startsAt?: string | null;
+  endsAt?: string | null;
 }
 
 export interface BlogPost {
@@ -192,5 +208,31 @@ export interface Tenant {
   plan: Plan;
   industry: string | null;
   onboardingCompleted: boolean;
+  createdAt: string;
+}
+
+export interface ChatDesign {
+  title: string;
+  subtitle: string;
+  greeting: string;
+  color: string;
+  position: "right" | "left";
+  launcher: "icon" | "label";
+  launcherLabel: string;
+  fontFamily: "system" | "inherit";
+  radius: "rounded" | "square";
+  customCss: string;
+}
+
+export interface ChatConversation {
+  leadId: string;
+  name: string | null;
+  contact: string;
+  status: string;
+  messageCount: number;
+  lastMessage: string;
+  lastMessageAt: string;
+  lastFrom: "visitor" | "ai" | "team";
+  needsReply: boolean;
   createdAt: string;
 }
