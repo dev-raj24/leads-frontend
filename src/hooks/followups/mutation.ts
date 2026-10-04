@@ -12,7 +12,11 @@ const useRefreshing = <TVars, TResult>(fn: (vars: TVars) => Promise<TResult>) =>
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: fn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["followups"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["followups"] });
+      queryClient.invalidateQueries({ queryKey: ["leads"] });
+      queryClient.invalidateQueries({ queryKey: ["lead"] });
+    },
   });
 };
 

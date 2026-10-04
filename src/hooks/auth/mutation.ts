@@ -4,6 +4,7 @@ import {
   changePasswordService,
   forgotPasswordService,
   loginService,
+  logoutAllService,
   resendVerificationService,
   resetPasswordService,
   verifyEmailService,
@@ -11,7 +12,7 @@ import {
   type LoginPayload,
   type SignupPayload,
 } from "@/services/auth";
-import { setSession, setUser } from "@/lib/session";
+import { setSession, setToken, setUser } from "@/lib/session";
 
 export const useSignup = () =>
   useMutation({
@@ -35,6 +36,15 @@ export const useChangePassword = () =>
   useMutation({
     mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) =>
       changePasswordService(currentPassword, newPassword),
+    onSuccess: (res) => {
+      if (res.token) setToken(res.token);
+    },
+  });
+
+export const useLogoutAll = () =>
+  useMutation({
+    mutationFn: logoutAllService,
+    onSuccess: (res) => setToken(res.token),
   });
 
 export const useChangeEmail = () =>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CodeSnippet } from "@/components/ui/CodeSnippet";
 import { Button } from "@/components/ui/Button";
 import { BusinessProfileForm } from "@/components/portal/BusinessProfileForm";
+import { FormFieldsEditor } from "@/components/portal/FormFieldsEditor";
 import { PageHead } from "@/components/portal/PageHead";
 import { env } from "@/config/env";
 import { useMySite } from "@/hooks/sites/query";
@@ -21,6 +22,7 @@ const MODULES = [
 
 const BLOG_MOUNT = "<div data-leadworks-blog></div>";
 const OFFER_MOUNT = "<div data-leadworks-offer></div>";
+const FORM_MOUNT = "<div data-leadworks-form></div>";
 
 const embedSnippet = (script: string, apiKey: string) =>
   `<script src="${env.apiUrl}/${script}"\n  data-site-key="${apiKey}"\n  data-api="${env.apiUrl}">\n</script>`;
@@ -66,13 +68,42 @@ export default function SettingsPage() {
       <div className="sec-t">Teach your AI</div>
       <BusinessProfileForm />
 
-      <div className="sec-t">Website snippet</div>
+      <div className="sec-t">Your script</div>
       <CodeSnippet code={embedSnippet("widget.js", apiKey)} />
       <p className="hint">
         {!isLoading && !site
-          ? "This is a placeholder key — connect leadworks-api to a database and log in to get your real site key."
-          : "One script for everything — chat bubble, offers and your blog. Paste it just before </body> on every page of your site."}
+          ? "This is a placeholder key. Connect leadworks-api to a database and log in to get your real site key."
+          : "One script for everything. Paste it just before </body> on every page of your site. What shows up depends on your plan and on where you place the pieces below."}
       </p>
+      <div className="pnl pad">
+        <div className="parts">
+          <div className="part">
+            <div className="part-h"><div className="module-t">Enquiry form</div><span className="pp w">FREE</span></div>
+            <div className="module-d">A contact form with the questions you choose below. Place it where you want it on a page.</div>
+            <CodeSnippet code={FORM_MOUNT} />
+          </div>
+          <div className="part">
+            <div className="part-h"><div className="module-t">Chat bubble</div><span className="pp p">PRO</span></div>
+            <div className="module-d">Appears on every page by itself. Answers visitors and lets your team step in. Look and colours are in Chat widget.</div>
+            {isPro ? <div><Button href="/ai-widget" variant="secondary" size="sm">Open chat widget</Button></div> : <div><Button href="/account" variant="secondary" size="sm">Upgrade to turn on</Button></div>}
+          </div>
+          <div className="part">
+            <div className="part-h"><div className="module-t">Blog</div><span className="pp p">PRO</span></div>
+            <div className="module-d">Every post you publish from AI Blog shows up here, each with its own page.</div>
+            <CodeSnippet code={BLOG_MOUNT} />
+            {!isPro && <div><Button href="/account" variant="secondary" size="sm">Upgrade to turn on</Button></div>}
+          </div>
+          <div className="part">
+            <div className="part-h"><div className="module-t">Offers</div><span className="pp p">PRO</span></div>
+            <div className="module-d">A floating card or popup shows by itself. To also show an offer inside a page, place this. Each offer has its own pinned snippet too.</div>
+            <CodeSnippet code={OFFER_MOUNT} />
+            {!isPro && <div><Button href="/account" variant="secondary" size="sm">Upgrade to turn on</Button></div>}
+          </div>
+        </div>
+      </div>
+
+      <div className="sec-t">Form questions</div>
+      {site ? <FormFieldsEditor site={site} /> : null}
 
       <div className="sec-t">Is it installed?</div>
       <div className="pnl pad" style={{ display: "grid", gap: 14 }}>
@@ -124,30 +155,6 @@ export default function SettingsPage() {
           >
             Save allowed websites
           </Button>
-        </div>
-      </div>
-
-      <div className="sec-t">Chat widget</div>
-      <div className="pnl pad" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-        <div>
-          <div className="module-t">Conversations and design</div>
-          <div className="module-d">Change the bubble&apos;s colours, title and greeting, and install it. Your conversations are in Chats.</div>
-        </div>
-        <Button href="/ai-widget" variant="secondary" size="sm">Open chat widget</Button>
-      </div>
-
-      <div className="sec-t">Place things on a page</div>
-      <p className="hint" style={{ marginTop: 0 }}>With the snippet above on the page, drop these wherever you want the content to appear.</p>
-      <div className="pnl pad" style={{ display: "grid", gap: 16 }}>
-        <div>
-          <div className="module-t">Your blog</div>
-          <div className="module-d" style={{ marginBottom: 8 }}>Every post you publish from AI Blog shows up here, with its own page.</div>
-          <CodeSnippet code={BLOG_MOUNT} />
-        </div>
-        <div>
-          <div className="module-t">An offer form</div>
-          <div className="module-d" style={{ marginBottom: 8 }}>Shows your newest live offer as a card with its lead form. Each offer also has its own pinned snippet on its edit page.</div>
-          <CodeSnippet code={OFFER_MOUNT} />
         </div>
       </div>
 

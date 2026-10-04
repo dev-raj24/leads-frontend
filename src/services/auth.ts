@@ -47,7 +47,7 @@ export async function resetPasswordService(token: string, password: string): Pro
   });
 }
 
-export async function changePasswordService(currentPassword: string, newPassword: string): Promise<{ ok: boolean }> {
+export async function changePasswordService(currentPassword: string, newPassword: string): Promise<{ ok: boolean; token?: string }> {
   return callApi({
     uriEndPoint: { ...authEndpoints.changePassword.v1 } as ApiEndpoint,
     body: { currentPassword, newPassword },
@@ -77,5 +77,11 @@ export async function resendVerificationService(): Promise<{ ok: boolean }> {
 export async function fetchMeService(): Promise<{ user: AuthUser; tenant: Tenant }> {
   return callApi({
     uriEndPoint: { ...authEndpoints.me.v1 } as ApiEndpoint,
+  });
+}
+
+export async function logoutAllService(): Promise<{ ok: boolean; token: string }> {
+  return callApi({
+    uriEndPoint: { ...authEndpoints.logoutAll.v1 } as ApiEndpoint,
   });
 }

@@ -37,6 +37,10 @@ export function setSession(token: string, user: AuthUser, tenant: Tenant) {
   window.localStorage.setItem(TENANT_KEY, JSON.stringify(tenant));
 }
 
+export function setToken(token: string) {
+  window.localStorage.setItem(TOKEN_KEY, token);
+}
+
 export function setTenant(tenant: Tenant) {
   window.localStorage.setItem(TENANT_KEY, JSON.stringify(tenant));
 }

@@ -9,12 +9,16 @@ import { Button } from "@/components/ui/Button";
 import { ListSkeleton } from "@/components/ui/Skeleton";
 import { Table, type Column } from "@/components/ui/Table";
 import { useBlogPosts } from "@/hooks/blog/query";
+import { useTenant } from "@/hooks/tenant/query";
+import { IconLock } from "@/components/icons";
 import { useDeleteBlogPost } from "@/hooks/blog/mutation";
 import { timeAgo } from "@/lib/format";
 import type { BlogPost } from "@/types/models";
 
 export default function BlogPage() {
   const { data, isLoading } = useBlogPosts();
+  const { data: tenantData } = useTenant();
+  const isPro = tenantData?.tenant.plan === "pro";
   const deletePost = useDeleteBlogPost();
   const [deleting, setDeleting] = useState<BlogPost | null>(null);
   const posts: BlogPost[] = data?.posts ?? [];
@@ -54,7 +58,7 @@ export default function BlogPage() {
       align: "right",
       cell: (p) => (
         <div className="row-actions">
-          <Button href={`/blog/new?id=${p.id}`} variant="secondary" size="sm" icon={<IconEdit size={14} />}>Edit</Button>
+          {isPro && <Button href={`/blog/new?id=${p.id}`} variant="secondary" size="sm" icon={<IconEdit size={14} />}>Edit</Button>}
           <Button variant="ghost" size="sm" iconOnly ariaLabel="Delete post" icon={<IconTrash size={16} />} onClick={() => setDeleting(p)} />
         </div>
       ),
@@ -67,12 +71,23 @@ export default function BlogPage() {
         eyebrow="Content"
         title={<>AI <em>Blog</em></>}
         sub="Write once with AI, publish straight to your website."
-        actions={<Button href="/blog/new" icon={<IconSparkle size={15} />}>Write with AI</Button>}
+        actions={isPro ? <Button href="/blog/new" icon={<IconSparkle size={15} />}>Write with AI</Button> : undefined}
       />
+
+      {tenantData && !isPro && (
+        <div className="pnl" style={{ marginBottom: 18 }}>
+          <EmptyState
+            icon={<IconLock size={26} />}
+            title="The blog is a Pro feature"
+            text={posts.length > 0 ? "Your posts are saved, but they are not shown on your website until you are back on Pro." : "Upgrade to Pro to write posts with AI and publish them straight to your website."}
+            action={<Button href="/account">View plans</Button>}
+          />
+        </div>
+      )}
 
       {isLoading && <ListSkeleton />}
 
-      {!isLoading && posts.length === 0 && (
+      {isPro && !isLoading && posts.length === 0 && (
         <div className="pnl">
           <EmptyState
             icon={<IconBlog size={26} />}

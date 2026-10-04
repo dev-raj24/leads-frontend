@@ -1,6 +1,6 @@
 import { Table, type Column } from "@/components/ui/Table";
 import { IconChat, IconGlobe, IconPhone, IconTag, IconWhatsapp } from "@/components/icons";
-import { initials, sourceLabel, statusLabel, timeAgo } from "@/lib/format";
+import { initials, nextStepFor, sourceLabel, timeAgo } from "@/lib/format";
 import type { Lead } from "@/types/models";
 
 const SOURCE_ICON: Record<string, typeof IconGlobe> = {
@@ -10,6 +10,8 @@ const SOURCE_ICON: Record<string, typeof IconGlobe> = {
   missed_call: IconPhone,
   offer: IconTag,
 };
+
+const STEP_PILL: Record<string, string> = { reply: "r", call: "r", approve: "p", wait: "n", followup: "n", won: "w", closed: "c" };
 
 const COLUMNS: Column<Lead>[] = [
   {
@@ -22,15 +24,17 @@ const COLUMNS: Column<Lead>[] = [
         <span className="av">{initials(lead.name ?? lead.contact)}</span>
         <div className="who-t">
           <strong>{lead.name ?? lead.contact}</strong>
-          <small>{lead.message ?? lead.contact}</small>
+          <small>
+            {lead.lastMessage ? `${lead.lastMessage.direction === "inbound" ? "" : lead.lastMessage.aiGenerated ? "AI: " : "You: "}${lead.lastMessage.body}` : (lead.message ?? lead.contact)}
+          </small>
         </div>
       </div>
     ),
   },
   {
     key: "source",
-    header: "Source",
-    width: "minmax(0, 1fr)",
+    header: "From",
+    width: "minmax(0, 0.8fr)",
     hideOnMobile: true,
     sort: (l) => l.source,
     cell: (lead) => {
@@ -39,23 +43,28 @@ const COLUMNS: Column<Lead>[] = [
     },
   },
   {
-    key: "status",
-    header: "Status",
-    width: "120px",
-    sort: (l) => l.status,
+    key: "next",
+    header: "Next step",
+    width: "minmax(0, 1.3fr)",
+    sort: (l) => (nextStepFor(l).needsYou ? 0 : 1),
     cell: (lead) => {
-      const [label, cls] = statusLabel(lead.status);
-      return <span className={`pp ${cls}`}>{label}</span>;
+      const step = nextStepFor(lead);
+      return (
+        <div className="step">
+          <span className={`pp ${STEP_PILL[step.key]}`}>{step.label.toUpperCase()}</span>
+          <small>{step.hint}</small>
+        </div>
+      );
     },
   },
   {
     key: "received",
-    header: "Received",
-    width: "100px",
+    header: "Last activity",
+    width: "110px",
     align: "right",
     hideOnMobile: true,
-    sort: (l) => new Date(l.createdAt).getTime(),
-    cell: (lead) => <span className="ago">{timeAgo(lead.createdAt)}</span>,
+    sort: (l) => new Date(l.lastMessage?.at ?? l.lastActivityAt).getTime(),
+    cell: (lead) => <span className="ago">{timeAgo(lead.lastMessage?.at ?? lead.lastActivityAt)}</span>,
   },
 ];
 

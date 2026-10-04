@@ -9,20 +9,28 @@ import { PageHead } from "@/components/portal/PageHead";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useLeads } from "@/hooks/leads/query";
 import { apiErrorCode } from "@/lib/errors";
+import { nextStepFor } from "@/lib/format";
 import LeadImportModal from "./LeadImportModal";
 import { Button } from "@/components/ui/Button";
 
 const FILTERS = [
+  { key: "needs", label: "Needs you" },
+  { key: "waiting", label: "Waiting on them" },
+  { key: "done", label: "Won / closed" },
   { key: "all", label: "All" },
-  { key: "new", label: "New" },
-  { key: "replied", label: "Replied" },
-  { key: "won", label: "Won" },
-  { key: "closed", label: "Closed" },
 ];
+
+const inFilter = (key: string, lead: Parameters<typeof nextStepFor>[0]) => {
+  const step = nextStepFor(lead);
+  if (key === "needs") return step.needsYou;
+  if (key === "waiting") return !step.needsYou && step.key !== "won" && step.key !== "closed";
+  if (key === "done") return step.key === "won" || step.key === "closed";
+  return true;
+};
 
 function LeadsContent() {
   const params = useSearchParams();
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("needs");
   const [search, setSearch] = useState(params.get("q") ?? "");
   useEffect(() => setSearch(params.get("q") ?? ""), [params]);
   const [showImport, setShowImport] = useState(false);
@@ -32,7 +40,7 @@ function LeadsContent() {
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
     return leads
-      .filter((l) => filter === "all" || l.status === filter)
+      .filter((l) => inFilter(filter, l))
       .filter(
         (l) =>
           !q ||
@@ -43,9 +51,8 @@ function LeadsContent() {
   }, [leads, filter, search]);
 
   const counts = useMemo(() => {
-    const result: Record<string, number> = { all: leads.length };
-    for (const l of leads) result[l.status] = (result[l.status] ?? 0) + 1;
-    for (const f of FILTERS) result[f.key] ??= 0;
+    const result: Record<string, number> = {};
+    for (const f of FILTERS) result[f.key] = leads.filter((l) => inFilter(f.key, l)).length;
     return result;
   }, [leads]);
 
@@ -56,7 +63,7 @@ function LeadsContent() {
       <PageHead
         eyebrow="Inbox"
         title="Leads"
-        sub={isLoading ? "Loading your enquiries…" : `${leads.length} ${leads.length === 1 ? "enquiry" : "enquiries"} across every source.`}
+        sub={isLoading ? "Loading your enquiries…" : (counts.needs ?? 0) > 0 ? `${counts.needs} ${counts.needs === 1 ? "lead needs" : "leads need"} you right now. Everything else is handled or waiting on the customer.` : "Nobody is waiting on you. New enquiries and replies show up here by themselves."}
         actions={<Button icon={<IconPlus size={15} />} onClick={() => setShowImport(true)}>Import leads</Button>}
       />
 
@@ -99,8 +106,8 @@ function LeadsContent() {
         <div className="pnl">
           <EmptyState
             icon={<IconInbox size={26} />}
-            title={leads.length === 0 ? "No leads yet" : "Nothing matches"}
-            text={leads.length === 0 ? "Once your site's widget or form sends enquiries — or you import a sheet — they'll show up here." : "Try a different filter or search term."}
+            title={leads.length === 0 ? "No leads yet" : filter === "needs" && !search.trim() ? "You are all caught up" : "Nothing matches"}
+            text={leads.length === 0 ? "Once your site's widget or form sends enquiries — or you import a sheet — they'll show up here." : filter === "needs" && !search.trim() ? "Nothing needs a reply or a call. Check Waiting on them to see who has gone quiet." : "Try a different filter or search term."}
             action={leads.length === 0 ? <Button icon={<IconPlus size={15} />} onClick={() => setShowImport(true)}>Import leads</Button> : undefined}
           />
         </div>

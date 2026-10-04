@@ -5,7 +5,7 @@ import { IconCard, IconCheck, IconLock } from "@/components/icons";
 import { PageHead } from "@/components/portal/PageHead";
 import { Button } from "@/components/ui/Button";
 import { PLANS } from "@/config/plans";
-import { useChangeEmail, useChangePassword } from "@/hooks/auth/mutation";
+import { useChangeEmail, useChangePassword, useLogoutAll } from "@/hooks/auth/mutation";
 import { useUpdateTenantName } from "@/hooks/tenant/mutation";
 import { useTenant } from "@/hooks/tenant/query";
 import { useBilling } from "@/hooks/billing/query";
@@ -263,6 +263,7 @@ function SubscriptionTab() {
 
 function PasswordTab() {
   const changePassword = useChangePassword();
+  const logoutAll = useLogoutAll();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -338,6 +339,18 @@ function PasswordTab() {
           Update password
         </Button>
       </form>
+
+      <div className="acct-field" style={{ marginTop: 28 }}>
+        <div className="acct-row">
+          <span>
+            Signed in on other devices?
+            <small style={{ display: "block", color: "var(--muted)" }}>Sign out everywhere except this browser. Changing your password does this too.</small>
+          </span>
+          <Button variant="secondary" size="sm" loading={logoutAll.isPending} loadingText="Signing out…" onClick={() => logoutAll.mutate()}>
+            {logoutAll.isSuccess ? "Done" : "Log out everywhere else"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

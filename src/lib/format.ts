@@ -15,7 +15,7 @@ export function timeAgo(iso: string): string {
 
 const STATUS_LABEL: Record<string, [string, string]> = {
   new: ["NEW", "n"],
-  replied: ["REPLIED", "r"],
+  replied: ["CONTACTED", "r"],
   closed: ["CLOSED", "c"],
   won: ["WON", "w"],
   lost: ["LOST", "c"],
@@ -81,6 +81,7 @@ const SKIP_REASON: Record<string, string> = {
   unsubscribed: "they asked not to get automatic emails",
   automated_address: "it is a no-reply address",
   invalid_address: "there is no email address",
+  ai_unavailable: "the AI took too long or was unavailable. You can still draft a reply with AI yourself",
   email_not_verified: "your email is not confirmed yet",
   monthly_limit: "the monthly lead limit was reached",
 };
@@ -119,4 +120,49 @@ export function eventLabel(type: string, payload: Record<string, unknown>): stri
     default:
       return null;
   }
+}
+
+export interface NextStep {
+  key: "reply" | "call" | "approve" | "wait" | "followup" | "won" | "closed";
+  label: string;
+  hint: string;
+  needsYou: boolean;
+}
+
+const when = (iso: string) => new Date(iso).toLocaleString("en-IN", { weekday: "short", hour: "numeric", minute: "2-digit" });
+
+/** The one thing to do next for a lead, worked out from its status, last message and queued follow-up. */
+export function nextStepFor(lead: {
+  status: string;
+  contact: string;
+  lastMessage?: { direction: "inbound" | "outbound"; aiGenerated: boolean } | null;
+  nextFollowup?: { at: string; status: string } | null;
+}): NextStep {
+  if (lead.status === "won") return { key: "won", label: "Won", hint: "Deal closed", needsYou: false };
+  if (lead.status === "lost" || lead.status === "closed") return { key: "closed", label: "Closed", hint: lead.status === "lost" ? "Marked lost" : "Marked closed", needsYou: false };
+
+  const hasEmail = lead.contact.includes("@");
+  const customerSpokeLast = !lead.lastMessage || lead.lastMessage.direction === "inbound";
+
+  if (!hasEmail && lead.status === "new") {
+    return { key: "call", label: "Call them", hint: "Phone number only, no email to reply to", needsYou: true };
+  }
+
+  if (customerSpokeLast) {
+    return hasEmail
+      ? { key: "reply", label: "Reply now", hint: "They are waiting for an answer", needsYou: true }
+      : { key: "call", label: "Call them", hint: "Phone number only, no email to reply to", needsYou: true };
+  }
+  if (lead.nextFollowup?.status === "pending") {
+    return { key: "approve", label: "Approve follow-up", hint: `Goes out ${when(lead.nextFollowup.at)} once you approve`, needsYou: true };
+  }
+  if (lead.nextFollowup) {
+    return { key: "followup", label: "Follow-up queued", hint: `Goes out ${when(lead.nextFollowup.at)}`, needsYou: false };
+  }
+  return {
+    key: "wait",
+    label: "Waiting for them",
+    hint: lead.lastMessage?.aiGenerated ? "AI replied, no answer yet" : "You replied, no answer yet",
+    needsYou: false,
+  };
 }

@@ -46,7 +46,7 @@ export default function FollowUpsPage() {
       <PageHead
         eyebrow="Nurture"
         title="Follow-ups"
-        sub={isLoading ? "Loading…" : `${waiting} waiting on you. Approve a nudge and it goes out at the scheduled time.`}
+        sub={isLoading ? "Loading…" : waiting > 0 ? `${waiting} ${waiting === 1 ? "nudge is" : "nudges are"} waiting for your OK. Each one also shows on that lead's page, and it stops by itself if the customer replies.` : "Nothing waiting on you. A nudge is queued for every lead nobody has answered, and it stops if they reply."}
       />
 
       <div className="toolbar">

@@ -18,6 +18,8 @@ export interface Lead {
   customFields?: Record<string, unknown>;
   createdAt: string;
   lastActivityAt: string;
+  lastMessage?: { body: string; direction: "inbound" | "outbound"; aiGenerated: boolean; at: string } | null;
+  nextFollowup?: { at: string; status: string } | null;
 }
 
 export interface CustomerSummary {

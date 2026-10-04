@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconLock, IconSparkle } from "@/components/icons";
 import Link from "next/link";
+import { EmptyState } from "@/components/portal/EmptyState";
 import { PageHead } from "@/components/portal/PageHead";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useBlogPost } from "@/hooks/blog/query";
@@ -86,6 +87,17 @@ function BlogFormContent() {
 
   if (editId && loadingExisting) {
     return <div className="pnl pad"><Skeleton width="40%" height={24} /></div>;
+  }
+
+  if (tenantData && !isPro) {
+    return (
+      <>
+        <Link href="/blog" className="back">← All posts</Link>
+        <div className="pnl">
+          <EmptyState icon={<IconLock size={26} />} title="The blog is a Pro feature" text="Upgrade to Pro to write posts and publish them to your website." action={<Button href="/account">View plans</Button>} />
+        </div>
+      </>
+    );
   }
 
   return (

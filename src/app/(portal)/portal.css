@@ -2373,3 +2373,106 @@ select.finput {
   gap: 12px;
   margin-top: 12px;
 }
+
+.step {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  min-width: 0;
+}
+.step small {
+  color: var(--muted);
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.nextbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+  padding: 12px 24px;
+  border-top: 1px solid var(--line);
+  background: #f7f5ef;
+  font-size: 14px;
+}
+.nextbar span {
+  color: var(--muted);
+}
+.nextbar.act {
+  background: var(--lime-soft);
+}
+.nextbar.act b {
+  color: var(--lime-ink);
+}
+.queued {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border: 1px dashed #cfc9b8;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 13.5px;
+}
+.queued > div {
+  flex: 1;
+  min-width: 160px;
+}
+.queued b {
+  display: block;
+}
+.queued small {
+  color: var(--muted);
+}
+.thread .bub {
+  max-width: 78%;
+}
+.thread .bub.out.team {
+  background: var(--primary);
+  color: #fff;
+}
+.thread .bub.out.team time {
+  color: rgba(255, 255, 255, 0.75);
+}
+.ffe-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(160px, 1.4fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+.ffe-req {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .ffe-row {
+    grid-template-columns: 1fr;
+  }
+}
+.parts {
+  display: grid;
+  gap: 0;
+}
+.part {
+  display: grid;
+  gap: 8px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.part:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.part-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
