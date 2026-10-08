@@ -10,7 +10,11 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { useBlogPost } from "@/hooks/blog/query";
 import { useGenerateBlogDraft, useCreateBlogPost, useUpdateBlogPost } from "@/hooks/blog/mutation";
 import { useTenant } from "@/hooks/tenant/query";
+import { useMySite } from "@/hooks/sites/query";
 import { Button } from "@/components/ui/Button";
+
+const origin = typeof window === "undefined" ? "" : window.location.host;
+const slugPreview = (title: string) => title.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "post";
 
 function BlogFormContent() {
   const router = useRouter();
@@ -32,6 +36,10 @@ function BlogFormContent() {
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [aiGenerated, setAiGenerated] = useState(false);
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const { data: siteData } = useMySite();
+  const publicSlug = siteData?.site.publicSlug ?? "your-site";
 
   useEffect(() => {
     if (existingPost?.post) {
@@ -39,6 +47,8 @@ function BlogFormContent() {
       setExcerpt(existingPost.post.excerpt ?? "");
       setContent(existingPost.post.content);
       setAiGenerated(existingPost.post.aiGenerated);
+      setMetaTitle(existingPost.post.metaTitle ?? "");
+      setMetaDescription(existingPost.post.metaDescription ?? "");
       setHasDraft(true);
     }
   }, [existingPost]);
@@ -52,6 +62,8 @@ function BlogFormContent() {
         setTitle(res.draft.title);
         setExcerpt(res.draft.excerpt);
         setContent(res.draft.content);
+        setMetaTitle(res.draft.metaTitle ?? "");
+        setMetaDescription(res.draft.metaDescription ?? "");
         setAiGenerated(true);
         setHasDraft(true);
       },
@@ -77,9 +89,9 @@ function BlogFormContent() {
     };
 
     if (editId) {
-      updateMutation.mutate({ id: editId, title, excerpt, content, status }, onSettled);
+      updateMutation.mutate({ id: editId, title, excerpt, content, status, metaTitle, metaDescription }, onSettled);
     } else {
-      createMutation.mutate({ title, excerpt, content, status, aiGenerated }, onSettled);
+      createMutation.mutate({ title, excerpt, content, status, aiGenerated, metaTitle, metaDescription }, onSettled);
     }
   }
 
@@ -154,6 +166,21 @@ function BlogFormContent() {
           <div className="field">
             <label className="flabel" htmlFor="content">Content</label>
             <textarea id="content" className="finput" rows={16} value={content} onChange={(e) => setContent(e.target.value)} />
+          </div>
+
+          <div className="sec-t" style={{ marginTop: 8 }}>How it looks on Google</div>
+          <div className="serp" aria-label="Search result preview">
+            <div className="serp-url">{origin}/b/{publicSlug}/{slugPreview(title)}</div>
+            <div className="serp-title">{(metaTitle || title || "Your post title").slice(0, 60)}</div>
+            <div className="serp-desc">{(metaDescription || excerpt || content.replace(/\s+/g, " ").slice(0, 155) || "Your description appears here.").slice(0, 160)}</div>
+          </div>
+          <div className="field">
+            <label className="flabel" htmlFor="meta-title">SEO title <span className={`count ${metaTitle.length > 60 ? "over" : ""}`}>{metaTitle.length}/60</span></label>
+            <input id="meta-title" className="finput" maxLength={70} value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder={title || "Defaults to the post title"} />
+          </div>
+          <div className="field">
+            <label className="flabel" htmlFor="meta-desc">SEO description <span className={`count ${metaDescription.length > 160 ? "over" : ""}`}>{metaDescription.length}/160</span></label>
+            <textarea id="meta-desc" className="finput" rows={2} maxLength={170} value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} placeholder="One sentence that makes someone click. Defaults to the excerpt." />
           </div>
 
           {error && <div className="auth-err">{error}</div>}

@@ -10,6 +10,7 @@ import { ListSkeleton } from "@/components/ui/Skeleton";
 import { Table, type Column } from "@/components/ui/Table";
 import { useBlogPosts } from "@/hooks/blog/query";
 import { useTenant } from "@/hooks/tenant/query";
+import { useMySite } from "@/hooks/sites/query";
 import { IconLock } from "@/components/icons";
 import { useDeleteBlogPost } from "@/hooks/blog/mutation";
 import { timeAgo } from "@/lib/format";
@@ -19,6 +20,8 @@ export default function BlogPage() {
   const { data, isLoading } = useBlogPosts();
   const { data: tenantData } = useTenant();
   const isPro = tenantData?.tenant.plan === "pro";
+  const { data: siteData } = useMySite();
+  const siteSlug = siteData?.site.publicSlug ?? null;
   const deletePost = useDeleteBlogPost();
   const [deleting, setDeleting] = useState<BlogPost | null>(null);
   const posts: BlogPost[] = data?.posts ?? [];
@@ -58,6 +61,9 @@ export default function BlogPage() {
       align: "right",
       cell: (p) => (
         <div className="row-actions">
+          {p.status === "published" && isPro && siteSlug && (
+            <a className="btn line sm" href={`/b/${siteSlug}/${p.slug}`} target="_blank" rel="noreferrer">View</a>
+          )}
           {isPro && <Button href={`/blog/new?id=${p.id}`} variant="secondary" size="sm" icon={<IconEdit size={14} />}>Edit</Button>}
           <Button variant="ghost" size="sm" iconOnly ariaLabel="Delete post" icon={<IconTrash size={16} />} onClick={() => setDeleting(p)} />
         </div>

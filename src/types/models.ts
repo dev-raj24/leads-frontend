@@ -89,6 +89,8 @@ export interface BlogPost {
   slug: string;
   excerpt: string | null;
   content: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
   status: "draft" | "published";
   aiGenerated: boolean;
   publishedAt: string | null;
@@ -100,6 +102,8 @@ export interface BlogDraft {
   title: string;
   excerpt: string;
   content: string;
+  metaTitle: string;
+  metaDescription: string;
 }
 
 export interface BlogPostPayload {
@@ -108,6 +112,8 @@ export interface BlogPostPayload {
   content?: string;
   status?: "draft" | "published";
   aiGenerated?: boolean;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 export interface AuthUser {
@@ -123,6 +129,7 @@ export interface Site {
   tenantId: string;
   domain: string | null;
   apiKey: string;
+  publicSlug: string | null;
   settings: Record<string, unknown>;
   createdAt: string;
 }

@@ -24,6 +24,7 @@ const BLOG_MOUNT = "<div data-leadworks-blog></div>";
 const OFFER_MOUNT = "<div data-leadworks-offer></div>";
 const FORM_MOUNT = "<div data-leadworks-form></div>";
 const hostedLink = (key: string) => `${typeof window === "undefined" ? "" : window.location.origin}/f/${key}`;
+const blogPageLink = (slug: string | null) => `${typeof window === "undefined" ? "" : window.location.origin}/b/${slug ?? "your-site"}`;
 const FORM_CAPTURE = "<form data-leadworks-capture> ... your own fields ... </form>";
 
 const embedSnippet = (script: string, apiKey: string) =>
@@ -103,6 +104,10 @@ export default function SettingsPage() {
             <div className="part-h"><div className="module-t">Blog</div><span className="pp p">PRO</span></div>
             <div className="module-d">Every post you publish from AI Blog shows up here, each with its own page.</div>
             <CodeSnippet code={BLOG_MOUNT} />
+            <div className="module-d" style={{ marginTop: 6 }}>
+              Want search engines to find your posts? Every post also has its own page with a proper title, description and sitemap. Link to it from your site, or submit the sitemap in Google Search Console.
+            </div>
+            <CodeSnippet code={`Blog page: ${blogPageLink(site?.publicSlug ?? null)}\nSitemap:   ${blogPageLink(site?.publicSlug ?? null)}/sitemap.xml`} />
             {!isPro && <div><Button href="/account" variant="secondary" size="sm">Upgrade to turn on</Button></div>}
           </div>
           <div className="part">
