@@ -15,3 +15,17 @@ export async function fetchCustomerService(
     pathParams: { contact },
   });
 }
+
+export async function exportCustomerService(contact: string): Promise<Record<string, unknown>> {
+  return callApi({
+    uriEndPoint: { ...customersEndpoints.export.v1 } as ApiEndpoint,
+    pathParams: { contact },
+  });
+}
+
+export async function eraseCustomerService(contact: string): Promise<{ ok: boolean; removed: number }> {
+  return callApi({
+    uriEndPoint: { ...customersEndpoints.erase.v1 } as ApiEndpoint,
+    pathParams: { contact },
+  });
+}

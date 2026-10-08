@@ -24,6 +24,7 @@ export function FormFieldsEditor({ site }: { site: Site }) {
   const update = useUpdateSiteSettings();
   const [rows, setRows] = useState<Row[]>(() => toRows(site.settings.leadFields));
   const [dirty, setDirty] = useState(false);
+  const [consent, setConsent] = useState(typeof site.settings.formConsent === "string" ? (site.settings.formConsent as string) : "");
 
   useEffect(() => {
     if (!dirty) setRows(toRows(site.settings.leadFields));
@@ -42,7 +43,7 @@ export function FormFieldsEditor({ site }: { site: Site }) {
         required: r.required,
         options: r.options.split(",").map((o) => o.trim()).filter(Boolean),
       }));
-    update.mutate({ siteId: site.id, settings: { ...site.settings, leadFields } }, { onSuccess: () => setDirty(false) });
+    update.mutate({ siteId: site.id, settings: { ...site.settings, leadFields, formConsent: consent } }, { onSuccess: () => setDirty(false) });
   }
 
   return (
@@ -60,6 +61,17 @@ export function FormFieldsEditor({ site }: { site: Site }) {
           <Button size="sm" variant="ghost" onClick={() => { setRows((r) => r.filter((_, idx) => idx !== i)); setDirty(true); }}>Remove</Button>
         </div>
       ))}
+      <div className="field" style={{ marginBottom: 0 }}>
+        <label className="flabel" htmlFor="form-consent">Small print under the form</label>
+        <input
+          id="form-consent"
+          className="finput"
+          maxLength={200}
+          placeholder="We will only use these details to reply to your enquiry."
+          value={consent}
+          onChange={(e) => { setConsent(e.target.value); setDirty(true); }}
+        />
+      </div>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         <Button size="sm" variant="secondary" disabled={rows.length >= 12} onClick={() => { setRows((r) => [...r, { name: "", required: false, options: "" }]); setDirty(true); }}>
           Add a question

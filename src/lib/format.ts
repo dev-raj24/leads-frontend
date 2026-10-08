@@ -109,6 +109,8 @@ export function eventLabel(type: string, payload: Record<string, unknown>): stri
       return `Automations paused: ${reason}`;
     case "manual_reply_sent":
       return "You replied by email";
+    case "chat_reply_emailed":
+      return "Your chat reply was also emailed (they had left the page)";
     case "followup_sent":
       return "Follow-up sent";
     case "followup_skipped":

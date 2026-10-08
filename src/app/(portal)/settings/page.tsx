@@ -23,6 +23,7 @@ const MODULES = [
 const BLOG_MOUNT = "<div data-leadworks-blog></div>";
 const OFFER_MOUNT = "<div data-leadworks-offer></div>";
 const FORM_MOUNT = "<div data-leadworks-form></div>";
+const hostedLink = (key: string) => `${typeof window === "undefined" ? "" : window.location.origin}/f/${key}`;
 const FORM_CAPTURE = "<form data-leadworks-capture> ... your own fields ... </form>";
 
 const embedSnippet = (script: string, apiKey: string) =>
@@ -82,6 +83,11 @@ export default function SettingsPage() {
             <div className="part-h"><div className="module-t">Enquiry form</div><span className="pp w">FREE</span></div>
             <div className="module-d">A contact form with the questions you choose below. Place it where you want it on a page.</div>
             <CodeSnippet code={FORM_MOUNT} />
+          </div>
+          <div className="part">
+            <div className="part-h"><div className="module-t">Form page link</div><span className="pp w">FREE</span></div>
+            <div className="module-d">No website, or only Instagram and WhatsApp? Share this link. It opens a ready form page with your questions, and every submission lands in your inbox.</div>
+            <CodeSnippet code={hostedLink(apiKey)} />
           </div>
           <div className="part">
             <div className="part-h"><div className="module-t">Your own form</div><span className="pp w">FREE</span></div>
