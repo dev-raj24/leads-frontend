@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { IconBlog, IconEdit, IconPlus, IconSparkle, IconTrash } from "@/components/icons";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { EmptyState } from "@/components/portal/EmptyState";
@@ -45,6 +46,19 @@ export default function BlogPage() {
       width: "110px",
       sort: (p) => p.status,
       cell: (p) => <span className={`pp ${p.status === "published" ? "w" : "c"}`}>{p.status === "published" ? "● LIVE" : "DRAFT"}</span>,
+    },
+    {
+      key: "seo",
+      header: "SEO",
+      width: "150px",
+      hideOnMobile: true,
+      sort: (p) => (p.metaTitle && p.metaDescription ? 0 : 1),
+      cell: (p) =>
+        p.metaTitle && p.metaDescription ? (
+          <span className="pp w">SET</span>
+        ) : (
+          <Link href={`/blog/new?id=${p.id}`} className="pp r" title="Add an SEO title and description">ADD SEO</Link>
+        ),
     },
     {
       key: "created",
