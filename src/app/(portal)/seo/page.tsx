@@ -62,12 +62,28 @@ function IssueRow({ issue }: { issue: SeoIssue }) {
   );
 }
 
+const HEAD_IDS = ["title", "description", "viewport", "canonical", "og", "schema"];
+
 function FixList({ pack }: { pack: SeoFixPack }) {
   if (pack.items.length === 0) return <p className="hint">Nothing needs changing on this page.</p>;
+  const headItems = pack.items.filter((i) => i.kind === "html" && HEAD_IDS.includes(i.id));
+  const rest = pack.items.filter((i) => !(i.kind === "html" && HEAD_IDS.includes(i.id)));
   return (
     <div className="seo-fixes">
+      {headItems.length >= 2 && (
+        <div className="seo-fix seo-fix-all">
+          <div className="seo-fix-h">
+            <b>Paste this once and you are done with the tags</b>
+            <small>Inside the &lt;head&gt; of this page. Includes: {headItems.map((i) => i.label.toLowerCase()).join(", ")}.</small>
+          </div>
+          <CodeSnippet code={headItems.map((i) => i.value).join("\n")} />
+          <p className="hint" style={{ margin: "6px 0 0" }}>
+            Delete the old title and description tags first, so the page does not end up with two. WordPress, Wix and similar: use the &quot;header code&quot; or &quot;custom code in head&quot; box, or fill the SEO title and description boxes from the items below.
+          </p>
+        </div>
+      )}
       {!pack.aiUsed && <p className="hint">The AI was busy, so only the fixes that don&apos;t need writing are shown. Try again in a minute for titles and descriptions.</p>}
-      {pack.items.map((item) => (
+      {(headItems.length >= 2 ? [...rest, ...headItems] : pack.items).map((item) => (
         <div key={item.id} className="seo-fix">
           <div className="seo-fix-h">
             <b>{item.label}</b>
