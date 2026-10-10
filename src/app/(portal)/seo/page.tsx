@@ -244,6 +244,15 @@ function WebsiteCheck() {
             </div>
           </div>
 
+          {report.pages.some((p) => p.jsRendered) && (
+            <div className="notice warn" style={{ marginTop: 18 }}>
+              <span>
+                <b>Your pages build their content in the browser.</b> A search engine that does not run JavaScript sees an almost empty page, so it cannot read your headings, text or links.
+                Ask your developer to send the real content in the page source (server-side rendering). Open the fix for a page below for the exact steps.
+              </span>
+            </div>
+          )}
+
           {audit.aiPlan ? (
             <>
               <div className="sec-t">Do these first</div>

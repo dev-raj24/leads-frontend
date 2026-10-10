@@ -311,6 +311,7 @@ export interface SeoPageReport {
   imagesWithoutAlt: number;
   ms: number;
   score: number;
+  jsRendered?: boolean;
   issues: SeoIssue[];
 }
 
