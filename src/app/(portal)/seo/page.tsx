@@ -5,12 +5,13 @@ import { IconLock, IconSearch } from "@/components/icons";
 import { EmptyState } from "@/components/portal/EmptyState";
 import { PageHead } from "@/components/portal/PageHead";
 import { Button } from "@/components/ui/Button";
-import { useStartSeoAudit } from "@/hooks/seo/mutation";
+import { CodeSnippet } from "@/components/ui/CodeSnippet";
+import { useStartSeoAudit, useWriteSeoFixes } from "@/hooks/seo/mutation";
 import { useSeoAudit, useSeoAudits } from "@/hooks/seo/query";
 import { useTenant } from "@/hooks/tenant/query";
 import { authErrorMessage } from "@/lib/errors";
 import { timeAgo } from "@/lib/format";
-import type { SeoIssue, SeoPageReport } from "@/types/models";
+import type { SeoFixPack, SeoIssue, SeoPageReport } from "@/types/models";
 
 const ago = (iso: string) => {
   const t = timeAgo(iso);
@@ -59,7 +60,26 @@ function IssueRow({ issue }: { issue: SeoIssue }) {
   );
 }
 
-function PageCard({ page }: { page: SeoPageReport }) {
+function FixList({ pack }: { pack: SeoFixPack }) {
+  if (pack.items.length === 0) return <p className="hint">Nothing needs changing on this page.</p>;
+  return (
+    <div className="seo-fixes">
+      {!pack.aiUsed && <p className="hint">The AI was busy, so only the fixes that don&apos;t need writing are shown. Try again in a minute for titles and descriptions.</p>}
+      {pack.items.map((item) => (
+        <div key={item.id} className="seo-fix">
+          <div className="seo-fix-h">
+            <b>{item.label}</b>
+            <small>{item.where}</small>
+          </div>
+          {item.kind === "steps" ? <p className="seo-steps">{item.value}</p> : <CodeSnippet code={item.value} />}
+          {item.note && <p className="hint" style={{ margin: "6px 0 0" }}>{item.note}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PageCard({ page, auditId, pack, writing, onWrite }: { page: SeoPageReport; auditId: string; pack?: SeoFixPack; writing: boolean; onWrite: (url: string) => void }) {
   const [open, setOpen] = useState(page.issues.some((i) => i.severity === "critical"));
   const path = (() => {
     try {
@@ -70,12 +90,12 @@ function PageCard({ page }: { page: SeoPageReport }) {
     }
   })();
   return (
-    <div className="pnl seo-page">
+    <div className="pnl seo-page" data-audit={auditId}>
       <button type="button" className="seo-page-h" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className={`seo-dot ${tone(page.score)}`}>{page.score}</span>
         <span className="seo-page-t">
           <strong>{page.title || path}</strong>
-          <small>{path} · {page.issues.length === 0 ? "no problems" : `${page.issues.length} to look at`}</small>
+          <small>{path} · {page.issues.length === 0 ? "no problems" : `${page.issues.length} to look at`}{pack ? " · fixes ready" : ""}</small>
         </span>
         <span aria-hidden>{open ? "−" : "+"}</span>
       </button>
@@ -83,6 +103,20 @@ function PageCard({ page }: { page: SeoPageReport }) {
         <div className="seo-page-b">
           {page.issues.length === 0 && <p className="hint">Nothing to fix on this page.</p>}
           {page.issues.map((i) => <IssueRow key={i.id} issue={i} />)}
+          {page.issues.length > 0 && !pack && (
+            <div style={{ paddingTop: 12 }}>
+              <Button size="sm" loading={writing} loadingText="Writing the fixes…" onClick={() => onWrite(page.url)}>Write the fixes for this page</Button>
+            </div>
+          )}
+          {pack && (
+            <>
+              <div className="sec-t" style={{ marginTop: 18 }}>Ready-made fixes. Copy and paste.</div>
+              <FixList pack={pack} />
+              <div style={{ paddingTop: 10 }}>
+                <Button size="sm" variant="secondary" loading={writing} loadingText="Writing again…" onClick={() => onWrite(page.url)}>Write them again</Button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -93,6 +127,9 @@ export default function SeoPage() {
   const { data: tenantData } = useTenant();
   const { data: list } = useSeoAudits();
   const start = useStartSeoAudit();
+  const writeFixes = useWriteSeoFixes();
+  const [writingUrl, setWritingUrl] = useState<string | null>(null);
+  const [bulk, setBulk] = useState<{ done: number; total: number } | null>(null);
   const [url, setUrl] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
   const { data: active } = useSeoAudit(activeId);
@@ -131,6 +168,34 @@ export default function SeoPage() {
     }
     return [...groups.values()].sort((a, b) => b.total - a.total).slice(0, 5);
   }, [report]);
+  const fixes = audit?.fixes ?? {};
+
+  async function writeOne(url: string) {
+    if (!audit) return;
+    setWritingUrl(url);
+    try {
+      await writeFixes.mutateAsync({ id: audit.id, url });
+    } finally {
+      setWritingUrl(null);
+    }
+  }
+
+  async function writeAll() {
+    if (!audit || !report) return;
+    const todo = report.pages.filter((p) => p.issues.length > 0 && !fixes[p.url]);
+    setBulk({ done: 0, total: todo.length });
+    for (const [i, page] of todo.entries()) {
+      try {
+        await writeFixes.mutateAsync({ id: audit.id, url: page.url });
+      } catch {
+        break;
+      }
+      setBulk({ done: i + 1, total: todo.length });
+    }
+    setBulk(null);
+  }
+
+  const pagesToFix = report ? report.pages.filter((p) => p.issues.length > 0 && !fixes[p.url]).length : 0;
   const delta = audit?.score != null && previous?.score != null ? audit.score - previous.score : null;
 
   function submit(e: React.FormEvent) {
@@ -228,9 +293,19 @@ export default function SeoPage() {
             </>
           )}
 
-          <div className="sec-t">Page by page</div>
+          <div className="sec-t" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <span>Page by page</span>
+            {pagesToFix > 0 && (
+              <Button size="sm" loading={!!bulk} loadingText={bulk ? `Writing fixes ${bulk.done} of ${bulk.total}…` : "Writing…"} onClick={writeAll}>
+                Write the fixes for all {pagesToFix} {pagesToFix === 1 ? "page" : "pages"}
+              </Button>
+            )}
+          </div>
+          {writeFixes.isError && <div className="auth-err" style={{ marginBottom: 10 }}>{authErrorMessage(writeFixes.error)}</div>}
           <div style={{ display: "grid", gap: 10 }}>
-            {[...report.pages].sort((a, b) => a.score - b.score).map((p) => <PageCard key={p.url} page={p} />)}
+            {[...report.pages].sort((a, b) => a.score - b.score).map((p) => (
+              <PageCard key={p.url} page={p} auditId={audit.id} pack={fixes[p.url]} writing={writingUrl === p.url || (!!bulk && !fixes[p.url] && p.issues.length > 0 && writeFixes.isPending)} onWrite={writeOne} />
+            ))}
           </div>
 
           <p className="hint" style={{ marginTop: 18 }}>

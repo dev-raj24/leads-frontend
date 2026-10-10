@@ -314,6 +314,22 @@ export interface SeoPageReport {
   issues: SeoIssue[];
 }
 
+export interface SeoFixItem {
+  id: string;
+  label: string;
+  kind: "html" | "text" | "steps";
+  where: string;
+  value: string;
+  note?: string;
+}
+
+export interface SeoFixPack {
+  url: string;
+  items: SeoFixItem[];
+  aiUsed: boolean;
+  generatedAt: string;
+}
+
 export interface SeoReport {
   score: number;
   pages: SeoPageReport[];
@@ -328,6 +344,7 @@ export interface SeoAudit {
   score: number | null;
   result?: SeoReport | null;
   pageCount?: number;
+  fixes?: Record<string, SeoFixPack>;
   aiPlan: string | null;
   error: string | null;
   createdAt: string;
