@@ -13,6 +13,7 @@ const TITLES: Record<string, string> = {
   "follow-ups": "Follow-ups",
   offers: "Offers",
   blog: "AI Blog",
+  seo: "SEO check",
   "ai-widget": "Chat widget",
   settings: "Settings",
   account: "Account",

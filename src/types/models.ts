@@ -291,3 +291,45 @@ export interface InstallStatus {
   lastSeenHost: string | null;
   blocked: Array<{ host: string; kind: string; lastAt: string; count: number }>;
 }
+
+export interface SeoIssue {
+  id: string;
+  severity: "critical" | "warning" | "info";
+  message: string;
+  fix: string;
+  points: number;
+}
+
+export interface SeoPageReport {
+  url: string;
+  status: number;
+  title: string;
+  description: string;
+  h1: number;
+  words: number;
+  images: number;
+  imagesWithoutAlt: number;
+  ms: number;
+  score: number;
+  issues: SeoIssue[];
+}
+
+export interface SeoReport {
+  score: number;
+  pages: SeoPageReport[];
+  siteIssues: SeoIssue[];
+  counts: { critical: number; warning: number; info: number; passedChecks: number };
+}
+
+export interface SeoAudit {
+  id: string;
+  url: string;
+  status: "running" | "done" | "failed";
+  score: number | null;
+  result?: SeoReport | null;
+  pageCount?: number;
+  aiPlan: string | null;
+  error: string | null;
+  createdAt: string;
+  finishedAt: string | null;
+}
