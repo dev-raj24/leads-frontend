@@ -322,6 +322,7 @@ export interface SeoFixItem {
   where: string;
   value: string;
   note?: string;
+  data?: Record<string, unknown>;
 }
 
 export interface SeoFixPack {
@@ -378,4 +379,11 @@ export interface SearchPerformance {
   daily: Array<{ date: string; clicks: number; impressions: number }>;
   queries: Array<SearchMetrics & { query: string }>;
   pages: Array<SearchMetrics & { page: string }>;
+}
+
+export interface SeoAppliedFix {
+  path: string;
+  pageUrl: string;
+  updatedAt: string;
+  data: { title?: string; description?: string; canonical?: string; lang?: string; jsonLd?: Record<string, unknown>; alts?: Array<{ src: string; alt: string }> };
 }

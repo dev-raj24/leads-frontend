@@ -36,6 +36,8 @@ const MESSAGES: Record<string, string> = {
   google_request_failed: "Google didn't answer properly. Please try again in a moment.",
   no_property_chosen: "Pick which website to show first.",
   unknown_property: "That website isn't in your Google account.",
+  fixes_not_written: "Write the fixes for this page first, then apply them.",
+  nothing_to_apply: "These fixes can't be applied through the script. Write them again, or paste them by hand.",
   payment_required: "Upgrading to Pro goes through checkout. Open Account → Subscription.",
   billing_not_configured: "Payments aren't switched on yet. Please check back soon.",
   payment_provider_error: "The payment provider couldn't start checkout. Please try again in a moment.",

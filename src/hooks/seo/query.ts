@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchSeoAuditService, fetchSeoAuditsService } from "@/services/seo";
+import { fetchSeoAuditService, fetchSeoAuditsService, fetchSeoOverridesService } from "@/services/seo";
 
 export const useSeoAudits = () => useQuery({ queryKey: ["seo-audits"], queryFn: fetchSeoAuditsService });
 
@@ -17,3 +17,5 @@ export const useSeoAudit = (id: string | null) =>
     },
     refetchIntervalInBackground: true,
   });
+
+export const useSeoOverrides = () => useQuery({ queryKey: ["seo-overrides"], queryFn: fetchSeoOverridesService });
