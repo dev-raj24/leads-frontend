@@ -350,3 +350,31 @@ export interface SeoAudit {
   createdAt: string;
   finishedAt: string | null;
 }
+
+export interface SearchConsoleStatus {
+  configured: boolean;
+  connected: boolean;
+  email: string | null;
+  property: string | null;
+  needsReconnect: boolean;
+}
+
+export interface SearchMetrics {
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+}
+
+export interface SearchPerformance {
+  property: string;
+  rangeDays: number;
+  startDate: string;
+  endDate: string;
+  fetchedAt: string;
+  totals: SearchMetrics;
+  previous: SearchMetrics;
+  daily: Array<{ date: string; clicks: number; impressions: number }>;
+  queries: Array<SearchMetrics & { query: string }>;
+  pages: Array<SearchMetrics & { page: string }>;
+}

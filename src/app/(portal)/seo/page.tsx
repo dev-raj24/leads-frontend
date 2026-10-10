@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { RankingsPanel } from "@/components/portal/RankingsPanel";
 import { IconLock, IconSearch } from "@/components/icons";
 import { EmptyState } from "@/components/portal/EmptyState";
 import { PageHead } from "@/components/portal/PageHead";
@@ -123,8 +125,7 @@ function PageCard({ page, auditId, pack, writing, onWrite }: { page: SeoPageRepo
   );
 }
 
-export default function SeoPage() {
-  const { data: tenantData } = useTenant();
+function WebsiteCheck() {
   const { data: list } = useSeoAudits();
   const start = useStartSeoAudit();
   const writeFixes = useWriteSeoFixes();
@@ -134,7 +135,6 @@ export default function SeoPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const { data: active } = useSeoAudit(activeId);
 
-  const isPro = tenantData?.tenant.plan === "pro";
   const audits = list?.audits ?? [];
 
   useEffect(() => {
@@ -204,26 +204,8 @@ export default function SeoPage() {
     start.mutate(url.trim(), { onSuccess: (res) => setActiveId(res.audit.id) });
   }
 
-  if (tenantData && !isPro) {
-    return (
-      <>
-        <PageHead eyebrow="Growth" title={<>SEO <em>check</em></>} sub="See how search engines read your website and what to fix first." />
-        <div className="pnl">
-          <EmptyState
-            icon={<IconLock size={26} />}
-            title="The SEO check is a Pro feature"
-            text="Scan your website, get a score out of 100, and a plain list of what to fix to rank better."
-            action={<Button href="/account">View plans</Button>}
-          />
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
-      <PageHead eyebrow="Growth" title={<>SEO <em>check</em></>} sub="We read your website the way a search engine does and tell you what to fix first." />
-
       <form className="pnl pad seo-form" onSubmit={submit}>
         <label className="field" style={{ margin: 0, flex: 1, minWidth: 220 }}>
           <span className="flabel">Your website address</span>
@@ -329,5 +311,47 @@ export default function SeoPage() {
         </>
       )}
     </>
+  );
+}
+
+function SeoTabs() {
+  const params = useSearchParams();
+  const { data: tenantData } = useTenant();
+  const isPro = tenantData?.tenant.plan === "pro";
+  const [tab, setTab] = useState<"check" | "rankings">(params.get("tab") === "rankings" ? "rankings" : "check");
+
+  if (tenantData && !isPro) {
+    return (
+      <>
+        <PageHead eyebrow="Growth" title={<>SEO <em>check</em></>} sub="See how search engines read your website and what to fix first." />
+        <div className="pnl">
+          <EmptyState
+            icon={<IconLock size={26} />}
+            title="The SEO check is a Pro feature"
+            text="Scan your website, get a score out of 100, ready-made fixes, and see the real searches that find you on Google."
+            action={<Button href="/account">View plans</Button>}
+          />
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <PageHead eyebrow="Growth" title={<>SEO <em>check</em></>} sub="Fix what is holding your website back, and see how Google actually shows it." />
+      <div className="seg" role="tablist" style={{ marginBottom: 20 }}>
+        <button role="tab" aria-selected={tab === "check"} className={tab === "check" ? "on" : ""} onClick={() => setTab("check")}>Website check</button>
+        <button role="tab" aria-selected={tab === "rankings"} className={tab === "rankings" ? "on" : ""} onClick={() => setTab("rankings")}>Google rankings</button>
+      </div>
+      {tab === "check" ? <WebsiteCheck /> : <RankingsPanel justConnected={params.get("connected") === "1"} returnedError={params.get("error")} />}
+    </>
+  );
+}
+
+export default function SeoPage() {
+  return (
+    <Suspense fallback={null}>
+      <SeoTabs />
+    </Suspense>
   );
 }
