@@ -5,6 +5,7 @@ import { CodeSnippet } from "@/components/ui/CodeSnippet";
 import { Button } from "@/components/ui/Button";
 import { BusinessProfileForm } from "@/components/portal/BusinessProfileForm";
 import { FormFieldsEditor } from "@/components/portal/FormFieldsEditor";
+import { WebsiteReader } from "@/components/portal/WebsiteReader";
 import { PageHead } from "@/components/portal/PageHead";
 import { env } from "@/config/env";
 import { useMySite } from "@/hooks/sites/query";
@@ -50,6 +51,17 @@ export default function SettingsPage() {
   }, [site]);
 
   const apiKey = site?.apiKey ?? "connect-your-database";
+  const formButton = ((site?.settings as Record<string, unknown> | undefined)?.formButton ?? {}) as { enabled?: boolean; label?: string; position?: string };
+  const buttonOn = formButton.enabled === true;
+  const autoCaptureOn = (site?.settings as Record<string, unknown> | undefined)?.autoCapture === true;
+  const [buttonLabel, setButtonLabel] = useState("Contact us");
+  useEffect(() => setButtonLabel(formButton.label || "Contact us"), [formButton.label]);
+
+  function saveButton(patch: { enabled?: boolean; label?: string }) {
+    if (!site) return;
+    const next = { enabled: buttonOn, label: buttonLabel || "Contact us", position: formButton.position ?? "right", ...patch };
+    updateSettings.mutate({ siteId: site.id, settings: { ...site.settings, formButton: next } });
+  }
 
   function toggle(key: string) {
     const previous = state;
@@ -68,6 +80,9 @@ export default function SettingsPage() {
         actions={<span className={`pp ${isPro ? "p" : "c"}`}>{isPro ? "PRO" : "FREE"}</span>}
       />
 
+      <div className="sec-t">Start with your website</div>
+      <WebsiteReader initialUrl={install?.allowedDomains?.[0] ? `https://${install.allowedDomains[0]}` : ""} />
+
       <div className="sec-t">Teach your AI</div>
       <BusinessProfileForm />
 
@@ -84,6 +99,22 @@ export default function SettingsPage() {
             <div className="part-h"><div className="module-t">Enquiry form</div><span className="pp w">FREE</span></div>
             <div className="module-d">A contact form with the questions you choose below. Place it where you want it on a page.</div>
             <CodeSnippet code={FORM_MOUNT} />
+          </div>
+          <div className="part">
+            <div className="part-h"><div className="module-t">Contact button</div><span className="pp w">FREE</span></div>
+            <div className="module-d">Nothing to place on a page. The script adds a &quot;Contact us&quot; button to every page, and it opens your form. If you use the chat bubble, the button sits just above it.</div>
+            <div className="btn-set">
+              <button className={`tgl ${buttonOn ? "on" : ""}`} role="switch" aria-checked={buttonOn} aria-label="Contact button" onClick={() => saveButton({ enabled: !buttonOn })} />
+              <input className="finput" aria-label="Button text" maxLength={30} value={buttonLabel} onChange={(e) => setButtonLabel(e.target.value)} onBlur={() => buttonLabel !== (formButton.label ?? "Contact us") && saveButton({ label: buttonLabel })} placeholder="Contact us" />
+            </div>
+          </div>
+          <div className="part">
+            <div className="part-h"><div className="module-t">Catch my existing forms</div><span className="pp w">FREE</span></div>
+            <div className="module-d">Already have a contact form? Switch this on and the script copies every enquiry sent through it into your inbox. Your own form and thank-you message stay as they are. Login, search and payment forms are never touched, and you can exclude one form with <code>data-leadworks-ignore</code>.</div>
+            <div className="btn-set">
+              <button className={`tgl ${autoCaptureOn ? "on" : ""}`} role="switch" aria-checked={autoCaptureOn} aria-label="Catch my existing forms" onClick={() => site && updateSettings.mutate({ siteId: site.id, settings: { ...site.settings, autoCapture: !autoCaptureOn } })} />
+              <span className="hint">{autoCaptureOn ? "On" : "Off"}</span>
+            </div>
           </div>
           <div className="part">
             <div className="part-h"><div className="module-t">Form page link</div><span className="pp w">FREE</span></div>

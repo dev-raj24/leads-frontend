@@ -387,3 +387,15 @@ export interface SeoAppliedFix {
   updatedAt: string;
   data: { title?: string; description?: string; canonical?: string; lang?: string; jsonLd?: Record<string, unknown>; alts?: Array<{ src: string; alt: string }> };
 }
+
+export interface SiteInspection {
+  url: string;
+  reachable: boolean;
+  status: number;
+  scriptFound: boolean;
+  keyMatches: boolean;
+  jsRendered: boolean;
+  pagesRead: number;
+  draft: BusinessProfile | null;
+  draftSkipped: "not_pro" | "no_text" | "ai_unavailable" | null;
+}

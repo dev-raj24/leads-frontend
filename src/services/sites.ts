@@ -1,7 +1,7 @@
 import { callApi } from "@/utils/apiUtils";
 import sitesEndpoints from "@/utils/apiUtils/endpoints/sites";
 import { ApiEndpoint } from "@/types/api";
-import type { InstallStatus, Site } from "@/types/models";
+import type { InstallStatus, Site, SiteInspection } from "@/types/models";
 
 export async function fetchMySiteService(): Promise<{ site: Site }> {
   return callApi({
@@ -23,5 +23,12 @@ export async function updateSiteSettingsService(
 export async function fetchInstallStatusService(): Promise<{ status: InstallStatus; allowedDomains: string[] }> {
   return callApi({
     uriEndPoint: { ...sitesEndpoints.install.v1 } as ApiEndpoint,
+  });
+}
+
+export async function inspectSiteService(url: string): Promise<{ inspection: SiteInspection }> {
+  return callApi({
+    uriEndPoint: { ...sitesEndpoints.inspect.v1 } as ApiEndpoint,
+    body: { url },
   });
 }
