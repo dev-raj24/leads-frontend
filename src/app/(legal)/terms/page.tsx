@@ -9,7 +9,7 @@ export default function TermsPage() {
     <LegalPage title="Terms of service" intro={`The rules for using ${site.name}. By creating an account you agree to them.`}>
       <h3>The service</h3>
       <p>
-        {site.name} is a lead inbox for small businesses. It collects enquiries from your website form and imported sheets, shows them in one place, helps you reply, and, on paid plans, writes AI replies and follow-ups, publishes a blog, checks your website for SEO problems and shows your Google Search Console numbers.
+        {site.name} is a lead inbox for small businesses. It collects enquiries from your website, shows them in one place, helps you reply, and, on paid plans, writes AI replies, runs a website chat, shows offers, publishes blog posts, checks your website for SEO problems and shows your Google Search Console numbers.
       </p>
 
       <h3>Your account</h3>
@@ -22,8 +22,8 @@ export default function TermsPage() {
       <h3>What you may and may not do</h3>
       <ul>
         <li>Only contact people who enquired with you or who have agreed to hear from you. Do not use Leadworks to send spam.</li>
-        <li>Do not put anything unlawful, misleading or harmful into your profile, replies or blog posts.</li>
-        <li>Do not try to access other accounts, send us requests that are not your own enquiries, or overload the service.</li>
+        <li>Do not put anything unlawful, misleading or harmful into your profile, offers, replies or blog posts.</li>
+        <li>Do not copy our script onto sites you do not own, try to access other accounts, or overload the service.</li>
         <li>Follow the laws that apply to your messages, including consent and unsubscribe rules. Automatic emails carry a stop link; do not remove it.</li>
       </ul>
 
@@ -37,13 +37,13 @@ export default function TermsPage() {
         <li>The Free plan has a monthly lead allowance. If you pass it, your leads are still saved and shown, and paid automations pause until the next month or until you upgrade.</li>
         <li>Pro is billed monthly through Razorpay at the price shown on our pricing page, which can include taxes. It renews until you cancel.</li>
         <li>You can cancel at any time from Account. Pro stays on until the end of the period you paid for, then your account moves to Free. Your data is kept.</li>
-        <li>If you downgrade or cancel, Pro-only features, such as AI replies, automatic follow-ups and the SEO check, stop. Your leads and data stay.</li>
+        <li>If you downgrade or cancel, Pro-only parts on your website, such as the chat bubble and offers, stop appearing. Your website itself is not affected.</li>
         <li>See the <a href="/refunds">refund policy</a> for refunds.</li>
       </ul>
 
       <h3>Your data</h3>
       <p>
-        Your leads and content belong to you. You allow us to store and process them to run the service, as described in the <a href="/privacy">privacy policy</a>.
+        Your leads, chats and content belong to you. You allow us to store and process them to run the service, as described in the <a href="/privacy">privacy policy</a>.
       </p>
 
       <h3>Availability</h3>

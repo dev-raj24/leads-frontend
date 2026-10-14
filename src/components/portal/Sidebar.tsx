@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Logo } from "@/components/Logo";
 import { IconLogout } from "@/components/icons";
 import { NavIcon, type NavIconName } from "@/components/portal/NavIcons";
+import { useChatConversations } from "@/hooks/chatWidget/query";
 import { useFollowups } from "@/hooks/followups/query";
 import { useLeads } from "@/hooks/leads/query";
 import { useTenant } from "@/hooks/tenant/query";
@@ -27,8 +28,10 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
   const { data: leads } = useLeads();
   const { data: followups } = useFollowups();
   const { data: tenantData } = useTenant();
+  const { data: chats } = useChatConversations();
 
   const newLeads = leads?.leads.filter((l) => l.status === "new").length ?? 0;
+  const chatsWaiting = chats?.conversations.filter((c) => c.needsReply).length ?? 0;
   const openFollowups = followups?.followups.filter((f) => f.status === "pending" || f.status === "manual").length ?? 0;
 
   const groups: Array<{ title: string; items: NavItem[] }> = [
@@ -37,6 +40,7 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
       title: "Inbox",
       items: [
         { href: "/leads", label: "Leads", icon: "leads", tone: "rose", badge: newLeads },
+        { href: "/chats", label: "Chats", icon: "chats", tone: "sky", badge: chatsWaiting },
         { href: "/customers", label: "Customers", icon: "customers", tone: "butter" },
         { href: "/follow-ups", label: "Follow-ups", icon: "followups", tone: "peach", badge: openFollowups },
       ],
@@ -46,6 +50,7 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
       items: [
         { href: "/offers", label: "Offers", icon: "offers", tone: "rose" },
         { href: "/blog", label: "AI Blog", icon: "blog", tone: "sky" },
+        { href: "/ai-widget", label: "Website chat", icon: "widget", tone: "lilac" },
         { href: "/seo", label: "SEO check", icon: "seo", tone: "mint" },
       ],
     },

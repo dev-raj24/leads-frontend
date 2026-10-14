@@ -9,21 +9,21 @@ export default function PrivacyPage() {
     <LegalPage title="Privacy policy" intro={`How ${site.legalName} handles your information and your customers' information.`}>
       <h3>Who is who</h3>
       <p>
-        You are the business that uses Leadworks. People who fill in your website forms or answer your emails are your customers. For your customers&apos; details, you decide why they are collected and we process them for you. For your own account details, we decide, and we are responsible for them.
+        You are the business that uses Leadworks. People who fill in your forms, chat with your website or answer your emails are your customers. For your customers&apos; details, you decide why they are collected and we process them for you. For your own account details, we decide, and we are responsible for them.
       </p>
 
       <h3>What we collect</h3>
       <ul>
         <li><b>Your account:</b> business name, email address, a hashed password, and the plan you chose.</li>
         <li><b>Your business profile:</b> the services, prices, hours and FAQs you type in, so the AI can answer from them.</li>
-        <li><b>Your customers&apos; details:</b> the name, phone number or email, message and answers a visitor submits on your website form, and the replies sent to them.</li>
-        <li><b>Technical data:</b> basic request logs for security and rate limiting.</li>
+        <li><b>Your customers&apos; details:</b> the name, phone number or email, message and answers a visitor submits on your website, their chat messages, and the replies sent to them.</li>
+        <li><b>Technical data:</b> which website the script ran on, and basic request logs for security and rate limiting.</li>
         <li><b>Payments:</b> handled by Razorpay. We do not see or store card or UPI details; we keep the subscription status and renewal date.</li>
       </ul>
 
       <h3>What we use it for</h3>
       <ul>
-        <li>To show you your leads and to email you when a new one arrives.</li>
+        <li>To show you your leads and chats, and to email you when a new one arrives.</li>
         <li>To send the replies and follow-ups you have switched on, to the people who contacted you.</li>
         <li>To write AI replies, follow-ups, blog posts and SEO fixes from the information you gave us.</li>
         <li>To run, secure and bill the service. We do not sell personal data and we do not use your customers&apos; details for advertising.</li>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
       <h3>Who we share it with</h3>
       <p>We use a small number of providers to run Leadworks, and they only receive what the feature needs:</p>
       <ul>
-        <li>Google (Gemini) receives your business profile and the text of the enquiry, or of your web pages, when AI writes a reply, follow-up, blog post or SEO fix.</li>
+        <li>Google (Gemini) receives your business profile and the text of the enquiry or chat when AI writes a reply, follow-up, blog post or SEO fix.</li>
         <li>Our email provider delivers the emails Leadworks sends on your behalf.</li>
         <li>Razorpay processes subscription payments.</li>
         <li>Our hosting and database providers store the data.</li>
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
 
       <h3>How long we keep it</h3>
       <p>
-        We keep your data while your account is open. If you stop using Leadworks and ask us to delete your account, we remove your account, leads and settings. Some records, such as payment records, are kept for as long as the law requires.
+        We keep your data while your account is open. If you stop using Leadworks and ask us to delete your account, we remove your account, leads, chats and settings. Some records, such as payment records, are kept for as long as the law requires.
       </p>
 
       <h3>Your rights</h3>

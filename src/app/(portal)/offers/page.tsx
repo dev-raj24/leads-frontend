@@ -93,13 +93,9 @@ export default function OffersPage() {
       <PageHead
         eyebrow="Promotions"
         title="Offers"
-        sub="Create and manage banners and discounts."
+        sub="Banners and discounts shown live on your website."
         actions={<Button href="/offers/new" icon={<IconPlus size={15} />}>Create offer</Button>}
       />
-
-      <div className="notice warn" style={{ marginBottom: 18 }}>
-        <span>Offers are saved here and ready. Showing them on your website needs the Leadworks script, which is switched off for now, so they are not live on a site yet.</span>
-      </div>
 
       {isLoading && <ListSkeleton />}
 

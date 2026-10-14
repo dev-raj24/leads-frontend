@@ -120,7 +120,7 @@ function OfferForm() {
     return (
       <>
         <Link href="/offers" className="back">← All offers</Link>
-        <PageHead eyebrow="New" title={<>Create an <em>offer</em></>} sub="Design the offer and save it." />
+        <PageHead eyebrow="New" title={<>Create an <em>offer</em></>} sub="It appears on your website as soon as it's live." />
         <div className="pnl">
           <EmptyState
             icon={<IconLock size={26} />}
@@ -140,7 +140,7 @@ function OfferForm() {
   return (
     <>
       <Link href="/offers" className="back">← All offers</Link>
-      <PageHead eyebrow={editId ? "Editing" : "New"} title={editId ? "Edit offer" : <>Create an <em>offer</em></>} sub="A banner, a popup, or a form for your site." />
+      <PageHead eyebrow={editId ? "Editing" : "New"} title={editId ? "Edit offer" : <>Create an <em>offer</em></>} sub="A banner, a popup, or a form you drop anywhere on your site." />
 
       <div className="split">
         <form className="pnl pad" onSubmit={submit}>
