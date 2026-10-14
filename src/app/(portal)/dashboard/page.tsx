@@ -32,13 +32,13 @@ import { getUser } from "@/lib/session";
 const RANGES = [7, 14, 30];
 
 const STATUS_COLORS: Record<string, string> = {
-  new: "#c9e24b",
-  replied: "#e6a23c",
-  won: "#0b5d4b",
-  closed: "#a8a396",
-  lost: "#d4574a",
+  new: "#4f7dff",
+  replied: "#f5b942",
+  won: "#34c98e",
+  closed: "#c4c9dc",
+  lost: "#ff6b6b",
 };
-const SOURCE_COLOR = ["#0b5d4b", "#7fb8a4", "#c9e24b", "#10151c"];
+const SOURCE_COLOR = ["#1f43b8", "#34c98e", "#f5b942", "#0e1630"];
 
 const shortDate = (iso: string) => new Date(`${iso}T00:00:00`).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
 

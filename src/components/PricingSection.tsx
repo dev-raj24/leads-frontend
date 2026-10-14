@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IconCheck, IconArrowRight } from "@/components/icons";
+import { IconCheck } from "@/components/icons";
 import { PLANS } from "@/config/plans";
 
 export function PricingSection() {
@@ -13,6 +13,9 @@ export function PricingSection() {
           <div className="plan-price">
             {p.price} <span>{p.per}</span>
           </div>
+          <Link href="/onboarding" className="m-btn solid lg">
+            {p.featured ? "Get Pro" : "Start free"}
+          </Link>
           <ul>
             {p.features.map((f) => (
               <li key={f}>
@@ -20,9 +23,6 @@ export function PricingSection() {
               </li>
             ))}
           </ul>
-          <Link href="/onboarding" className={`m-btn ${p.featured ? "lime" : "solid"}`}>
-            {p.featured ? "Get Pro" : "Start free"} <IconArrowRight size={15} />
-          </Link>
         </div>
       ))}
     </div>

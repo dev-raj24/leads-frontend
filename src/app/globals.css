@@ -3,45 +3,69 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   DESIGN TOKENS — warm ivory + forest green. Change the palette here only.
+   DESIGN TOKENS — Apple-style neutral canvas, one emerald accent with a lime
+   glow. Change the palette here only.
    ========================================================================== */
 :root {
-  --primary: #0b5d4b;
-  --primary-hover: #084637;
-  --primary-soft: #e8f3ee;
-  --primary-line: #bcd9cc;
+  --primary: #1f43b8;
+  --primary-hover: #17358f;
+  --primary-press: #112a75;
+  --primary-soft: #e4ebff;
+  --primary-line: #bccdff;
+  --link: #1f43b8;
 
-  --lime: #d9f470;
-  --lime-soft: #f3fad6;
-  --lime-ink: #46620a;
+  /* pastel tile palette: fill + matching ink */
+  --lilac: #e4ebff;
+  --lilac-ink: #1f43b8;
+  --mint: #d9f5e8;
+  --mint-ink: #0d7a4d;
+  --peach: #ffe6d5;
+  --peach-ink: #b4501a;
+  --sky: #dcefff;
+  --sky-ink: #32587a;
+  --rose: #ffe0e6;
+  --rose-ink: #b4234a;
+  --butter: #fff3c4;
+  --butter-ink: #6e5a14;
 
-  --ink: #10151c;
-  --text: #10151c;
-  --grey: #454b54;
-  --muted: #6a707a;
-  --faint: #9aa0a8;
-  --line: #e6e3dc;
-  --border: #e6e3dc;
+  --lime: #ffe6d5;
+  --lime-soft: #ffe6d5;
+  --lime-ink: #b4501a;
+  --eyebrow: #1f43b8;
 
-  --bg: #f7f6f2;
+  --ink: #0e1630;
+  --text: #0e1630;
+  --grey: #484d66;
+  --muted: #6a6f88;
+  --faint: #9a9fb5;
+  --line: #e8eaf2;
+  --border: #e8eaf2;
+  --hair: #dcdfeb;
+  --fill: #f0f1f7;
+
+  --bg: #f4f5fa;
   --card-bg: #ffffff;
 
-  --green: #0b5d4b;
-  --green-soft: #e8f3ee;
-  --amber: #a15c07;
-  --amber-soft: #fef6e7;
-  --red: #c4321c;
-  --red-soft: #fdf1ee;
-  --violet: #5b3fc4;
-  --violet-soft: #f3f0fd;
+  --green: #0d7a4d;
+  --green-soft: #d9f5e8;
+  --amber: #b4501a;
+  --amber-soft: #ffe6d5;
+  --red: #e5484d;
+  --red-soft: #ffe8e6;
+  --violet: #1f43b8;
+  --violet-soft: #e4ebff;
 
-  --radius-sm: 8px;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 1px 2px rgba(16, 21, 28, 0.05);
-  --shadow: 0 1px 3px rgba(16, 21, 28, 0.06), 0 1px 2px rgba(16, 21, 28, 0.04);
-  --shadow-lg: 0 18px 40px -12px rgba(16, 21, 28, 0.16), 0 4px 10px -4px rgba(16, 21, 28, 0.06);
-  --ring: 0 0 0 4px rgba(11, 93, 75, 0.14);
+  --radius-sm: 12px;
+  --radius: 16px;
+  --radius-lg: 28px;
+  --shadow-sm: 0 1px 2px rgba(14, 22, 48, 0.05);
+  --shadow: 0 4px 16px rgba(14, 22, 48, 0.06);
+  --shadow-lg: 0 24px 60px -12px rgba(14, 22, 48, 0.25), 0 4px 14px -4px rgba(14, 22, 48, 0.08);
+  --ring: 0 0 0 4px rgba(31, 67, 184, 0.18);
+
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-jakarta), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -56,11 +80,13 @@ html {
 
 html,
 body {
-  font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--bg);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -76,14 +102,17 @@ button:disabled {
   cursor: not-allowed;
 }
 
+::selection {
+  background: rgba(31, 67, 184, 0.22);
+}
+
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
 .serif {
-  font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
+  font-style: normal;
 }
 
 /* ==========================================================================
@@ -92,8 +121,8 @@ button:disabled {
 .big {
   background: var(--primary);
   color: #fff;
-  padding: 13px 26px;
-  border-radius: 100px;
+  padding: 13px 22px;
+  border-radius: 14px;
   border: none;
   font-weight: 700;
   font-size: 15px;
@@ -102,30 +131,26 @@ button:disabled {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 1px 2px rgba(16, 21, 28, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  transition: background 0.2s, transform 0.2s var(--ease);
 }
 .big:hover:not(:disabled) {
   background: var(--primary-hover);
-  transform: translateY(-1px);
 }
 .gho {
-  background: #fff;
-  color: #344054;
-  border: 1px solid #d0d5dd;
-  padding: 13px 22px;
-  border-radius: 10px;
-  font-weight: 600;
+  background: var(--fill);
+  color: var(--ink);
+  border: none;
+  padding: 13px 20px;
+  border-radius: 14px;
+  font-weight: 700;
   font-size: 15px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  box-shadow: var(--shadow-sm);
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.2s;
 }
 .gho:hover {
-  background: #f9fafb;
-  border-color: #b8bfca;
+  background: #e6e8f1;
 }
 
 .field {
@@ -136,23 +161,25 @@ button:disabled {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #344054;
+  color: var(--grey);
   margin-bottom: 6px;
 }
 .finput {
   width: 100%;
-  padding: 11px 14px;
+  padding: 12px 14px;
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--ink);
   background: #fff;
-  border: 1px solid #d0d5dd;
-  border-radius: 10px;
-  box-shadow: var(--shadow-sm);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  border: 1.5px solid #dcdfeb;
+  border-radius: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 .finput::placeholder {
   color: var(--faint);
+}
+.finput:hover {
+  border-color: #b4b9cf;
 }
 .finput:focus {
   outline: none;
@@ -163,7 +190,7 @@ button:disabled {
   border-color: var(--red);
 }
 .finput.err:focus {
-  box-shadow: 0 0 0 4px rgba(196, 50, 28, 0.12);
+  box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.16);
 }
 .ferr {
   margin-top: 6px;
@@ -176,82 +203,62 @@ button:disabled {
 .pp {
   display: inline-flex;
   align-items: center;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 4px 11px;
   border-radius: 100px;
-  border: 1px solid var(--line);
-  background: #f2f4f7;
+  background: var(--fill);
   color: var(--grey);
   white-space: nowrap;
 }
-.pp.n {
-  background: var(--lime-soft);
-  border-color: #e0ef9c;
-  color: var(--lime-ink);
-}
-.pp.r {
-  background: var(--amber-soft);
-  border-color: #fedf89;
-  color: var(--amber);
-}
-.pp.w {
-  background: var(--primary-soft);
-  border-color: var(--primary-line);
-  color: var(--primary);
-}
-.pp.c {
-  background: #f2f4f7;
-  border-color: #e4e7ec;
-  color: var(--muted);
-}
-.pp.p {
-  background: var(--violet-soft);
-  border-color: #d9d6fe;
-  color: var(--violet);
-}
+.pp.n { background: var(--rose); color: var(--rose-ink); }
+.pp.r { background: var(--peach); color: var(--peach-ink); }
+.pp.w { background: var(--mint); color: var(--mint-ink); }
+.pp.c { background: var(--fill); color: var(--muted); }
+.pp.p { background: var(--sky); color: var(--sky-ink); }
 
 /* ==========================================================================
    CHAT BUBBLES — used by the landing hero, lead threads and the AI drawer
    ========================================================================== */
 .bub {
   max-width: 86%;
-  padding: 9px 13px;
-  border-radius: 14px;
+  padding: 9px 14px;
+  border-radius: 20px;
   font-size: 13.5px;
-  line-height: 1.5;
+  line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
 }
 .bub.in {
   background: #fff;
-  border-top-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(14, 22, 48, 0.06);
+  color: var(--ink);
+  border-bottom-left-radius: 5px;
   align-self: flex-start;
-  box-shadow: 0 1px 1px rgba(16, 21, 28, 0.06);
 }
 .bub.out {
-  background: #dcf7c5;
-  border-top-right-radius: 4px;
+  background: var(--primary);
+  color: #fff;
+  border-bottom-right-radius: 5px;
   align-self: flex-end;
-  box-shadow: 0 1px 1px rgba(16, 21, 28, 0.06);
 }
 .bub time {
   display: block;
   margin-top: 3px;
   font-size: 10.5px;
-  color: var(--muted);
+  opacity: 0.55;
   text-align: right;
 }
 .bub.user {
   background: var(--primary);
   color: #fff;
-  border-bottom-right-radius: 4px;
+  border-bottom-right-radius: 5px;
   align-self: flex-end;
 }
 .bub.bot {
-  background: #f1eee7;
-  border-bottom-left-radius: 4px;
+  background: var(--fill);
+  border-bottom-left-radius: 5px;
   align-self: flex-start;
 }
 
@@ -275,9 +282,7 @@ button:disabled {
   justify-content: center;
   padding: 44px 52px;
   color: #fff;
-  background:
-    radial-gradient(70% 50% at 100% 0%, rgba(217, 244, 112, 0.18), transparent 70%),
-    var(--primary);
+  background: var(--primary);
 }
 .auth-logo {
   position: absolute;
@@ -288,14 +293,20 @@ button:disabled {
   width: 100%;
 }
 .auth-quote {
-  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(34px, 3.6vw, 52px);
-  line-height: 1.08;
-  letter-spacing: -0.015em;
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
   max-width: 460px;
 }
 .auth-quote em {
-  color: var(--lime);
+  font-style: normal;
+  background: var(--peach);
+  color: var(--ink);
+  padding: 0 12px;
+  border-radius: 16px;
+  display: inline-block;
+  transform: rotate(-1.5deg);
 }
 .auth-points {
   list-style: none;
@@ -303,8 +314,8 @@ button:disabled {
   flex-direction: column;
   gap: 12px;
   margin-top: 28px;
-  font-size: 14.5px;
-  color: rgba(255, 255, 255, 0.82);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.78);
 }
 .auth-points li {
   display: flex;
@@ -312,7 +323,7 @@ button:disabled {
   align-items: center;
 }
 .auth-points svg {
-  color: var(--lime);
+  color: var(--peach);
   flex-shrink: 0;
 }
 .auth-fine {
@@ -320,7 +331,7 @@ button:disabled {
   bottom: 44px;
   left: 52px;
   font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.55);
 }
 .auth-fine a {
   text-decoration: underline;
@@ -339,23 +350,23 @@ button:disabled {
   max-width: 640px;
 }
 .auth-box h2 {
-  font-family: var(--font-display), Georgia, serif;
-  font-weight: 400;
-  font-size: 44px;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
+  font-weight: 800;
+  font-size: 38px;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  font-weight: 800;
 }
 .auth-box h2 em {
+  font-style: normal;
   color: var(--primary);
 }
 .auth-sub {
   color: var(--muted);
-  font-size: 14.5px;
+  font-size: 15px;
   margin: 10px 0 28px;
 }
 .auth-err {
   background: var(--red-soft);
-  border: 1px solid #f4c7bd;
   color: var(--red);
   border-radius: 12px;
   padding: 10px 14px;
@@ -380,26 +391,30 @@ button:disabled {
 }
 .oauth-btn {
   width: 100%;
-  padding: 11px;
-  font-size: 14px;
+  padding: 12px;
+  font-size: 14.5px;
   font-weight: 600;
-  color: #344054;
+  color: var(--ink);
   background: #fff;
-  border: 1px solid #d5d2ca;
-  border-radius: 100px;
+  border: 1.5px solid #dcdfeb;
+  border-radius: 14px;
   cursor: pointer;
+  transition: background 0.2s;
+}
+.oauth-btn:hover:not(:disabled) {
+  background: #f8f9fc;
 }
 .oauth-btn:disabled {
   opacity: 0.55;
 }
 .auth-alt {
   margin-top: 24px;
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--muted);
 }
 .auth-alt a {
   color: var(--primary);
-  font-weight: 700;
+  font-weight: 600;
 }
 .auth-steps {
   display: flex;
@@ -418,13 +433,13 @@ button:disabled {
 .auth-steps li span {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: 700;
   color: var(--faint);
-  border: 1.5px solid var(--line);
+  background: var(--fill);
 }
 .auth-steps li.on {
   color: var(--ink);
@@ -432,7 +447,6 @@ button:disabled {
 .auth-steps li.on span {
   color: #fff;
   background: var(--primary);
-  border-color: var(--primary);
 }
 .auth-steps li.done {
   color: var(--muted);
@@ -440,7 +454,6 @@ button:disabled {
 .auth-steps li.done span {
   color: var(--primary);
   background: var(--primary-soft);
-  border-color: var(--primary-line);
 }
 @media (max-width: 860px) {
   .auth-wrap {

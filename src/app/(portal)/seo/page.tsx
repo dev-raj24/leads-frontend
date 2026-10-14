@@ -8,12 +8,12 @@ import { EmptyState } from "@/components/portal/EmptyState";
 import { PageHead } from "@/components/portal/PageHead";
 import { Button } from "@/components/ui/Button";
 import { CodeSnippet } from "@/components/ui/CodeSnippet";
-import { useApplySeoFixes, useRemoveSeoOverride, useStartSeoAudit, useWriteSeoFixes } from "@/hooks/seo/mutation";
-import { useSeoAudit, useSeoAudits, useSeoOverrides } from "@/hooks/seo/query";
+import { useStartSeoAudit, useWriteSeoFixes } from "@/hooks/seo/mutation";
+import { useSeoAudit, useSeoAudits } from "@/hooks/seo/query";
 import { useTenant } from "@/hooks/tenant/query";
 import { authErrorMessage } from "@/lib/errors";
 import { timeAgo } from "@/lib/format";
-import type { SeoAppliedFix, SeoFixPack, SeoIssue, SeoPageReport } from "@/types/models";
+import type { SeoFixPack, SeoIssue, SeoPageReport } from "@/types/models";
 
 const ago = (iso: string) => {
   const t = timeAgo(iso);
@@ -97,54 +97,7 @@ function FixList({ pack }: { pack: SeoFixPack }) {
   );
 }
 
-const pathOf = (url: string) => {
-  try {
-    const p = new URL(url).pathname.replace(/\/+$/, "");
-    return p === "" ? "/" : p;
-  } catch {
-    return "/";
-  }
-};
-
-function ApplyBox({ auditId, page, pack, applied }: { auditId: string; page: SeoPageReport; pack: SeoFixPack; applied?: SeoAppliedFix }) {
-  const apply = useApplySeoFixes();
-  const remove = useRemoveSeoOverride();
-  const parts = pack.items
-    .filter((i) => ["title", "description", "canonical", "lang", "schema", "alt"].includes(i.id) && i.data)
-    .map((i) => ({ title: "page title", description: "description", canonical: "canonical link", lang: "language", schema: "business details", alt: "image descriptions" }[i.id] as string));
-  if (parts.length === 0 && !applied) return null;
-  const path = pathOf(page.url);
-
-  return (
-    <div className="seo-apply">
-      <div className="seo-fix-h">
-        <b>{applied ? "Live through your script" : "No code? Let your script put these on the page"}</b>
-        <small>{parts.join(", ")}</small>
-      </div>
-      <p className="hint" style={{ margin: "0 0 10px" }}>
-        {applied
-          ? `Your script now sets these on ${path} every time it opens.`
-          : "Your Leadworks script is already on your site, so it can set these when the page opens. Nothing in your site's code changes."}
-        {" "}It runs in the visitor&apos;s browser: Google usually reads it, but link previews and some search engines do not. A change in your site&apos;s own code is more reliable.
-      </p>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {!applied ? (
-          <Button size="sm" loading={apply.isPending} loadingText="Applying…" onClick={() => apply.mutate({ id: auditId, url: page.url })}>
-            Put these on my page with the script
-          </Button>
-        ) : (
-          <>
-            <Button size="sm" variant="secondary" loading={apply.isPending} loadingText="Updating…" onClick={() => apply.mutate({ id: auditId, url: page.url })}>Update with the latest fixes</Button>
-            <Button size="sm" variant="ghost" loading={remove.isPending} onClick={() => remove.mutate(path)}>Turn off</Button>
-          </>
-        )}
-      </div>
-      {(apply.isError || remove.isError) && <div className="auth-err" style={{ marginTop: 10 }}>{authErrorMessage(apply.error ?? remove.error)}</div>}
-    </div>
-  );
-}
-
-function PageCard({ page, auditId, pack, applied, writing, onWrite }: { page: SeoPageReport; auditId: string; pack?: SeoFixPack; applied?: SeoAppliedFix; writing: boolean; onWrite: (url: string) => void }) {
+function PageCard({ page, pack, writing, onWrite }: { page: SeoPageReport; pack?: SeoFixPack; writing: boolean; onWrite: (url: string) => void }) {
   const [open, setOpen] = useState(page.issues.some((i) => i.severity === "critical"));
   const path = (() => {
     try {
@@ -155,12 +108,12 @@ function PageCard({ page, auditId, pack, applied, writing, onWrite }: { page: Se
     }
   })();
   return (
-    <div className="pnl seo-page" data-audit={auditId}>
+    <div className="pnl seo-page">
       <button type="button" className="seo-page-h" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className={`seo-dot ${tone(page.score)}`}>{page.score}</span>
         <span className="seo-page-t">
           <strong>{page.title || path}</strong>
-          <small>{path} · {page.issues.length === 0 ? "no problems" : `${page.issues.length} to look at`}{pack ? " · fixes ready" : ""}{applied ? " · live via script" : ""}</small>
+          <small>{path} · {page.issues.length === 0 ? "no problems" : `${page.issues.length} to look at`}{pack ? " · fixes ready" : ""}</small>
         </span>
         <span aria-hidden>{open ? "−" : "+"}</span>
       </button>
@@ -176,7 +129,6 @@ function PageCard({ page, auditId, pack, applied, writing, onWrite }: { page: Se
           {pack && (
             <>
               <div className="sec-t" style={{ marginTop: 18 }}>Ready-made fixes. Copy and paste.</div>
-              <ApplyBox auditId={auditId} page={page} pack={pack} applied={applied} />
               <FixList pack={pack} />
               <div style={{ paddingTop: 10 }}>
                 <Button size="sm" variant="secondary" loading={writing} loadingText="Writing again…" onClick={() => onWrite(page.url)}>Write them again</Button>
@@ -193,8 +145,6 @@ function WebsiteCheck() {
   const { data: list } = useSeoAudits();
   const start = useStartSeoAudit();
   const writeFixes = useWriteSeoFixes();
-  const { data: overridesData } = useSeoOverrides();
-  const appliedByPath = useMemo(() => new Map((overridesData?.overrides ?? []).map((o) => [o.path, o])), [overridesData]);
   const [writingUrl, setWritingUrl] = useState<string | null>(null);
   const [bulk, setBulk] = useState<{ done: number; total: number } | null>(null);
   const [url, setUrl] = useState("");
@@ -361,7 +311,7 @@ function WebsiteCheck() {
           {writeFixes.isError && <div className="auth-err" style={{ marginBottom: 10 }}>{authErrorMessage(writeFixes.error)}</div>}
           <div style={{ display: "grid", gap: 10 }}>
             {[...report.pages].sort((a, b) => a.score - b.score).map((p) => (
-              <PageCard key={p.url} page={p} auditId={audit.id} pack={fixes[p.url]} applied={appliedByPath.get(pathOf(p.url))} writing={writingUrl === p.url || (!!bulk && !fixes[p.url] && p.issues.length > 0 && writeFixes.isPending)} onWrite={writeOne} />
+              <PageCard key={p.url} page={p} pack={fixes[p.url]} writing={writingUrl === p.url || (!!bulk && !fixes[p.url] && p.issues.length > 0 && writeFixes.isPending)} onWrite={writeOne} />
             ))}
           </div>
 
