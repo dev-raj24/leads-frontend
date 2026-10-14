@@ -25,14 +25,14 @@ export default function PrivacyPage() {
       <ul>
         <li>To show you your leads and to email you when a new one arrives.</li>
         <li>To send the replies and follow-ups you have switched on, to the people who contacted you.</li>
-        <li>To write AI replies, follow-ups and SEO fixes from the information you gave us.</li>
+        <li>To write AI replies, follow-ups, blog posts and SEO fixes from the information you gave us.</li>
         <li>To run, secure and bill the service. We do not sell personal data and we do not use your customers&apos; details for advertising.</li>
       </ul>
 
       <h3>Who we share it with</h3>
       <p>We use a small number of providers to run Leadworks, and they only receive what the feature needs:</p>
       <ul>
-        <li>Google (Gemini) receives your business profile and the text of the enquiry, or of your web pages, when AI writes a reply, follow-up or SEO fix.</li>
+        <li>Google (Gemini) receives your business profile and the text of the enquiry, or of your web pages, when AI writes a reply, follow-up, blog post or SEO fix.</li>
         <li>Our email provider delivers the emails Leadworks sends on your behalf.</li>
         <li>Razorpay processes subscription payments.</li>
         <li>Our hosting and database providers store the data.</li>

@@ -9,7 +9,7 @@ export default function TermsPage() {
     <LegalPage title="Terms of service" intro={`The rules for using ${site.name}. By creating an account you agree to them.`}>
       <h3>The service</h3>
       <p>
-        {site.name} is a lead inbox for small businesses. It collects enquiries from your website form and imported sheets, shows them in one place, helps you reply, and, on paid plans, writes AI replies and follow-ups, checks your website for SEO problems and shows your Google Search Console numbers.
+        {site.name} is a lead inbox for small businesses. It collects enquiries from your website form and imported sheets, shows them in one place, helps you reply, and, on paid plans, writes AI replies and follow-ups, publishes a blog, checks your website for SEO problems and shows your Google Search Console numbers.
       </p>
 
       <h3>Your account</h3>
@@ -22,7 +22,7 @@ export default function TermsPage() {
       <h3>What you may and may not do</h3>
       <ul>
         <li>Only contact people who enquired with you or who have agreed to hear from you. Do not use Leadworks to send spam.</li>
-        <li>Do not put anything unlawful, misleading or harmful into your profile or replies.</li>
+        <li>Do not put anything unlawful, misleading or harmful into your profile, replies or blog posts.</li>
         <li>Do not try to access other accounts, send us requests that are not your own enquiries, or overload the service.</li>
         <li>Follow the laws that apply to your messages, including consent and unsubscribe rules. Automatic emails carry a stop link; do not remove it.</li>
       </ul>

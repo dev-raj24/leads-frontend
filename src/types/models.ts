@@ -346,3 +346,12 @@ export interface SearchPerformance {
   pages: Array<SearchMetrics & { page: string }>;
 }
 
+export interface SiteInspection {
+  url: string;
+  reachable: boolean;
+  status: number;
+  jsRendered: boolean;
+  pagesRead: number;
+  draft: BusinessProfile | null;
+  draftSkipped: "not_pro" | "no_text" | "ai_unavailable" | null;
+}

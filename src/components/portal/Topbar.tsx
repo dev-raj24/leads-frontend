@@ -10,6 +10,8 @@ const TITLES: Record<string, string> = {
   leads: "Leads",
   customers: "Customers",
   "follow-ups": "Follow-ups",
+  offers: "Offers",
+  blog: "AI Blog",
   seo: "SEO check",
   settings: "Settings",
   account: "Account",

@@ -51,14 +51,14 @@ const STEPS = [
   { t: "Send your enquiries", d: "Your website form sends each enquiry to Leadworks with one small request (a developer adds it in minutes). Got old leads in Excel? Import them in one go." },
   { t: "Teach the AI", d: "Answer a few questions about your business — services, timings, prices. That's all the AI needs to speak for you." },
   { t: "Close deals", d: "Leads flow in and you get an email each time. On Pro, AI replies in seconds and follow-ups go out on time. You see exactly who is still waiting." },
-  { t: "Get found on Google", d: "On Pro, scan your website, get a score out of 100 and ready-to-paste fixes, and watch the real searches that find you on Google." },
+  { t: "Get found on Google", d: "On Pro, write blog posts with AI that get their own SEO pages, scan your site for ready-to-paste fixes, and watch the real searches that find you on Google." },
 ];
 
 const FAQ = [
   ["Will this work with my existing website?", "Yes, as long as your contact form can send its details to a web address. A developer adds that one request, usually in minutes, and the enquiries land in your inbox. If you would rather not, you can import leads from an Excel sheet."],
   ["What if the AI says something wrong to my customer?", "The AI only answers from what you tell it: your services, prices and hours. If something isn't covered, it says the team will follow up. It stays off until you have filled in your business profile, and you can see every reply it sent. Automatic follow-ups are off until you switch them on."],
   ["Does it work with WhatsApp?", "Not yet. Today Leadworks collects enquiries from your website form and imported sheets. WhatsApp is on our list, and we'd rather tell you that plainly than promise it."],
-  ["Will this help me show up on Google?", "The SEO check reads your pages the way a search engine does, scores them, and writes the title, description and other fixes ready to paste. Connect Google Search Console and you see the real searches that find you. Good content and time still decide where you rank, and nobody can promise a position."],
+  ["Will this help me show up on Google?", "Every blog post gets its own page with the SEO title and description you set, and a sitemap. The SEO check reads your pages the way a search engine does and writes ready-to-paste fixes, and Google Search Console shows the real searches that find you. Good content and time still decide where you rank, and nobody can promise a position."],
   ["Do I need a developer?", `Only once: someone adds the small request that sends your website form to Leadworks. Everything else happens in the dashboard. If you get stuck, write to ${site.supportEmail} and we will help.`],
   ["What happens to my data if I cancel?", "Your account moves to Free and your leads and settings stay. If you want everything deleted, write to us and we will delete it."],
   ["What happens if I go over 50 leads on the Free plan?", "Nothing is lost. Every lead is still saved and shown in your inbox. Paid automations such as AI replies pause until next month or until you upgrade."],

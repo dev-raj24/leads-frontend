@@ -44,6 +44,8 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
     {
       title: "Growth",
       items: [
+        { href: "/offers", label: "Offers", icon: "offers", tone: "rose" },
+        { href: "/blog", label: "AI Blog", icon: "blog", tone: "sky" },
         { href: "/seo", label: "SEO check", icon: "seo", tone: "mint" },
       ],
     },

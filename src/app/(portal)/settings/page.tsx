@@ -2,11 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { CodeSnippet } from "@/components/ui/CodeSnippet";
+import { FormFieldsEditor } from "@/components/portal/FormFieldsEditor";
+import { WebsiteReader } from "@/components/portal/WebsiteReader";
 import { BusinessProfileForm } from "@/components/portal/BusinessProfileForm";
 import { PageHead } from "@/components/portal/PageHead";
 import { useMySite } from "@/hooks/sites/query";
 import { useUpdateSiteSettings } from "@/hooks/sites/mutation";
 import { useTenant } from "@/hooks/tenant/query";
+
+const pageLink = (path: string) => `${typeof window === "undefined" ? "" : window.location.origin}${path}`;
 
 const MODULES = [
   { key: "alerts", label: "Instant alerts", desc: "Get an email the moment a lead arrives", def: true, pro: false },
@@ -44,8 +49,28 @@ export default function SettingsPage() {
         actions={<span className={`pp ${isPro ? "p" : "c"}`}>{isPro ? "PRO" : "FREE"}</span>}
       />
 
+      <div className="sec-t">Start with your website</div>
+      <WebsiteReader initialUrl={site?.domain ? `https://${site.domain}` : ""} />
+
       <div className="sec-t">Teach your AI</div>
       <BusinessProfileForm />
+
+      <div className="sec-t">Your public pages</div>
+      <div className="pnl pad" style={{ display: "grid", gap: 16 }}>
+        <div>
+          <div className="module-t">Form page</div>
+          <div className="module-d" style={{ marginBottom: 8 }}>A ready enquiry form with your questions. Share the link on Instagram, WhatsApp or your Google profile. Every submission lands in your inbox.</div>
+          <CodeSnippet code={site ? pageLink(`/f/${site.apiKey}`) : "Loading…"} />
+        </div>
+        <div>
+          <div className="module-t">Blog {!isPro && <span className="pp p" style={{ marginLeft: 6 }}>PRO</span>}</div>
+          <div className="module-d" style={{ marginBottom: 8 }}>Every post you publish from AI Blog gets its own page with a proper title, description and sitemap. Link to it from your site menu or submit the sitemap in Google Search Console.</div>
+          <CodeSnippet code={site ? `Blog page: ${pageLink(`/b/${site.publicSlug ?? "your-site"}`)}\nSitemap:   ${pageLink(`/b/${site.publicSlug ?? "your-site"}`)}/sitemap.xml` : "Loading…"} />
+        </div>
+      </div>
+
+      <div className="sec-t">Form questions</div>
+      {site ? <FormFieldsEditor site={site} /> : null}
 
       <div className="sec-t">
         Modules {updateSettings.isPending && <span style={{ textTransform: "none", letterSpacing: 0, fontWeight: 500 }}>· saving…</span>}

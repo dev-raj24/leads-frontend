@@ -27,7 +27,7 @@ export const PLANS: PlanInfo[] = [
       "Reply by email from the dashboard",
       "Customer list and follow-up reminders",
     ],
-    locked: ["AI reply in seconds", "SEO check with ready-made fixes", "Google Search Console rankings", "Automatic follow-ups"],
+    locked: ["AI reply in seconds", "AI blog", "SEO check with ready-made fixes", "Google Search Console rankings", "Automatic follow-ups"],
     featured: false,
   },
   {
@@ -39,6 +39,7 @@ export const PLANS: PlanInfo[] = [
     features: [
       "Up to 1,000 leads a month",
       "AI writes the first reply in seconds",
+      "AI blog with its own SEO pages and sitemap",
       "Automatic follow-ups when nobody has replied",
       "SEO check with a score and ready-to-paste fixes",
       "Google Search Console: your real searches and rankings",
