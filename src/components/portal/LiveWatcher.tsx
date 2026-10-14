@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useChatConversations } from "@/hooks/chatWidget/query";
 import { useLeads } from "@/hooks/leads/query";
 
 interface Toast {
@@ -16,10 +17,12 @@ const TOAST_MS = 9000;
 /** Polls the inbox and tells the owner — toast, and a count in the browser tab — the moment something new lands. */
 export function LiveWatcher() {
   const { data: leads } = useLeads();
+  const { data: chats } = useChatConversations();
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [unseen, setUnseen] = useState(0);
   const baseTitle = useRef("");
   const seenLeads = useRef<Set<string> | null>(null);
+  const seenChats = useRef<Set<string> | null>(null);
 
   const push = useCallback((toast: Toast) => {
     setToasts((t) => [...t.slice(-3), toast]);
@@ -57,6 +60,28 @@ export function LiveWatcher() {
       push({ id: `lead:${lead.id}`, title: "New lead", text: `${lead.name ?? lead.contact} just got in touch.`, href: `/leads/${lead.id}` });
     }
   }, [leads, push]);
+
+  useEffect(() => {
+    if (!chats) return;
+    const known = seenChats.current;
+    const currentKeys = chats.conversations.flatMap((c) => [`new:${c.leadId}`, ...(c.needsReply ? [`msg:${c.leadId}:${c.lastMessageAt}`] : [])]);
+    if (known === null) {
+      seenChats.current = new Set(currentKeys);
+      return;
+    }
+    for (const c of chats.conversations) {
+      const newKey = `new:${c.leadId}`;
+      const msgKey = `msg:${c.leadId}:${c.lastMessageAt}`;
+      if (!known.has(newKey)) {
+        known.add(newKey);
+        if (c.needsReply) known.add(msgKey);
+        push({ id: newKey, title: "New chat on your site", text: c.lastMessage.slice(0, 90), href: "/chats" });
+      } else if (c.needsReply && !known.has(msgKey)) {
+        known.add(msgKey);
+        push({ id: msgKey, title: "New chat message", text: c.lastMessage.slice(0, 90), href: "/chats" });
+      }
+    }
+  }, [chats, push]);
 
   if (toasts.length === 0) return null;
 

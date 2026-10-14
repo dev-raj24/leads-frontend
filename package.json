@@ -6,9 +6,9 @@
     "security-check": "node scripts/security-check.js",
     "prebuild": "node scripts/security-check.js",
     "predev": "node scripts/security-check.js",
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "node api.js && next dev",
+    "build": "node api.js && next build",
+    "start": "node api.js && next start"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.4",

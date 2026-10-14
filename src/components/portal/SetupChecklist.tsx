@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { IconCheck } from "@/components/icons";
 import { useAiConfig } from "@/hooks/aiConfig/query";
+import { useInstallStatus } from "@/hooks/sites/install";
 import { useLeads } from "@/hooks/leads/query";
 import { getUser } from "@/lib/session";
 import { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ const profileReady = (p?: BusinessProfile) =>
 
 export function SetupChecklist() {
   const { data: ai } = useAiConfig();
+  const { data: install } = useInstallStatus();
   const { data: leads } = useLeads();
   const [verified, setVerified] = useState(true);
   useEffect(() => setVerified(getUser()?.emailVerified !== false), []);
@@ -21,10 +23,11 @@ export function SetupChecklist() {
   const steps = [
     { done: verified, title: "Confirm your email", note: "So new-lead alerts reach you.", href: "/account", cta: "Open account" },
     { done: profileReady(profile), title: "Tell us about your business", note: "Hours, services and prices. This is what the AI answers from.", href: "/settings", cta: "Add details" },
+    { done: !!install?.status.installed, title: "Put the script on your website", note: "One snippet before </body>. We'll tick this when we see it.", href: "/settings", cta: "Get the snippet" },
     { done: (leads?.leads.length ?? 0) > 0, title: "Receive your first lead", note: "Submit your own form once to see the alert and the inbox work.", href: "/leads", cta: "Open leads" },
   ];
 
-  if (!ai || !leads) return null;
+  if (!ai || !install || !leads) return null;
   if (steps.every((s) => s.done)) return null;
   const left = steps.filter((s) => !s.done).length;
 

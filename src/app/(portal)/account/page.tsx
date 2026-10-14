@@ -241,7 +241,7 @@ function SubscriptionTab() {
       {plan === "pro" && billing?.planStatus !== "cancelling" && (
         <div className="acct-upsell">
           <div className="acct-upsell-t">Cancel anytime</div>
-          <p className="hint" style={{ marginTop: 0 }}>You keep Pro until the end of what you&apos;ve paid for. Pro-only features pause quietly and your data stays.</p>
+          <p className="hint" style={{ marginTop: 0 }}>You keep Pro until the end of what you&apos;ve paid for. Your website widgets keep working; Pro-only parts pause quietly and your data stays.</p>
           <Button variant="secondary" onClick={() => setConfirmCancel(true)}>Cancel subscription</Button>
           {cancel.isError && <div className="auth-err" style={{ marginTop: 12 }}>{authErrorMessage(cancel.error)}</div>}
         </div>
@@ -250,7 +250,7 @@ function SubscriptionTab() {
       <ConfirmModal
         isOpen={confirmCancel}
         title="Cancel your Pro plan?"
-        message="You'll keep Pro until the end of the period you've paid for. After that, AI replies, the SEO check and automatic follow-ups pause. Your leads and settings stay."
+        message="You'll keep Pro until the end of the period you've paid for. After that, AI replies, chat, offers, the SEO check and automatic follow-ups pause. Your leads and settings stay."
         confirmText="Cancel plan"
         cancelText="Keep Pro"
         isLoading={cancel.isPending}

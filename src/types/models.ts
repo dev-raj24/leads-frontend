@@ -224,6 +224,33 @@ export interface Tenant {
   createdAt: string;
 }
 
+export interface ChatDesign {
+  title: string;
+  subtitle: string;
+  greeting: string;
+  color: string;
+  position: "right" | "left";
+  launcher: "icon" | "label";
+  launcherLabel: string;
+  fontFamily: "system" | "inherit";
+  radius: "rounded" | "square";
+  customCss: string;
+}
+
+export interface ChatConversation {
+  leadId: string;
+  name: string | null;
+  contact: string | null;
+  isLead: boolean;
+  status: string;
+  messageCount: number;
+  lastMessage: string;
+  lastMessageAt: string;
+  lastFrom: "visitor" | "ai" | "team";
+  needsReply: boolean;
+  createdAt: string;
+}
+
 export interface LeadEvent {
   id: string;
   type: string;
@@ -236,7 +263,8 @@ export interface PlanDef {
   name: string;
   priceInr: number;
   leadsPerMonth: number;
-  features: { aiReply: boolean; offers: boolean; blog: boolean; autoFollowup: boolean };
+  aiChatMessagesPerMonth: number;
+  features: { aiReply: boolean; chatWidget: boolean; offers: boolean; blog: boolean; autoFollowup: boolean };
 }
 
 export interface Usage {
@@ -255,6 +283,20 @@ export interface BillingOverview {
   billingConfigured: boolean;
   usage: Usage;
   plans: PlanDef[];
+}
+
+export interface InstallStatus {
+  installed: boolean;
+  lastSeenAt: string | null;
+  lastSeenHost: string | null;
+  blocked: Array<{ host: string; kind: string; lastAt: string; count: number }>;
+}
+
+export interface SeoAppliedFix {
+  path: string;
+  pageUrl: string;
+  updatedAt: string;
+  data: { title?: string; description?: string; canonical?: string; lang?: string; jsonLd?: Record<string, unknown>; alts?: Array<{ src: string; alt: string }> };
 }
 
 export interface SeoIssue {
@@ -350,6 +392,8 @@ export interface SiteInspection {
   url: string;
   reachable: boolean;
   status: number;
+  scriptFound: boolean;
+  keyMatches: boolean;
   jsRendered: boolean;
   pagesRead: number;
   draft: BusinessProfile | null;

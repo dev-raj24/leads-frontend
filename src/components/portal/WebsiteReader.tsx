@@ -43,6 +43,15 @@ export function WebsiteReader({ initialUrl }: { initialUrl: string }) {
 
       {result?.reachable && (
         <>
+          <div className="module-d">
+            {result.scriptFound && result.keyMatches ? (
+              <><span className="pp w" style={{ marginRight: 8 }}>● INSTALLED</span>Your Leadworks script is on this website and is using your key.</>
+            ) : result.scriptFound ? (
+              <><span className="pp r" style={{ marginRight: 8 }}>WRONG KEY</span>A Leadworks script is on this site, but with a different key. Copy the snippet from this page again.</>
+            ) : (
+              <><span className="pp c" style={{ marginRight: 8 }}>NOT FOUND</span>We could not see the Leadworks script on this page. Paste the snippet below before &lt;/body&gt; on every page.</>
+            )}
+          </div>
           {result.jsRendered && (
             <p className="hint" style={{ margin: 0 }}>This site builds its pages in the browser, so we could read very little of it.</p>
           )}
