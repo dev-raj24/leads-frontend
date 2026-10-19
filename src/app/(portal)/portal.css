@@ -951,6 +951,13 @@ a.tr:hover {
   color: var(--ink);
 }
 
+/* ---- review star rating -------------------------------------------------- */
+.rv-stars {
+  display: inline-flex;
+  gap: 2px;
+  color: #e3a008;
+}
+
 /* ---- opening hours picker (Google-style row) ---------------------------- */
 .hrs {
   display: flex;

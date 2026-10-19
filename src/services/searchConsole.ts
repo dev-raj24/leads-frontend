@@ -1,7 +1,7 @@
 import { callApi } from "@/utils/apiUtils";
 import endpoints from "@/utils/apiUtils/endpoints/searchConsole";
 import { ApiEndpoint } from "@/types/api";
-import type { SearchConsoleStatus, SearchPerformance } from "@/types/models";
+import type { RankTrendKeyword, SearchConsoleStatus, SearchPerformance } from "@/types/models";
 
 const ep = (key: keyof typeof endpoints) => ({ ...endpoints[key].v1 }) as ApiEndpoint;
 
@@ -27,4 +27,8 @@ export async function fetchScPerformanceService(days: number, refresh = false): 
 
 export async function disconnectScService(): Promise<{ status: SearchConsoleStatus }> {
   return callApi({ uriEndPoint: ep("disconnect") });
+}
+
+export async function fetchScRankTrendService(days: number): Promise<{ keywords: RankTrendKeyword[] }> {
+  return callApi({ uriEndPoint: ep("trend"), query: { days } });
 }
