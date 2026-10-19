@@ -16,6 +16,9 @@ const searchConsole = {
   performance: {
     v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/search-console/performance" },
   },
+  trend: {
+    v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/search-console/rankings/trend" },
+  },
   disconnect: {
     v1: { ...defaults.methods.DELETE, ...defaults.versions.v1, uri: "/search-console" },
   },

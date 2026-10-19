@@ -52,6 +52,7 @@ export function Sidebar({ open, onNavigate, user }: { open: boolean; onNavigate:
         { href: "/blog", label: "AI Blog", icon: "blog", tone: "sky" },
         { href: "/ai-widget", label: "Website chat", icon: "widget", tone: "lilac" },
         { href: "/seo", label: "SEO check", icon: "seo", tone: "mint" },
+        { href: "/reviews", label: "Reviews", icon: "reviews", tone: "butter" },
       ],
     },
     {

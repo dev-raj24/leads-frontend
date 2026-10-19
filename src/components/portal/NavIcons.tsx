@@ -9,6 +9,7 @@ export type NavIconName =
   | "offers"
   | "blog"
   | "seo"
+  | "reviews"
   | "widget"
   | "settings"
   | "account";
@@ -93,6 +94,12 @@ export function NavIcon({ name, size = 20 }: { name: NavIconName; size?: number 
           <circle cx="10.5" cy="10.5" r="6.5" {...tint} />
           <path d="M15.5 15.5L20.5 20.5" />
           <path d="M7.8 11.6l1.8-2.2 1.4 1.4 2-2.6" />
+        </svg>
+      );
+    case "reviews":
+      return (
+        <svg {...p}>
+          <path d="M12 3.8l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16l-4.8 2.7.9-5.4-3.9-3.8 5.4-.8z" {...tint} />
         </svg>
       );
     case "widget":

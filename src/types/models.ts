@@ -388,6 +388,44 @@ export interface SearchPerformance {
   pages: Array<SearchMetrics & { page: string }>;
 }
 
+export interface RankTrendKeyword {
+  query: string;
+  points: Array<{ date: string; position: number; clicks: number; impressions: number }>;
+  earliest: number;
+  latest: number;
+  change: number;
+}
+
+export type ReviewStatus = "pending" | "sent" | "skipped";
+
+export interface GoogleReview {
+  id: string;
+  reviewId: string;
+  reviewerName: string | null;
+  rating: number | null;
+  comment: string | null;
+  createTime: string | null;
+  aiDraft: string | null;
+  status: ReviewStatus;
+  sentReply: string | null;
+  sentAt: string | null;
+}
+
+export interface ReviewConnectionStatus {
+  configured: boolean;
+  connected: boolean;
+  email: string | null;
+  locationId: string | null;
+  locationName: string | null;
+  needsReconnect: boolean;
+}
+
+export interface GoogleLocation {
+  accountId: string;
+  locationId: string;
+  title: string;
+}
+
 export interface SiteInspection {
   url: string;
   reachable: boolean;

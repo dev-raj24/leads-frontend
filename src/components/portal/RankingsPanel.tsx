@@ -7,10 +7,10 @@ import { BarChart } from "@/components/ui/BarChart";
 import { Button } from "@/components/ui/Button";
 import { Table, type Column } from "@/components/ui/Table";
 import { useChooseScProperty, useConnectSc, useDisconnectSc, useRefreshScPerformance } from "@/hooks/searchConsole/mutation";
-import { useScPerformance, useScProperties, useScStatus } from "@/hooks/searchConsole/query";
+import { useScPerformance, useScProperties, useScRankTrend, useScStatus } from "@/hooks/searchConsole/query";
 import { apiErrorCode, authErrorMessage } from "@/lib/errors";
 import { timeAgo } from "@/lib/format";
-import type { SearchMetrics } from "@/types/models";
+import type { RankTrendKeyword, SearchMetrics } from "@/types/models";
 
 const RANGES = [7, 28, 90];
 const nf = (n: number) => n.toLocaleString("en-IN");
@@ -38,6 +38,60 @@ function Kpi({ label, value, delta, hint }: { label: string; value: string; delt
 }
 
 const positionLabel = (p: number) => (p <= 3 ? "Top 3" : p <= 10 ? "Page 1" : p <= 20 ? "Page 2" : "Page 3+");
+
+function MovementRow({ keyword }: { keyword: RankTrendKeyword }) {
+  const improved = keyword.change > 0.4;
+  const declined = keyword.change < -0.4;
+  return (
+    <div className="seo-issue">
+      <span className={`pp ${improved ? "w" : declined ? "r" : "n"}`}>
+        {improved ? `UP ${keyword.change.toFixed(1)}` : declined ? `DOWN ${Math.abs(keyword.change).toFixed(1)}` : "STEADY"}
+      </span>
+      <div>
+        <b>{keyword.query}</b>
+        <p>
+          Was {keyword.earliest.toFixed(1)} ({positionLabel(keyword.earliest)}) on {keyword.points[0].date} · now {keyword.latest.toFixed(1)} ({positionLabel(keyword.latest)})
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** How tracked keywords moved over the last N days — the thing an owner actually wants: "are we climbing Google?" */
+function RankMovement({ ready }: { ready: boolean }) {
+  const { data, isLoading } = useScRankTrend(30, ready);
+  const keywords = data?.keywords ?? [];
+  if (!ready || isLoading) return null;
+  if (keywords.length === 0) {
+    return (
+      <div className="pnl pad hint" style={{ marginBottom: 18 }}>
+        Movement over time shows up here once we have a few days of history for your keywords — check back tomorrow.
+      </div>
+    );
+  }
+  const improving = keywords.filter((k) => k.change > 0.4);
+  const slipping = [...keywords].filter((k) => k.change < -0.4).sort((a, b) => a.change - b.change);
+  return (
+    <>
+      <div className="sec-t">Climbing Google (last 30 days)</div>
+      <div className="pnl pad" style={{ marginBottom: 18 }}>
+        {improving.length === 0 ? (
+          <p className="hint">No keyword has moved up yet. Fixing SEO issues and getting more clicks helps this over a few weeks.</p>
+        ) : (
+          improving.slice(0, 8).map((k) => <MovementRow key={k.query} keyword={k} />)
+        )}
+      </div>
+      {slipping.length > 0 && (
+        <>
+          <div className="sec-t">Slipping</div>
+          <div className="pnl pad" style={{ marginBottom: 18 }}>
+            {slipping.slice(0, 6).map((k) => <MovementRow key={k.query} keyword={k} />)}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
 
 export function RankingsPanel({ justConnected, returnedError }: { justConnected: boolean; returnedError: string | null }) {
   const { data: statusData, isLoading } = useScStatus();
@@ -170,6 +224,8 @@ export function RankingsPanel({ justConnected, returnedError }: { justConnected:
                   </div>
                 </>
               )}
+
+              <RankMovement ready={ready} />
 
               <div className="sec-t">What people searched</div>
               {perf.queries.length === 0 ? (
