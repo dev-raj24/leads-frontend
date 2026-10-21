@@ -18,7 +18,7 @@ export async function fetchReviewLocationsService(): Promise<{ locations: Google
 }
 
 export async function chooseReviewLocationService(location: GoogleLocation): Promise<{ status: ReviewConnectionStatus }> {
-  return callApi({ uriEndPoint: ep("choose"), body: { accountId: location.accountId, locationId: location.locationId, title: location.title } });
+  return callApi({ uriEndPoint: ep("choose"), body: { accountId: location.accountId, locationId: location.locationId } });
 }
 
 export async function fetchReviewsService(): Promise<{ reviews: GoogleReview[] }> {
