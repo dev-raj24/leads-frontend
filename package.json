@@ -1,0 +1,37 @@
+{
+  "name": "leadworks-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "security-check": "node scripts/security-check.js",
+    "prebuild": "node scripts/security-check.js",
+    "predev": "node scripts/security-check.js",
+    "dev": "node init && next dev",
+    "build": "node init && next build",
+    "start": "node init && next start"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.4",
+    "axios": "^1.20.0",
+    "next": "^15.5.28",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-hook-form": "^7.89.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.15",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "^10.4.18",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "5.5.4"
+  },
+  "resolutions": {
+    "postcss": "^8.5.23",
+    "sharp": "^0.35.5",
+    "follow-redirects": "^1.16.1",
+    "source-map-js": "^1.2.2",
+    "postcss-selector-parser": "^7.1.7"
+  }
+}
