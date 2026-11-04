@@ -281,7 +281,7 @@ function OfferForm() {
             <>
               <CodeSnippet code={embedCode} />
               <p className="hint">
-                Paste this where you want the offer {isForm ? "form" : "card"} to appear. It needs your Leadworks snippet on the page (Settings → Website snippet). Leave the value empty — <code>data-leadworks-offer</code> — to always show your newest live offer.
+                Paste this where you want the offer {isForm ? "form" : "card"} to appear on a page (Settings → optional advanced section). Your offer already floats automatically without this — only use it if you want one pinned inside a specific page. Leave the value empty — <code>data-leadworks-offer</code> — to always show your newest live offer.
               </p>
             </>
           ) : (

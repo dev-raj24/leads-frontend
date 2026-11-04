@@ -143,10 +143,13 @@ export function InstallGuide({ apiKey, isPro }: { apiKey: string; isPro: boolean
   return (
     <div className="pnl pad" style={{ display: "grid", gap: 20 }}>
       <div>
-        <div className="module-t">One code for everything</div>
+        <div className="module-t">One-time setup, no tech skills needed</div>
         <p className="module-d" style={{ margin: "6px 0 0" }}>
-          You paste one small piece of code on your website, one time. After that you never touch the site again. Chat, offers, blog and the enquiry form
+          One small piece of code goes on your website, one time. After that you never touch the site again. Chat, offers, blog and the enquiry form
           are all switched on and off from this dashboard, and your plan decides which of them show.
+        </p>
+        <p className="module-d" style={{ margin: "10px 0 0", padding: "10px 12px", background: "var(--bg)", borderRadius: 10 }}>
+          <b>Don&apos;t want to do this yourself?</b> Press &quot;Copy a message for my developer&quot; below and send it to whoever built your website, on WhatsApp or email — it has everything they need.
         </p>
       </div>
 

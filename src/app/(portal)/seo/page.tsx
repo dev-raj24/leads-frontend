@@ -118,19 +118,19 @@ function ApplyBox({ auditId, page, pack, applied }: { auditId: string; page: Seo
   return (
     <div className="seo-apply">
       <div className="seo-fix-h">
-        <b>{applied ? "Live through your script" : "No code? Let your script put these on the page"}</b>
+        <b>{applied ? "Live through your website connection" : "No developer? Leadworks can put these on the page"}</b>
         <small>{parts.join(", ")}</small>
       </div>
       <p className="hint" style={{ margin: "0 0 10px" }}>
         {applied
-          ? `Your script now sets these on ${path} every time it opens.`
-          : "Your Leadworks script is already on your site, so it can set these when the page opens. Nothing in your site's code changes."}
+          ? `This now sets these on ${path} every time it opens.`
+          : "Leadworks is already connected to your site, so it can set these when the page opens. Nothing in your site's code changes."}
         {" "}It runs in the visitor&apos;s browser: Google usually reads it, but link previews and some search engines do not. A change in your site&apos;s own code is more reliable.
       </p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
         {!applied ? (
           <Button size="sm" loading={apply.isPending} loadingText="Applying…" onClick={() => apply.mutate({ id: auditId, url: page.url })}>
-            Put these on my page with the script
+            Put these on my page automatically
           </Button>
         ) : (
           <>
@@ -160,7 +160,7 @@ function PageCard({ page, auditId, pack, applied, writing, onWrite }: { page: Se
         <span className={`seo-dot ${tone(page.score)}`}>{page.score}</span>
         <span className="seo-page-t">
           <strong>{page.title || path}</strong>
-          <small>{path} · {page.issues.length === 0 ? "no problems" : `${page.issues.length} to look at`}{pack ? " · fixes ready" : ""}{applied ? " · live via script" : ""}</small>
+          <small>{path} · {page.issues.length === 0 ? "no problems" : `${page.issues.length} to look at`}{pack ? " · fixes ready" : ""}{applied ? " · live automatically" : ""}</small>
         </span>
         <span aria-hidden>{open ? "−" : "+"}</span>
       </button>

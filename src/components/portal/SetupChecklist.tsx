@@ -23,7 +23,7 @@ export function SetupChecklist() {
   const steps = [
     { done: verified, title: "Confirm your email", note: "So new-lead alerts reach you.", href: "/account", cta: "Open account" },
     { done: profileReady(profile), title: "Tell us about your business", note: "Hours, services and prices. This is what the AI answers from.", href: "/settings", cta: "Add details" },
-    { done: !!install?.status.installed, title: "Put the script on your website", note: "One snippet before </body>. We'll tick this when we see it.", href: "/settings", cta: "Get the snippet" },
+    { done: !!install?.status.installed, title: "Connect your website", note: "A 2-minute one-time setup. No tech skills needed — we'll tick this off automatically once it's live.", href: "/settings", cta: "Connect now" },
     { done: (leads?.leads.length ?? 0) > 0, title: "Receive your first lead", note: "Submit your own form once to see the alert and the inbox work.", href: "/leads", cta: "Open leads" },
   ];
 

@@ -88,7 +88,7 @@ export default function AiWidgetPage() {
       <PageHead
         eyebrow="Module"
         title={<>Website <em>chat</em></>}
-        sub="Make the chat look like your brand, then add the script or share the chat link. Conversations are in Chats."
+        sub="Make the chat look like your brand, turn it on in Settings, or share the chat link. Conversations are in Chats."
         actions={
           <>
             <Button href="/chats" variant="secondary" size="sm">Open chats</Button>
@@ -122,7 +122,7 @@ export default function AiWidgetPage() {
         <div className="pnl pad" style={{ maxWidth: 760 }}>
           <div className="sec-t" style={{ marginTop: 0 }}>Your chat link</div>
           <CodeSnippet code={site ? pageLink(`/c/${site.apiKey}`) : "Loading…"} />
-          <p className="hint">Put this link in your Instagram bio, WhatsApp status or business profile, or behind a &ldquo;Chat with us&rdquo; button on your website. No script or install needed.</p>
+          <p className="hint">Put this link in your Instagram bio, WhatsApp status or business profile, or behind a &ldquo;Chat with us&rdquo; button on your website. Nothing to install.</p>
         </div>
       )}
     </>
