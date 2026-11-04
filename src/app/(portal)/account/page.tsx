@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { IconCard, IconCheck, IconLock } from "@/components/icons";
 import { PageHead } from "@/components/portal/PageHead";
 import { Button } from "@/components/ui/Button";
+import { PasswordField } from "@/components/ui/PasswordField";
 import { PLANS } from "@/config/plans";
 import { useChangeEmail, useChangePassword, useLogoutAll } from "@/hooks/auth/mutation";
 import { useUpdateTenantName } from "@/hooks/tenant/mutation";
@@ -135,10 +136,9 @@ function ProfileTab({ user, onUserChange }: { user: AuthUser | null; onUserChang
             </div>
             <div className="field">
               <label className="flabel" htmlFor="account-email-pw">Current password</label>
-              <input
+              <PasswordField
                 id="account-email-pw"
                 className="finput"
-                type="password"
                 placeholder="Confirm with your current password"
                 autoComplete="current-password"
                 value={emailPassword}
@@ -293,10 +293,9 @@ function PasswordTab() {
       <form onSubmit={submitPassword} className="acct-pw-form">
         <div className="field">
           <label className="flabel" htmlFor="cur-password">Current password</label>
-          <input
+          <PasswordField
             id="cur-password"
             className="finput"
-            type="password"
             autoComplete="current-password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -305,10 +304,9 @@ function PasswordTab() {
         </div>
         <div className="field">
           <label className="flabel" htmlFor="new-password">New password</label>
-          <input
+          <PasswordField
             id="new-password"
             className="finput"
-            type="password"
             autoComplete="new-password"
             minLength={8}
             maxLength={72}
@@ -320,10 +318,9 @@ function PasswordTab() {
         </div>
         <div className="field">
           <label className="flabel" htmlFor="confirm-password">Confirm new password</label>
-          <input
+          <PasswordField
             id="confirm-password"
             className="finput"
-            type="password"
             autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}

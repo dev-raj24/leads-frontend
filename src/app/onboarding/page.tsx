@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
+import { PasswordField } from "@/components/ui/PasswordField";
 import { useSignup } from "@/hooks/auth/mutation";
 import { authErrorMessage } from "@/lib/errors";
 
@@ -71,10 +72,9 @@ export default function OnboardingPage() {
         </div>
         <div className="field">
           <label className="flabel" htmlFor="password">Password</label>
-          <input
+          <PasswordField
             id="password"
             className={`finput ${errors.password ? "err" : ""}`}
-            type="password"
             autoComplete="new-password"
             placeholder="At least 8 characters"
             aria-invalid={!!errors.password}

@@ -189,6 +189,29 @@ button:disabled {
 .finput.err {
   border-color: var(--red);
 }
+.pw-eye {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 0 14px 14px 0;
+}
+.pw-eye:hover {
+  color: var(--ink);
+}
+.pw-eye:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
 .finput.err:focus {
   box-shadow: 0 0 0 4px rgba(229, 72, 77, 0.16);
 }

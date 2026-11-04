@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
+import { PasswordField } from "@/components/ui/PasswordField";
 import { useLogin } from "@/hooks/auth/mutation";
 import { authErrorMessage } from "@/lib/errors";
 
@@ -59,10 +60,9 @@ export default function LoginPage() {
             <label className="flabel" htmlFor="password">Password</label>
             <Link href="/forgot-password" style={{ fontSize: 12.5, fontWeight: 600, color: "var(--primary)" }}>Forgot password?</Link>
           </div>
-          <input
+          <PasswordField
             id="password"
             className={`finput ${errors.password ? "err" : ""}`}
-            type="password"
             autoComplete="current-password"
             placeholder="••••••••"
             aria-invalid={!!errors.password}

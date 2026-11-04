@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthShell } from "@/components/AuthShell";
+import { PasswordField } from "@/components/ui/PasswordField";
 import { useResetPassword } from "@/hooks/auth/mutation";
 import { authErrorMessage } from "@/lib/errors";
 
@@ -46,10 +47,9 @@ function ResetPasswordForm() {
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div className="field">
           <label className="flabel" htmlFor="password">New password</label>
-          <input
+          <PasswordField
             id="password"
             className={`finput ${errors.password ? "err" : ""}`}
-            type="password"
             autoComplete="new-password"
             placeholder="At least 8 characters"
             aria-invalid={!!errors.password}

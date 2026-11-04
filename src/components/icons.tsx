@@ -346,6 +346,29 @@ export const IconStar = ({ size, className, style, ...props }: P) => (
     />
   </svg>
 );
+export const IconEye = ({ size, className, style, ...props }: P) => (
+  <svg {...base(size)} className={className} style={style} {...props}>
+    <path
+      d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinejoin="round"
+    />
+    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.7" />
+  </svg>
+);
+export const IconEyeOff = ({ size, className, style, ...props }: P) => (
+  <svg {...base(size)} className={className} style={style} {...props}>
+    <path
+      d="M3.5 3.5l17 17M9.9 5.3A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a16.4 16.4 0 0 1-3.2 4.1M6.5 6.9A16.6 16.6 0 0 0 2 12s3.6 7 10 7a9.9 9.9 0 0 0 3.6-.7"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path d="M9.9 10a3 3 0 0 0 4.2 4.2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 export const IconTrash = ({ size, className, style, ...props }: P) => (
   <svg {...base(size)} className={className} style={style} {...props}>
     <path
