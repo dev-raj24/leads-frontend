@@ -414,16 +414,16 @@ export interface GoogleReview {
 export interface ReviewConnectionStatus {
   configured: boolean;
   connected: boolean;
-  email: string | null;
-  locationId: string | null;
-  locationName: string | null;
-  needsReconnect: boolean;
+  businessName: string | null;
+  address: string | null;
 }
 
-export interface GoogleLocation {
-  accountId: string;
-  locationId: string;
+export interface BusinessMatch {
+  dataId: string;
   title: string;
+  address: string | null;
+  rating: number | null;
+  reviewCount: number | null;
 }
 
 export interface SiteInspection {

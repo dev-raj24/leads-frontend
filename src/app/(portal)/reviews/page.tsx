@@ -1,21 +1,20 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { IconChart, IconRefresh, IconSparkle, IconStar } from "@/components/icons";
+import { useState } from "react";
+import { IconChart, IconRefresh, IconSearch, IconSparkle, IconStar } from "@/components/icons";
 import { EmptyState } from "@/components/portal/EmptyState";
 import { PageHead } from "@/components/portal/PageHead";
 import { Button } from "@/components/ui/Button";
 import {
-  useChooseReviewLocation,
-  useConnectReviews,
+  useChooseBusiness,
+  useCopyReviewReply,
   useDisconnectReviews,
   useRegenerateReviewDraft,
-  useSendReviewReply,
+  useSearchBusiness,
   useSkipReview,
   useSyncReviews,
 } from "@/hooks/reviews/mutation";
-import { useReviewLocations, useReviewStatus, useReviews } from "@/hooks/reviews/query";
+import { useReviewStatus, useReviews } from "@/hooks/reviews/query";
 import { useTenant } from "@/hooks/tenant/query";
 import { authErrorMessage } from "@/lib/errors";
 import { timeAgo } from "@/lib/format";
@@ -40,11 +39,18 @@ function Stars({ rating }: { rating: number | null }) {
 
 function ReviewCard({ review }: { review: GoogleReview }) {
   const [text, setText] = useState(review.aiDraft ?? "");
+  const [copied, setCopied] = useState(false);
   const regenerate = useRegenerateReviewDraft();
-  const send = useSendReviewReply();
+  const copy = useCopyReviewReply();
   const skip = useSkipReview();
   const pending = review.status === "pending";
-  const busy = regenerate.isPending || send.isPending || skip.isPending;
+  const busy = regenerate.isPending || copy.isPending || skip.isPending;
+
+  function doCopy() {
+    navigator.clipboard?.writeText(text);
+    setCopied(true);
+    copy.mutate({ id: review.id, text: text.trim() }, { onSettled: () => setTimeout(() => setCopied(false), 1800) });
+  }
 
   return (
     <div className="pnl pad" style={{ marginBottom: 14 }}>
@@ -55,7 +61,7 @@ function ReviewCard({ review }: { review: GoogleReview }) {
         </div>
         <div style={{ textAlign: "right" }}>
           <span className={`pp ${review.status === "sent" ? "w" : review.status === "skipped" ? "n" : "p"}`}>
-            {review.status === "sent" ? "REPLIED" : review.status === "skipped" ? "SKIPPED" : "NEEDS A REPLY"}
+            {review.status === "sent" ? "COPIED" : review.status === "skipped" ? "SKIPPED" : "NEEDS A REPLY"}
           </span>
           <div className="hint" style={{ marginTop: 4 }}>{ago(review.createTime)}</div>
         </div>
@@ -64,13 +70,13 @@ function ReviewCard({ review }: { review: GoogleReview }) {
       {review.comment && <p style={{ margin: "0 0 12px" }}>&ldquo;{review.comment}&rdquo;</p>}
 
       {review.status === "sent" && review.sentReply && (
-        <div className="fu-draft"><span>Your reply: &ldquo;{review.sentReply}&rdquo;</span></div>
+        <div className="fu-draft"><span>What you copied: &ldquo;{review.sentReply}&rdquo;</span></div>
       )}
 
       {pending && (
         <>
           <div className="field">
-            <label className="flabel" htmlFor={`rv-${review.id}`}>Reply (AI-drafted — read it before sending)</label>
+            <label className="flabel" htmlFor={`rv-${review.id}`}>Reply (AI-drafted — read it before copying)</label>
             <textarea
               id={`rv-${review.id}`}
               className="finput"
@@ -81,7 +87,6 @@ function ReviewCard({ review }: { review: GoogleReview }) {
             />
           </div>
           {regenerate.isError && <p className="hint" style={{ color: "var(--red)", margin: "0 0 8px" }}>{authErrorMessage(regenerate.error)}</p>}
-          {send.isError && <p className="hint" style={{ color: "var(--red)", margin: "0 0 8px" }}>{authErrorMessage(send.error)}</p>}
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Button
               size="sm"
@@ -94,19 +99,16 @@ function ReviewCard({ review }: { review: GoogleReview }) {
             >
               {text ? "Redraft with AI" : "Draft with AI"}
             </Button>
-            <Button
-              size="sm"
-              disabled={busy || !text.trim()}
-              loading={send.isPending}
-              loadingText="Posting…"
-              onClick={() => send.mutate({ id: review.id, text: text.trim() })}
-            >
-              Send reply to Google
+            <Button size="sm" disabled={busy || !text.trim()} onClick={doCopy}>
+              {copied ? "Copied!" : "Copy reply"}
             </Button>
             <Button size="sm" variant="ghost" disabled={busy} loading={skip.isPending} onClick={() => skip.mutate(review.id)}>
               Skip
             </Button>
           </div>
+          <p className="hint" style={{ margin: "10px 0 0" }}>
+            Copies it, then open the Google Business Profile app (or business.google.com) and paste it as your reply — only the verified owner can post there, so Leadworks can&apos;t do that last step for you.
+          </p>
         </>
       )}
     </div>
@@ -127,7 +129,7 @@ function ReviewsConnected() {
         <span className="hint">{pending.length > 0 ? `${pending.length} ${pending.length === 1 ? "review" : "reviews"} waiting for a reply` : "You're all caught up"}</span>
         <div style={{ display: "flex", gap: 10 }}>
           <Button size="sm" variant="secondary" icon={<IconRefresh size={14} />} loading={sync.isPending} loadingText="Checking…" onClick={() => sync.mutate()}>Check for new reviews</Button>
-          <Button size="sm" variant="ghost" loading={disconnect.isPending} onClick={() => disconnect.mutate()}>Disconnect Google</Button>
+          <Button size="sm" variant="ghost" loading={disconnect.isPending} onClick={() => disconnect.mutate()}>Disconnect</Button>
         </div>
       </div>
 
@@ -152,25 +154,53 @@ function ReviewsConnected() {
   );
 }
 
-function LocationPicker() {
-  const { data, isLoading, error } = useReviewLocations(true);
-  const choose = useChooseReviewLocation();
-  const locations = data?.locations ?? [];
+function BusinessPicker() {
+  const [q, setQ] = useState("");
+  const [searched, setSearched] = useState(false);
+  const search = useSearchBusiness();
+  const choose = useChooseBusiness();
+  const matches = search.data?.matches ?? [];
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!q.trim()) return;
+    setSearched(true);
+    search.mutate(q.trim());
+  }
 
   return (
     <div className="pnl pad">
       <h3 style={{ margin: "0 0 6px" }}>Which business?</h3>
-      <p className="hint" style={{ margin: "0 0 12px" }}>Pick the Google Business Profile listing whose reviews you want to manage here.</p>
-      {isLoading && <p className="hint">Loading your Google Business listings…</p>}
-      {error && <div className="auth-err">{authErrorMessage(error)}</div>}
-      {!isLoading && !error && locations.length === 0 && (
-        <p className="hint">This Google account has no Business Profile listing. Add and verify one at business.google.com, then reload this page.</p>
+      <p className="hint" style={{ margin: "0 0 14px" }}>
+        Search for your business the way it appears on Google Maps — name plus city works best.
+      </p>
+      <form onSubmit={submit} style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 14 }}>
+        <input className="finput" style={{ flex: 1, minWidth: 220 }} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Smile Dental, Indore" />
+        <Button type="submit" icon={<IconSearch size={14} />} loading={search.isPending} loadingText="Searching…" disabled={!q.trim()}>Search</Button>
+      </form>
+
+      {search.isError && <div className="auth-err" style={{ marginBottom: 12 }}>{authErrorMessage(search.error)}</div>}
+      {searched && !search.isPending && matches.length === 0 && !search.isError && (
+        <p className="hint">No match found on Google Maps. Try just the business name, or add the city.</p>
       )}
+
       <div style={{ display: "grid", gap: 8 }}>
-        {locations.map((loc) => (
-          <Button key={loc.locationId} variant="secondary" disabled={choose.isPending} onClick={() => choose.mutate(loc)}>
-            {loc.title}
-          </Button>
+        {matches.map((m) => (
+          <button
+            key={m.dataId}
+            type="button"
+            className="pnl pad"
+            style={{ textAlign: "left", cursor: "pointer", border: "1px solid var(--line)" }}
+            disabled={choose.isPending}
+            onClick={() => choose.mutate(m)}
+          >
+            <b>{m.title}</b>
+            <div className="hint" style={{ marginTop: 2 }}>
+              {m.address}
+              {m.rating != null && ` · ${m.rating}★`}
+              {m.reviewCount != null && ` (${m.reviewCount} reviews)`}
+            </div>
+          </button>
         ))}
       </div>
       {choose.isError && <div className="auth-err" style={{ marginTop: 12 }}>{authErrorMessage(choose.error)}</div>}
@@ -178,22 +208,18 @@ function LocationPicker() {
   );
 }
 
-function ReviewsTabs() {
-  const params = useSearchParams();
+export default function ReviewsPage() {
   const { data: tenantData } = useTenant();
   const isPro = tenantData?.tenant.plan === "pro";
   const { data: statusData, isLoading } = useReviewStatus();
-  const connect = useConnectReviews();
   const status = statusData?.status;
-  const justConnected = params.get("connected") === "1";
-  const returnedError = params.get("error");
 
   if (tenantData && !isPro) {
     return (
       <>
         <PageHead eyebrow="Reputation" title={<>Google <em>reviews</em></>} sub="See new reviews as they come in and reply with an AI-drafted response you approve." />
         <div className="pnl">
-          <EmptyState icon={<IconChart size={26} />} title="Review replies are a Pro feature" text="Connect your Google Business Profile, get an AI-drafted reply for every new review, and send it with one click after you check it." action={<Button href="/account">View plans</Button>} />
+          <EmptyState icon={<IconChart size={26} />} title="Review replies are a Pro feature" text="See your Google reviews, get an AI-drafted reply for every new one, and copy it across in one click after you check it." action={<Button href="/account">View plans</Button>} />
         </div>
       </>
     );
@@ -201,48 +227,19 @@ function ReviewsTabs() {
 
   if (isLoading || !status) return null;
 
-  const needsLocation = status.connected && !status.locationId && !status.needsReconnect;
-  const reconnect = status.needsReconnect;
-  const ready = status.connected && !!status.locationId && !reconnect;
+  const ready = status.connected;
 
   return (
     <>
-      <PageHead eyebrow="Reputation" title={<>Google <em>reviews</em></>} sub="A reply drafted by AI for every new review — you read it, edit if needed, and send." />
+      <PageHead eyebrow="Reputation" title={<>Google <em>reviews</em></>} sub="A reply drafted by AI for every new review — you read it, edit if needed, and copy it across." />
 
       {!status.configured && (
         <div className="pnl">
-          <EmptyState icon={<IconChart size={26} />} title="Google connection isn't switched on yet" text="This server doesn't have Google sign-in keys. Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to the backend settings, then come back." />
+          <EmptyState icon={<IconChart size={26} />} title="Review lookup isn't switched on yet" text="This server doesn't have a review lookup key set up. Add SERPAPI_KEY to the backend settings, then come back." />
         </div>
       )}
 
-      {status.configured && (
-        <>
-          {justConnected && needsLocation && <div className="notice warn" style={{ marginBottom: 14 }}>Google is connected. Choose which business below.</div>}
-          {returnedError && <div className="state-err" style={{ marginBottom: 14 }}>We couldn&apos;t finish connecting to Google. Please try again.</div>}
-
-          {(!status.connected || reconnect) && (
-            <div className="pnl pad">
-              <h3 style={{ margin: "0 0 6px" }}>{reconnect ? "Connect Google again" : "Connect your Google Business Profile"}</h3>
-              <p className="hint" style={{ margin: "0 0 14px" }}>
-                {reconnect ? "Google access was withdrawn or expired." : "We'll watch for new reviews and draft a reply for each with AI. Nothing posts to Google until you approve it."}
-              </p>
-              <Button loading={connect.isPending} loadingText="Opening Google…" onClick={() => connect.mutate()}>Connect Google Business Profile</Button>
-              {connect.isError && <div className="auth-err" style={{ marginTop: 12 }}>{authErrorMessage(connect.error)}</div>}
-            </div>
-          )}
-
-          {needsLocation && <LocationPicker />}
-          {ready && <ReviewsConnected />}
-        </>
-      )}
+      {status.configured && (!ready ? <BusinessPicker /> : <ReviewsConnected />)}
     </>
-  );
-}
-
-export default function ReviewsPage() {
-  return (
-    <Suspense fallback={null}>
-      <ReviewsTabs />
-    </Suspense>
   );
 }

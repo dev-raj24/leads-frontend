@@ -4,14 +4,11 @@ const reviews = {
   status: {
     v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/reviews/status" },
   },
-  connect: {
-    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/reviews/connect" },
-  },
-  locations: {
-    v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/reviews/locations" },
+  search: {
+    v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/reviews/search" },
   },
   choose: {
-    v1: { ...defaults.methods.PUT, ...defaults.versions.v1, uri: "/reviews/location" },
+    v1: { ...defaults.methods.PUT, ...defaults.versions.v1, uri: "/reviews/business" },
   },
   list: {
     v1: { ...defaults.methods.GET, ...defaults.versions.v1, uri: "/reviews" },
@@ -25,8 +22,8 @@ const reviews = {
   skip: {
     v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/reviews/:id/skip" },
   },
-  send: {
-    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/reviews/:id/send" },
+  copy: {
+    v1: { ...defaults.methods.POST, ...defaults.versions.v1, uri: "/reviews/:id/copy" },
   },
   disconnect: {
     v1: { ...defaults.methods.DELETE, ...defaults.versions.v1, uri: "/reviews" },

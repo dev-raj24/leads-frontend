@@ -1,32 +1,26 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  chooseReviewLocationService,
-  connectReviewsService,
+  chooseBusinessService,
+  copyReviewReplyService,
   disconnectReviewsService,
   regenerateReviewDraftService,
-  sendReviewReplyService,
+  searchBusinessService,
   skipReviewService,
   syncReviewsService,
 } from "@/services/reviews";
-import type { GoogleLocation, GoogleReview } from "@/types/models";
+import type { BusinessMatch, GoogleReview } from "@/types/models";
 
 const patchReview = (queryClient: ReturnType<typeof useQueryClient>, review: GoogleReview) =>
   queryClient.setQueryData<{ reviews: GoogleReview[] } | undefined>(["reviews"], (old) =>
     old ? { reviews: old.reviews.map((r) => (r.id === review.id ? review : r)) } : old
   );
 
-export const useConnectReviews = () =>
-  useMutation({
-    mutationFn: connectReviewsService,
-    onSuccess: (res) => {
-      window.location.href = res.url;
-    },
-  });
+export const useSearchBusiness = () => useMutation({ mutationFn: (q: string) => searchBusinessService(q) });
 
-export const useChooseReviewLocation = () => {
+export const useChooseBusiness = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (location: GoogleLocation) => chooseReviewLocationService(location),
+    mutationFn: (match: BusinessMatch) => chooseBusinessService(match),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["review-status"] });
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
@@ -58,10 +52,10 @@ export const useSkipReview = () => {
   });
 };
 
-export const useSendReviewReply = () => {
+export const useCopyReviewReply = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, text }: { id: string; text: string }) => sendReviewReplyService(id, text),
+    mutationFn: ({ id, text }: { id: string; text: string }) => copyReviewReplyService(id, text),
     onSuccess: (res) => patchReview(queryClient, res.review),
   });
 };
